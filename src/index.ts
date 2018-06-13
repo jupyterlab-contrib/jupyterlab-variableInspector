@@ -55,6 +55,9 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const label = "Open Variable Inspector";
         const namespace = "variableinspector";
         const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
+        console.log("Local path");
+        console.log(app.serviceManager.contents.localPath("Code/git/jupyterlab_variableinspector/src/var_list.py"));
+
 
         /**
          * Create and track a new inspector.
@@ -124,7 +127,7 @@ const consoles: JupyterLabPlugin<void> = {
                 queryCommand: "_var_dic_list()",
                 connector: connector,
                 manager: app.serviceManager.contents,
-                initScriptPath: "BCI_Projects/jupyterlab_variableinspector/src/var_list.py"
+                initScriptPath: "Put the abs path to var_list.py here"
             };
 
             const handler = new VariableInspectionHandler( options );
@@ -177,7 +180,7 @@ const notebooks: JupyterLabPlugin<void> = {
                 queryCommand: "_var_dic_list()",
                 connector: connector,
                 manager: app.serviceManager.contents,
-                initScriptPath: "BCI_Projects/jupyterlab_variableinspector/src/var_list.py"
+                initScriptPath: "Put the abs path to var_list.py here"
             };
             const handler = new VariableInspectionHandler( options );
 
