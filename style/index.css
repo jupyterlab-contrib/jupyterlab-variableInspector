@@ -1,0 +1,34 @@
+.jp-VarInspector{
+    flex-direction: column;
+    overflow: auto;
+	font-size: var(--jp-ui-font-size1);
+}
+
+
+.jp-VarInspector-table{
+    border-collapse: collapse;
+    margin: auto;
+    width: 100%;
+}
+
+.jp-VarInspector-table td, .jp-VarInspector-table thead{
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.jp-VarInspector-table tr:nth-child(even){
+    background-color: #f2f2f2;
+}
+
+.jp-VarInspector-table tr:hover {background-color: #ddd;}
+
+.jp-VarInspector-table thead{
+    font-weight: bold;
+    text-align: center;
+    height: 50px;
+    background-color: #FFA500;
+    color: white;
+}
+
+
+
