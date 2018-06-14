@@ -23,10 +23,11 @@
 .jp-VarInspector-table tr:hover {background-color: #ddd;}
 
 .jp-VarInspector-table thead{
+	font-size: var(--jp-ui-font-size1);
     font-weight: bold;
     text-align: center;
     height: 50px;
-    background-color: #FFA500;
+    background-color: #f37726;
     color: white;
 }
 

@@ -26,12 +26,19 @@ class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void
      *  Signal is emitted on 'execute_result' from the kernel
      */  
     private _queryResponse = new Signal<this, nbformat.IExecuteResult>( this );
+    
 
     constructor( options: KernelConnector.IOptions ) {
         super();
         this._session = options.session;
     }
 
+    
+    get kerneltype(): string{
+        return this._session.kernel.name;
+    }
+    
+    
     /**
      *  A Promise that is fulfilled when the session associated w/ the connector is ready.
      */      
@@ -67,6 +74,9 @@ class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void
         }
 
         return kernel.ready.then(() => {
+            
+            console.log(kernel.model);
+            
             let future: Kernel.IFuture = kernel.requestExecute( request );
             future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
                 let msgType = msg.header.msg_type;
