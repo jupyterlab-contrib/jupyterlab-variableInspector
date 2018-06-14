@@ -60,8 +60,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const namespace = "variableinspector";
         const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
 
-
-       
+        
         /**
          * Create and track a new inspector.
          */
