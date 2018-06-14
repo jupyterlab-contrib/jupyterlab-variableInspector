@@ -15,7 +15,7 @@ import {
 } from "@jupyterlab/apputils";
 
 import {
-    KernelMessage, ContentsManager
+    KernelMessage
 } from "@jupyterlab/services";
 
 import {
@@ -35,8 +35,7 @@ export
 
     private _connector: KernelConnector;
     private _queryCommand: string;
-    private _initScriptPath: string;
-    private _manager: ContentsManager;
+    private _initScript: string;
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
@@ -44,8 +43,7 @@ export
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
         this._queryCommand = options.queryCommand;
-        this._initScriptPath = options.initScriptPath;
-        this._manager = options.manager;
+        this._initScript = options.initScript;
         this._connector.ready.then(() => {
             this._initOnKernel().then(( msg ) => {
                 this._connector.iopubMessage.connect( this._queryCall );
@@ -99,19 +97,15 @@ export
      * TODO: Use script based on kernel language.
      */
     private _initOnKernel(): Promise<KernelMessage.IExecuteReplyMsg> {
-        return this._manager.get( this._initScriptPath ).then(( result ) => {
-            return result.content;
-        } ).then(( content ) => {
+        let request: KernelMessage.IExecuteRequest = {
+            code: this._initScript,
+            stop_on_error: false,
+            store_history: false,
+        };
 
-            let request: KernelMessage.IExecuteRequest = {
-                code: content,
-                stop_on_error: false,
-                store_history: false,
-            }
-
-            let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request );
-            return reply;
-        } );
+        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request );
+        return reply;
+   
     }
 
 
@@ -161,7 +155,6 @@ namespace VariableInspectionHandler {
         interface IOptions {
         connector: KernelConnector;
         queryCommand: string;
-        initScriptPath: string;
-        manager: ContentsManager;
+        initScript: string;
     }
 }

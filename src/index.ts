@@ -15,6 +15,10 @@ import {
 } from "./manager";
 
 import {
+    Languages
+} from "./inspectorscripts";
+
+import {
     ICommandPalette, InstanceTracker
 } from '@jupyterlab/apputils';
 
@@ -55,10 +59,9 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const label = "Open Variable Inspector";
         const namespace = "variableinspector";
         const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
-        console.log("Local path");
-        console.log(app.serviceManager.contents.localPath("Code/git/jupyterlab_variableinspector/src/var_list.py"));
 
 
+       
         /**
          * Create and track a new inspector.
          */
@@ -76,7 +79,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
 
             //Track the inspector panel
             tracker.add( panel );
-            
+
             return panel;
         }
 
@@ -97,7 +100,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
                 if ( !manager.panel.isAttached ) {
                     app.shell.addToMainArea( manager.panel );
                 }
-                if(manager.source){
+                if ( manager.source ) {
                     manager.source.performInspection();
                 }
                 app.shell.activateById( manager.panel.id );
@@ -117,28 +120,43 @@ const consoles: JupyterLabPlugin<void> = {
     autoStart: true,
     activate: ( app: JupyterLab, manager: IVariableInspector, consoles: IConsoleTracker ): void => {
 
+
+
         const handlers: { [id: string]: VariableInspectionHandler } = {};
 
         consoles.widgetAdded.connect(( sender, consolePanel ) => {
 
-            const session = consolePanel.console.session;       
-            const connector = new KernelConnector( { session } );
-            const options: VariableInspectionHandler.IOptions = {
-                queryCommand: "_var_dic_list()",
-                connector: connector,
-                manager: app.serviceManager.contents,
-                initScriptPath: "Put the abs path to var_list.py here"
-            };
+            // Get the kernel type and create a new handler if a script exists for that type of kernel.
+            let scripts: Promise<Languages.LanguageModel> = Languages.getScript( "python3" );
+            scripts.then(( result: Languages.LanguageModel ) => {
+                let initScript = result.initScript;
+                let queryCommand = result.queryCommand;
 
-            const handler = new VariableInspectionHandler( options );
+                const session = consolePanel.console.session;
+                const connector = new KernelConnector( { session } );
 
-            handlers[consolePanel.id] = handler;
 
-            consolePanel.disposed.connect(() => {
-                delete handlers[consolePanel.id];
-                handler.dispose();
+                const options: VariableInspectionHandler.IOptions = {
+                    queryCommand: queryCommand,
+                    connector: connector,
+                    initScript: initScript
+                };
+
+                const handler = new VariableInspectionHandler( options );
+
+                handlers[consolePanel.id] = handler;
+
+                consolePanel.disposed.connect(() => {
+                    delete handlers[consolePanel.id];
+                    handler.dispose();
+                } );
+
             } );
-           
+
+            scripts.catch(( result: string ) => {
+                console.log( result );
+                return;
+            } );
         } );
 
         app.shell.currentChanged.connect(( sender, args ) => {
@@ -150,13 +168,18 @@ const consoles: JupyterLabPlugin<void> = {
             let source = handlers[widget.id];
             if ( source ) {
                 manager.source = source;
+                manager.source.performInspection();
             }
         } );
 
+        //Otherwise log error message.
         app.contextMenu.addItem( {
             command: CommandIDs.open,
             selector: ".jp-CodeConsole"
         } );
+
+
+
     }
 }
 
@@ -169,29 +192,44 @@ const notebooks: JupyterLabPlugin<void> = {
     autoStart: true,
     activate: ( app: JupyterLab, manager: IVariableInspector, notebooks: INotebookTracker ): void => {
 
-
         const handlers: { [id: string]: VariableInspectionHandler } = {};
 
-        notebooks.widgetAdded.connect(( sender, nbPanel : NotebookPanel ) => {
+        /**
+         * Watch for new notebook instances
+         */
+        notebooks.widgetAdded.connect(( sender, nbPanel: NotebookPanel ) => {
 
             const session = nbPanel.session;
             const connector = new KernelConnector( { session } );
-            const options: VariableInspectionHandler.IOptions = {
-                queryCommand: "_var_dic_list()",
-                connector: connector,
-                manager: app.serviceManager.contents,
-                initScriptPath: "Put the abs path to var_list.py here"
-            };
-            const handler = new VariableInspectionHandler( options );
+            connector.ready.then(() => {
 
-            handlers[nbPanel.id] = handler;
+                // Get the kernel type and create a new handler if a script exists for that type of kernel.
+                let kerneltype: string = connector.kerneltype;
+                let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
+                scripts.then(( result: Languages.LanguageModel ) => {
+                    let initScript = result.initScript;
+                    let queryCommand = result.queryCommand;
 
-            nbPanel.disposed.connect(() => {
-                delete handlers[nbPanel.id];
-                handler.dispose();
+                    const options: VariableInspectionHandler.IOptions = {
+                        queryCommand: queryCommand,
+                        connector: connector,
+                        initScript: initScript
+                    };
+                    const handler = new VariableInspectionHandler( options );
+
+                    handlers[nbPanel.id] = handler;
+
+                    nbPanel.disposed.connect(() => {
+                        delete handlers[nbPanel.id];
+                        handler.dispose();
+                    } );
+                } );
+
+                //Otherwise log error message.
+                scripts.catch(( result: string ) => {
+                    console.log( result );
+                } )
             } );
-           
-
         } );
 
         app.shell.currentChanged.connect(( sender, args ) => {
@@ -202,6 +240,8 @@ const notebooks: JupyterLabPlugin<void> = {
             let source = handlers[widget.id];
             if ( source ) {
                 manager.source = source;
+                manager.source.performInspection();
+
 
             }
         } );

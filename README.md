@@ -9,7 +9,9 @@ This project is based on the [variable inspector extension for jupyter notebooks
 For the time being, this project is still in its first steps. Contributions in any form are very welcome!
 
 ## Features
+![Demogif](early_demo.gif)
 - Allows inspection of variables for both python consoles and python notebooks
+
 
 ## Prerequisites
 
