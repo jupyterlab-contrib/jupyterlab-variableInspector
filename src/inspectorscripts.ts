@@ -53,8 +53,7 @@ def _var_dic_list():\n
     types_to_exclude = ['module', 'function', 'builtin_function_or_method','instance', '_Feature', 'type', 'ufunc']\n
     values = _nms.who_ls()\n
     vardic = [{'varName': v, 'varType': type(eval(v)).__name__, 'varSize': str(_getsizeof(eval(v))), 'varShape': str(_getshapeof(eval(v))) if _getshapeof(eval(v)) else '', 'varContent': str(eval(v))[:200]}  # noqa\n
-
-    for v in values if (v not in ['_html', '_nms', 'NamespaceMagics', '_Jupyter']) & (type(eval(v)).__name__ not in types_to_exclude)] # noqa\n
+        for v in values if ((str(eval(v))[0] != "<") or (isinstance(eval(v), str)))] #Prevent showing classes, modules etc.\n
     return json.dumps(vardic)\n
                         `,
                         queryCommand : "_var_dic_list()"},
