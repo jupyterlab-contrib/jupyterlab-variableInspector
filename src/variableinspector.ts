@@ -83,7 +83,7 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
     set source(source: IVariableInspector.IInspectable | null){
         
         if (this._source === source){
-            this._source.performInspection();
+            //this._source.performInspection();
             return;
         }
         //Remove old subscriptions

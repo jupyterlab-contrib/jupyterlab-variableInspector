@@ -39,17 +39,22 @@ export
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
+    private _ready : Promise<void>;
+    
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
         this._queryCommand = options.queryCommand;
         this._initScript = options.initScript;
-        this._connector.ready.then(() => {
-            this._initOnKernel().then(( msg ) => {
-                this._connector.iopubMessage.connect( this._queryCall );
-                this._connector.queryResponse.connect( this._handleQueryResponse );
+        this._ready =  this._connector.ready.then(() => {
+            this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
+            this._connector.iopubMessage.connect( this._queryCall );
+            this._connector.queryResponse.connect( this._handleQueryResponse );
+            return;
+    
             } );
         } );
+        
     }
 
     /**
@@ -61,6 +66,10 @@ export
     
     get isDisposed(): boolean {
         return this._isDisposed;
+    }
+    
+    get ready():Promise<void>{
+        return this._ready;
     }
     
     /**
@@ -115,7 +124,6 @@ export
      * (TODO: query resp. could be forwarded to panel directly)
      */
     private _handleQueryResponse = ( sender: KernelConnector, response: nbformat.IExecuteResult ) => {
-
         let content: string = <string>response.data["text/plain"];
         content = content.replace( /^'|'$/g, '' );
 

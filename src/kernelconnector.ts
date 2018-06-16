@@ -73,10 +73,7 @@ class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
-        return kernel.ready.then(() => {
-            
-            console.log(kernel.model);
-            
+        return kernel.ready.then(() => {                      
             let future: Kernel.IFuture = kernel.requestExecute( request );
             future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
                 let msgType = msg.header.msg_type;
