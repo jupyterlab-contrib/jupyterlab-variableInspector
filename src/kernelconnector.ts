@@ -11,7 +11,7 @@ import {
 } from "@jupyterlab/services";
 
 import {
-    ISignal, Signal
+    ISignal, Signal, Slot
 } from "@phosphor/signaling";
 
 
@@ -22,12 +22,7 @@ export
 class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void, KernelMessage.IExecuteRequest>{
        
     private _session: IClientSession;
-    /**
-     *  Signal is emitted on 'execute_result' from the kernel
-     */  
-    private _queryResponse = new Signal<this, nbformat.IExecuteResult>( this );
-    
-
+   
     constructor( options: KernelConnector.IOptions ) {
         super();
         this._session = options.session;
@@ -53,41 +48,25 @@ class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void
         return this._session.iopubMessage;
     }
     
-    /**
-     * A signal emitted for 'execute_result' messages from the kernel.
-     */
-    get queryResponse(): ISignal<KernelConnector, nbformat.IExecuteResult> {
-        return this._queryResponse;
-    }
+   
 
     /**
      * Executes the given request on the kernel associated with the connector.
      * @param request: IExecuteRequest to forward to the kernel.
      * @returns Promise<KernelMessage.IExecuteReplyMsg>
      */
-    fetch( request: KernelMessage.IExecuteRequest ): Promise<KernelMessage.IExecuteReplyMsg> {
+   fetch( request: KernelMessage.IExecuteRequest, ioCallback: (msg: KernelMessage.IIOPubMessage) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
 
         const kernel = this._session.kernel;
-
         if ( !kernel ) {
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
-        return kernel.ready.then(() => {
-            
-            console.log(kernel.model);
-            
+        return kernel.ready.then(() => {                       
             let future: Kernel.IFuture = kernel.requestExecute( request );
-            future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
-                let msgType = msg.header.msg_type;
-                switch ( msgType ) {
-                    case "execute_result":
-                        this._queryResponse.emit( msg.content as nbformat.IExecuteResult );
-                        break;
-
-                    default:
-                        break;
-                }
+        
+            future.onIOPub = (( msg: KernelMessage.IIOPubMessage ) => {
+               ioCallback(msg);
             } );
             return future.done as Promise<KernelMessage.IExecuteReplyMsg>;
         } );
