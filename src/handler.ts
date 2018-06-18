@@ -125,7 +125,7 @@ export
      */
     private _handleQueryResponse = ( sender: KernelConnector, response: nbformat.IExecuteResult ) => {
         let content: string = <string>response.data["text/plain"];
-        content = content.replace( /^'|'$/g, '' );
+        content = content.replace( /^'|'$/g, '' ).replace(/\\"/g,"\"").replace(/\\'/g,"\'");
 
         let update: IVariableInspector.IVariableInspectorUpdate;
         update = <IVariableInspector.IVariableInspectorUpdate>JSON.parse( content );
