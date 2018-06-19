@@ -10,6 +10,10 @@ import {
    Widget, PanelLayout
 } from '@phosphor/widgets';
 
+import {
+    DataGrid, DataModel
+} from "@phosphor/datagrid";
+
 import '../style/index.css';
 
 
@@ -41,6 +45,7 @@ namespace IVariableInspector{
     interface IInspectable{
         disposed: ISignal<any,void>;
         inspected: ISignal<any, IVariableInspectorUpdate>;
+        datagridSend : ISignal<any,DataModel>;
         performInspection(): void;
     }
     
@@ -66,10 +71,13 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
     
     private _source : IVariableInspector.IInspectable | null = null;
     private _table : HTMLTableElement;
+    private _datagrid : DataGrid | null = null;
+    private _layout_foo : PanelLayout;
+
     
     constructor() {
         super();
-        this.layout = new PanelLayout();
+        this._layout_foo = this.layout = new PanelLayout();
         this.addClass(PANEL_CLASS);
         this._table = Private.createTable();
         this._table.className = TABLE_CLASS;
@@ -89,6 +97,7 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
         //Remove old subscriptions
         if (this._source){
             this._source.inspected.disconnect(this.onInspectorUpdate,this);
+            this._source.datagridSend.disconnect(this.addDataGrid, this);
             this._source.disposed.disconnect(this.onSourceDisposed, this);
         }        
         this._source = source;
@@ -96,6 +105,7 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
         if(this._source){            
             this._source.inspected.connect(this.onInspectorUpdate,this);
             this._source.disposed.connect(this.onSourceDisposed, this);
+            this._source.datagridSend.connect(this.addDataGrid, this);
             this._source.performInspection();
         }  
     }
@@ -110,7 +120,14 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
         this.source = null;
         super.dispose();
     }
-        
+    
+    
+    addDataGrid(model:DataModel):void{
+        this._datagrid = new DataGrid();
+        this._datagrid.model = model;
+        this._layout_foo.addWidget(this._datagrid);
+    }
+    
     
     protected onInspectorUpdate(sender: any, args: IVariableInspector.IVariableInspectorUpdate ):void{
         
@@ -119,6 +136,7 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
         this._table.createTFoot();
+       
         for ( var index = 0; index < args.length; index++ ) {
             row = this._table.tFoot.insertRow();
             let cell = row.insertCell( 0 );

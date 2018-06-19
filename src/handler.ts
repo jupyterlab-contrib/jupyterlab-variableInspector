@@ -27,7 +27,7 @@ import {
 } from "@jupyterlab/coreutils"
 
 import {
-    JSONModel, DataGrid
+    JSONModel, DataModel
 }from "@phosphor/datagrid";
 
 /**
@@ -43,6 +43,8 @@ export
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
+    
+    private _datagridSend = new Signal<this, DataModel>(this);
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
@@ -71,6 +73,11 @@ export
      */
     get inspected(): ISignal<VariableInspectionHandler, IVariableInspector.IVariableInspectorUpdate> {
         return this._inspected;
+    }
+    
+    
+    get datagridSend(): ISignal<VariableInspectionHandler, DataModel>{
+        return this._datagridSend;
     }
     
     /**
@@ -122,7 +129,7 @@ export
             store_history: false,
         };
 
-        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request );
+        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, null );
         return reply;
    
     }
@@ -138,7 +145,7 @@ export
         let msgType = response.header.msg_type;
         switch (msgType){
             case "execute_result":
-                let payload = respose.content as nbformat.IExecuteResult;
+                let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
                 content = content.replace( /^'|'$/g, '' );
     
@@ -158,25 +165,14 @@ export
         switch(msgType){
         case "execute_result":
             let payload = response.content as nbformat.IExecuteResult;
-            let content : string = <sting> payload.data["text/plain"];
+            let content : string = <string> payload.data["text/plain"];
             content = content.replace(/^'|'$/g, "");
             
             let model : JSONModel;
             model = <JSONModel> JSON.parse(content);
+            this._datagridSend.emit(model);
             
             
-            let grid5 = new DataGrid({
-                style: {
-                    ...DataGrid.defaultStyle,
-                    rowBackgroundColor: i => i % 2 === 0 ? 'rgba(138, 172, 200, 0.3)' : '',
-                    columnBackgroundColor: i => i % 2 === 0 ? 'rgba(100, 100, 100, 0.1)' : ''
-                },
-                baseRowSize: 32,
-                baseColumnSize: 128,
-                baseRowHeaderSize: 64,
-                baseColumnHeaderSize: 32
-              });
-            grid5.model = model
             //TODO add response to JSON grid.
             //TODO: How to refresh the datagrid.
             break;

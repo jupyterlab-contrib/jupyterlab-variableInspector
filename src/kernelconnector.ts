@@ -2,16 +2,17 @@ import {
     IClientSession
 } from "@jupyterlab/apputils";
 
+/*
 import {
-    DataConnector, nbformat
+    DataConnector//, nbformat
 } from "@jupyterlab/coreutils";
-
+*/
 import {
     KernelMessage, Kernel
 } from "@jupyterlab/services";
 
 import {
-    ISignal, Signal, Slot
+    ISignal//, Signal, Slot
 } from "@phosphor/signaling";
 
 
@@ -19,12 +20,11 @@ import {
  * Connector class that handles execute request to a kernel
  */ 
 export
-class KernelConnector extends DataConnector<KernelMessage.IExecuteReplyMsg, void, KernelMessage.IExecuteRequest>{
+class KernelConnector{
        
     private _session: IClientSession;
    
     constructor( options: KernelConnector.IOptions ) {
-        super();
         this._session = options.session;
     }
 
