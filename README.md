@@ -24,7 +24,7 @@ Download the repository and build the project with `npm install` and `npm run bu
 
 
 ## TODOs
-- [ ] Load inspection script from relative paths.
+~~- [ ] Load inspection script from relative paths.~~
 - [ ] Add a better presentation (datagrids) for dataframes and ndarrays.
 - [ ] Allow sorting the inspector table.
 - [ ] Add support for other languages.
