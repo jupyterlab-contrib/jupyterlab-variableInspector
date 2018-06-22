@@ -106,6 +106,16 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
             }
         } );
         palette.addItem( { command, category } );
+        
+        let label_1 = "foo";
+        let command_1 = "MTXInspect";
+        app.commands.addCommand(command_1, {
+            label: label_1,
+            execute: () => {
+                manager.source.performMatrixInspection("df");
+            }
+        });
+        palette.addItem({command : command_1, category});
         return manager;
     }
 }
@@ -133,10 +143,11 @@ const consoles: JupyterLabPlugin<void> = {
 
                 const session = consolePanel.console.session;
                 const connector = new KernelConnector( { session } );
-
+                let matrixQueryCommand = result.matrixQueryCommand;
 
                 const options: VariableInspectionHandler.IOptions = {
                     queryCommand: queryCommand,
+                    matrixQueryCommand: matrixQueryCommand,
                     connector: connector,
                     initScript: initScript
                 };
@@ -208,9 +219,11 @@ const notebooks: JupyterLabPlugin<void> = {
                 scripts.then(( result: Languages.LanguageModel ) => {
                     let initScript = result.initScript;
                     let queryCommand = result.queryCommand;
+                    let matrixQueryCommand = result.matrixQueryCommand;
 
                     const options: VariableInspectionHandler.IOptions = {
                         queryCommand: queryCommand,
+                        matrixQueryCommand: matrixQueryCommand,
                         connector: connector,
                         initScript: initScript
                     };

@@ -28,7 +28,7 @@ import {
 
 import {
     JSONModel, DataModel
-}from "@phosphor/datagrid";
+} from "@phosphor/datagrid";
 
 /**
  * An object that handles code inspection.
@@ -39,16 +39,17 @@ export
     private _connector: KernelConnector;
     private _queryCommand: string;
     private _initScript: string;
-    private _matrixQueryCommand : string;
+    private _matrixQueryCommand: string;
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
-    
-    private _datagridSend = new Signal<this, DataModel>(this);
+
+    private _datagridSend = new Signal<this, DataModel>( this );
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
         this._queryCommand = options.queryCommand;
+        this._matrixQueryCommand = options.matrixQueryCommand;
         this._initScript = options.initScript;
         this._connector.ready.then(() => {
             this._initOnKernel().then(( msg ) => {
@@ -63,23 +64,23 @@ export
     get disposed(): ISignal<VariableInspectionHandler, void> {
         return this._disposed;
     }
-    
+
     get isDisposed(): boolean {
         return this._isDisposed;
     }
-    
+
     /**
      * A signal emitted when an inspector value is generated.
      */
     get inspected(): ISignal<VariableInspectionHandler, IVariableInspector.IVariableInspectorUpdate> {
         return this._inspected;
     }
-    
-    
-    get datagridSend(): ISignal<VariableInspectionHandler, DataModel>{
+
+
+    get datagridSend(): ISignal<VariableInspectionHandler, DataModel> {
         return this._datagridSend;
     }
-    
+
     /**
      * Performs an inspection by sending an execute request with the query command to the kernel.
      */
@@ -95,15 +96,67 @@ export
     /**
      * Performs an inspection of the specified matrix.
      */
-    public performMatrixInspection(varName:string):void{
+
+    public performMatrixInspection( varName: string ): Promise<DataModel> {
         let request: KernelMessage.IExecuteRequest = {
-                code: this._matrixQueryCommand + "(" + varName + ")",
-                stop_on_error : false,
-                store_history: false,
+            code: this._matrixQueryCommand + "(" + varName + ")",
+            stop_on_error: false,
+            store_history false,
         };
-        this._connector.fetch(request, this._handleMatrixInspectionResponse );
+        return new Promise( function( resolve, reject ) {
+            this._connector.fetch( request,
+                ( response: KernelMessage.IIOPubMessage ) => {
+                    let msgType = response.header.msg_type;
+                    switch ( msgType ) {
+                        case "execute_result":
+                            let payload = response.content as nbformat.IExecuteResult;
+                            let content: string = <string>payload.data["text/plain"];
+                            let modelOptions = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
+                            let jsonModel = new JSONModel( modelOptions );
+                            resolve( JSONModel );
+                            break;
+                        case "error":
+                            reject( "Kernel error on 'matrixQuery' call!" );
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            );
+        } );
     }
-    
+
+
+    /**
+    public performMatrixInspection( varName: string, responseHandler: ( KernelMessage.IIOPubMessage ) => any ): void {
+        console.log( "Inspecting matrix" )
+        let request: KernelMessage.IExecuteRequest = {
+            code: this._matrixQueryCommand + "(" + varName + ")",
+            stop_on_error: false,
+            store_history: false,
+        };
+        this._connector.fetch( request, ( response: KernelMessage.IIOPubMessage ): void => {
+            let msgType = response.header.msg_type;
+            console.log( response );
+            switch ( msgType ) {
+                case "execute_result":
+                    let payload = response.content as nbformat.IExecuteResult;
+                    console.log( "Building datagrid" );
+                    let content: string = <string>payload.data["text/plain"];
+                    let foo = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
+
+                    let bar = new JSONModel( foo );
+
+                    //TODO add response to JSON grid.
+                    //TODO: How to refresh the datagrid.
+                    break;
+                default:
+                    break;
+            }
+        }
+        );
+    }
+*/
     /*
      * Disposes the kernel connector.
      */
@@ -116,7 +169,7 @@ export
         Signal.clearData( this );
     }
 
-  
+
 
     /**
      * Initializes the kernel by running the set up script located at _initScriptPath.
@@ -129,9 +182,9 @@ export
             store_history: false,
         };
 
-        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, null );
+        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, ( () => { } ) );
         return reply;
-   
+
     }
 
 
@@ -140,56 +193,37 @@ export
      * Handle query response. Emit new signal containing the IVariableInspector.IInspectorUpdate object.
      * (TODO: query resp. could be forwarded to panel directly)
      */
-    private _handleQueryResponse = ( response: KernelMessage.IIOPubMessage ) : void => {
-        
+    private _handleQueryResponse = ( response: KernelMessage.IIOPubMessage ): void => {
         let msgType = response.header.msg_type;
-        switch (msgType){
+        switch ( msgType ) {
             case "execute_result":
                 let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
-                content = content.replace( /^'|'$/g, '' );
-    
+                content = content.replace( /^'|'$/g, '' ).replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+
                 let update: IVariableInspector.IVariableInspectorUpdate;
                 update = <IVariableInspector.IVariableInspectorUpdate>JSON.parse( content );
-    
+
                 this._inspected.emit( update );
                 break;
-             default:
-                 break;     
-        }        
-    };
-    
-    
-    private _handleMatrixInspectionResponse = (response : KernelMessage.IIOPubMessage) : void =>{
-        let msgType = response.header.msg_type;
-        switch(msgType){
-        case "execute_result":
-            let payload = response.content as nbformat.IExecuteResult;
-            let content : string = <string> payload.data["text/plain"];
-            content = content.replace(/^'|'$/g, "");
-            
-            let model : JSONModel;
-            model = <JSONModel> JSON.parse(content);
-            this._datagridSend.emit(model);
-            
-            
-            //TODO add response to JSON grid.
-            //TODO: How to refresh the datagrid.
-            break;
-        default:
-            break;
+            default:
+                break;
         }
     };
 
+
+
+
     /*
      * Invokes a inspection if the signal emitted from specified session is an 'execute_input' msg.
-     */       
+     */
     private _queryCall = ( sess: IClientSession, msg: KernelMessage.IMessage ) => {
         let msgType = msg.header.msg_type;
         switch ( msgType ) {
             case 'execute_input':
                 let code = msg.content.code;
-                if ( !( code == this._queryCommand ) ) {
+                console.log( "code: " + code );
+                if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) ) {
                     this.performInspection();
                 }
                 break;
@@ -213,6 +247,7 @@ namespace VariableInspectionHandler {
         interface IOptions {
         connector: KernelConnector;
         queryCommand: string;
+        matrixQueryCommand: string;
         initScript: string;
     }
 }

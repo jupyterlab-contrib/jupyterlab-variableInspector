@@ -56,13 +56,13 @@ class KernelConnector{
      * @returns Promise<KernelMessage.IExecuteReplyMsg>
      */
    fetch( request: KernelMessage.IExecuteRequest, ioCallback: (msg: KernelMessage.IIOPubMessage) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
-
         const kernel = this._session.kernel;
         if ( !kernel ) {
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
-        return kernel.ready.then(() => {                       
+        return kernel.ready.then(() => {     
+            console.log("Fetching" + request.code);
             let future: Kernel.IFuture = kernel.requestExecute( request );
         
             future.onIOPub = (( msg: KernelMessage.IIOPubMessage ) => {

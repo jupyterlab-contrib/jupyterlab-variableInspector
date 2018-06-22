@@ -7,7 +7,7 @@ import {
   } from '@phosphor/coreutils';
   
 import {
-   Widget, PanelLayout
+   Widget, StackedLayout
 } from '@phosphor/widgets';
 
 import {
@@ -47,6 +47,7 @@ namespace IVariableInspector{
         inspected: ISignal<any, IVariableInspectorUpdate>;
         datagridSend : ISignal<any,DataModel>;
         performInspection(): void;
+        performMatrixInspection(varName:string):void;
     }
     
     export
@@ -60,8 +61,10 @@ namespace IVariableInspector{
         varShape : string;
         varContent : string;
         varType : string;
+        isMatrix : Boolean;
     }
 }
+
 
 /**
  * A panel that renders the variables
@@ -71,17 +74,14 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
     
     private _source : IVariableInspector.IInspectable | null = null;
     private _table : HTMLTableElement;
-    private _datagrid : DataGrid | null = null;
-    private _layout_foo : PanelLayout;
 
     
     constructor() {
         super();
-        this._layout_foo = this.layout = new PanelLayout();
         this.addClass(PANEL_CLASS);
         this._table = Private.createTable();
         this._table.className = TABLE_CLASS;
-        this.node.appendChild(this._table);
+        this.node.appendChild(this._table as HTMLElement);
     }   
     
     get source(): IVariableInspector.IInspectable | null{
@@ -122,10 +122,19 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
     }
     
     
-    addDataGrid(model:DataModel):void{
-        this._datagrid = new DataGrid();
-        this._datagrid.model = model;
-        this._layout_foo.addWidget(this._datagrid);
+    addDataGrid(sender: any, dataModel:DataModel):void{
+        let datagrid =  new DataGrid({
+            baseRowSize: 32,
+            baseColumnSize: 128,
+            baseRowHeaderSize: 64,
+            baseColumnHeaderSize: 32            
+        });
+        datagrid.model = dataModel;
+        datagrid.title.label = "DataGrid";
+        datagrid.title.closable = true;
+        let lout : StackedLayout= <StackedLayout> this.parent.layout;
+        lout.addWidget(datagrid);
+        
     }
     
     
@@ -136,9 +145,16 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
         this._table.createTFoot();
-       
         for ( var index = 0; index < args.length; index++ ) {
             row = this._table.tFoot.insertRow();
+            if(args[index].isMatrix){
+                let name = args[index].varName;
+                row.onclick = ( ev: MouseEvent):any =>{
+                    console.log("clock");
+                    this._source.performMatrixInspection(name);
+                }
+                row.bgColor =  "#78BE20";
+            }
             let cell = row.insertCell( 0 );
             cell.innerHTML = args[index].varName;
             cell = row.insertCell( 1 );
@@ -162,7 +178,9 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
 }
 
 
-namespace Private {
+namespace Private {  
+    
+      
     export
         function createTable(): HTMLTableElement {
         let table = document.createElement( "table" );
