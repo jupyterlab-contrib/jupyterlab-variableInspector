@@ -1,13 +1,13 @@
 import {
-  ISignal
+    ISignal
 } from '@phosphor/signaling';
 
 import {
     Token
-  } from '@phosphor/coreutils';
-  
+} from '@phosphor/coreutils';
+
 import {
-   Widget, StackedLayout
+    Widget, StackedLayout
 } from '@phosphor/widgets';
 
 import {
@@ -24,44 +24,43 @@ const TABLE_CLASS = "jp-VarInspector-table";
  * The inspector panel token.
  */
 export
-const IVariableInspector = new Token<IVariableInspector>("jupyterlab_extension/variableinspector:IVariableInspector");
+    const IVariableInspector = new Token<IVariableInspector>( "jupyterlab_extension/variableinspector:IVariableInspector" );
 
 /**
  * An interface for an inspector.
  */
 export
-interface IVariableInspector{
+    interface IVariableInspector {
     source: IVariableInspector.IInspectable | null;
-    
+
 }
 
 /**
  * A namespace for inspector interfaces.
  */
 export
-namespace IVariableInspector{
-    
+namespace IVariableInspector {
+
     export
-    interface IInspectable{
-        disposed: ISignal<any,void>;
+        interface IInspectable {
+        disposed: ISignal<any, void>;
         inspected: ISignal<any, IVariableInspectorUpdate>;
-        datagridSend : ISignal<any,DataModel>;
         performInspection(): void;
-        performMatrixInspection(varName:string):void;
+        performMatrixInspection( varName: string ): Promise<DataModel>;
     }
-    
+
     export
-    type IVariableInspectorUpdate =  Array<IVariable>;
-    
-    
+        type IVariableInspectorUpdate = Array<IVariable>;
+
+
     export
-    interface IVariable{
-        varName : string;
-        varSize : string;
-        varShape : string;
-        varContent : string;
-        varType : string;
-        isMatrix : Boolean;
+        interface IVariable {
+        varName: string;
+        varSize: string;
+        varShape: string;
+        varContent: string;
+        varType: string;
+        isMatrix: Boolean;
     }
 }
 
@@ -70,90 +69,72 @@ namespace IVariableInspector{
  * A panel that renders the variables
  */
 export
-class VariableInspectorPanel extends Widget implements IVariableInspector{
-    
-    private _source : IVariableInspector.IInspectable | null = null;
-    private _table : HTMLTableElement;
+    class VariableInspectorPanel extends Widget implements IVariableInspector {
 
-    
+    private _source: IVariableInspector.IInspectable | null = null;
+    private _table: HTMLTableElement;
+
+
     constructor() {
         super();
-        this.addClass(PANEL_CLASS);
+        this.addClass( PANEL_CLASS );
         this._table = Private.createTable();
         this._table.className = TABLE_CLASS;
-        this.node.appendChild(this._table as HTMLElement);
-    }   
-    
-    get source(): IVariableInspector.IInspectable | null{
+        this.node.appendChild( this._table as HTMLElement );
+    }
+
+    get source(): IVariableInspector.IInspectable | null {
         return this._source;
     }
-    
-    set source(source: IVariableInspector.IInspectable | null){
-        
-        if (this._source === source){
+
+    set source( source: IVariableInspector.IInspectable | null ) {
+
+        if ( this._source === source ) {
             this._source.performInspection();
             return;
         }
         //Remove old subscriptions
-        if (this._source){
-            this._source.inspected.disconnect(this.onInspectorUpdate,this);
-            this._source.datagridSend.disconnect(this.addDataGrid, this);
-            this._source.disposed.disconnect(this.onSourceDisposed, this);
-        }        
+        if ( this._source ) {
+            this._source.inspected.disconnect( this.onInspectorUpdate, this );
+            this._source.disposed.disconnect( this.onSourceDisposed, this );
+        }
         this._source = source;
         //Subscribe to new object
-        if(this._source){            
-            this._source.inspected.connect(this.onInspectorUpdate,this);
-            this._source.disposed.connect(this.onSourceDisposed, this);
-            this._source.datagridSend.connect(this.addDataGrid, this);
+        if ( this._source ) {
+            this._source.inspected.connect( this.onInspectorUpdate, this );
+            this._source.disposed.connect( this.onSourceDisposed, this );
             this._source.performInspection();
-        }  
+        }
     }
-    
+
     /**
      * Dispose resources
      */
-    dispose():void{
-        if(this.isDisposed){
+    dispose(): void {
+        if ( this.isDisposed ) {
             return;
         }
         this.source = null;
         super.dispose();
     }
-    
-    
-    addDataGrid(sender: any, dataModel:DataModel):void{
-        let datagrid =  new DataGrid({
-            baseRowSize: 32,
-            baseColumnSize: 128,
-            baseRowHeaderSize: 64,
-            baseColumnHeaderSize: 32            
-        });
-        datagrid.model = dataModel;
-        datagrid.title.label = "DataGrid";
-        datagrid.title.closable = true;
-        let lout : StackedLayout= <StackedLayout> this.parent.layout;
-        lout.addWidget(datagrid);
-        
-    }
-    
-    
-    protected onInspectorUpdate(sender: any, args: IVariableInspector.IVariableInspectorUpdate ):void{
-        
-        
+
+    protected onInspectorUpdate( sender: any, args: IVariableInspector.IVariableInspectorUpdate ): void {
+
+
         //Render new variable state
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
         this._table.createTFoot();
         for ( var index = 0; index < args.length; index++ ) {
             row = this._table.tFoot.insertRow();
-            if(args[index].isMatrix){
+            if ( args[index].isMatrix ) {
                 let name = args[index].varName;
-                row.onclick = ( ev: MouseEvent):any =>{
-                    console.log("clock");
-                    this._source.performMatrixInspection(name);
+                row.onclick = ( ev: MouseEvent ): any => {
+                    this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
+                        this._showMatrix( model, name )
+                    } );
                 }
-                row.bgColor =  "#78BE20";
+                row.bgColor = "#e5e5e5";
             }
             let cell = row.insertCell( 0 );
             cell.innerHTML = args[index].varName;
@@ -167,20 +148,37 @@ class VariableInspectorPanel extends Widget implements IVariableInspector{
             cell.innerHTML = args[index].varContent;
         }
     }
-    
+
     /**
      * Handle source disposed signals.
      */
-    protected onSourceDisposed(sender: any, args: void): void {
-      this.source = null;
-    }  
-    
+    protected onSourceDisposed( sender: any, args: void ): void {
+        this.source = null;
+    }
+
+
+
+    private _showMatrix( dataModel: DataModel, name: string ): void {
+        let datagrid = new DataGrid( {
+            baseRowSize: 32,
+            baseColumnSize: 128,
+            baseRowHeaderSize: 64,
+            baseColumnHeaderSize: 32
+        } );
+        datagrid.model = dataModel;
+        datagrid.title.label = "Matrix: " + name;
+        datagrid.title.closable = true;
+        let lout: StackedLayout = <StackedLayout>this.parent.layout;
+        lout.addWidget( datagrid );
+        //Todo activate matrix
+    }
+
 }
 
 
-namespace Private {  
-    
-      
+namespace Private {
+
+
     export
         function createTable(): HTMLTableElement {
         let table = document.createElement( "table" );

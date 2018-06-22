@@ -44,8 +44,6 @@ export
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
 
-    private _datagridSend = new Signal<this, DataModel>( this );
-
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
         this._queryCommand = options.queryCommand;
@@ -76,11 +74,6 @@ export
         return this._inspected;
     }
 
-
-    get datagridSend(): ISignal<VariableInspectionHandler, DataModel> {
-        return this._datagridSend;
-    }
-
     /**
      * Performs an inspection by sending an execute request with the query command to the kernel.
      */
@@ -101,10 +94,11 @@ export
         let request: KernelMessage.IExecuteRequest = {
             code: this._matrixQueryCommand + "(" + varName + ")",
             stop_on_error: false,
-            store_history false,
+            store_history: false,
         };
+        let con = this._connector;
         return new Promise( function( resolve, reject ) {
-            this._connector.fetch( request,
+            con.fetch( request,
                 ( response: KernelMessage.IIOPubMessage ) => {
                     let msgType = response.header.msg_type;
                     switch ( msgType ) {
@@ -113,9 +107,10 @@ export
                             let content: string = <string>payload.data["text/plain"];
                             let modelOptions = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
                             let jsonModel = new JSONModel( modelOptions );
-                            resolve( JSONModel );
+                            resolve( jsonModel );
                             break;
                         case "error":
+                            console.log(response);
                             reject( "Kernel error on 'matrixQuery' call!" );
                             break;
                         default:
@@ -127,36 +122,6 @@ export
     }
 
 
-    /**
-    public performMatrixInspection( varName: string, responseHandler: ( KernelMessage.IIOPubMessage ) => any ): void {
-        console.log( "Inspecting matrix" )
-        let request: KernelMessage.IExecuteRequest = {
-            code: this._matrixQueryCommand + "(" + varName + ")",
-            stop_on_error: false,
-            store_history: false,
-        };
-        this._connector.fetch( request, ( response: KernelMessage.IIOPubMessage ): void => {
-            let msgType = response.header.msg_type;
-            console.log( response );
-            switch ( msgType ) {
-                case "execute_result":
-                    let payload = response.content as nbformat.IExecuteResult;
-                    console.log( "Building datagrid" );
-                    let content: string = <string>payload.data["text/plain"];
-                    let foo = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
-
-                    let bar = new JSONModel( foo );
-
-                    //TODO add response to JSON grid.
-                    //TODO: How to refresh the datagrid.
-                    break;
-                default:
-                    break;
-            }
-        }
-        );
-    }
-*/
     /*
      * Disposes the kernel connector.
      */
@@ -222,7 +187,6 @@ export
         switch ( msgType ) {
             case 'execute_input':
                 let code = msg.content.code;
-                console.log( "code: " + code );
                 if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) ) {
                     this.performInspection();
                 }

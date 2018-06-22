@@ -1,22 +1,22 @@
 export
-namespace Languages{
+namespace Languages {
     export
-    type LanguageModel = {
-            initScript : string;
-            queryCommand : string;
-            matrixQueryCommand : string;
-    }
+        type LanguageModel = {
+            initScript: string;
+            queryCommand: string;
+            matrixQueryCommand: string;
+        }
 }
 
 export
-abstract class Languages{
+    abstract class Languages {
     /**
      * Init and query script for supported languages.
      */
-   static scripts: { [index: string]: Languages.LanguageModel } = {
-           "python3" : { 
-               initScript :
-                   `import json\n
+    static scripts: { [index: string]: Languages.LanguageModel } = {
+        "python3": {
+            initScript:
+            `import json\n
 import numpy as np\n
 import pandas as pd\n
 from sys import getsizeof\n
@@ -57,24 +57,25 @@ def _jupyterlab_variableinspector_getmatrixcontent(x):\n
 \t\tresponse = {"schema": pd.io.json.build_table_schema(df), "data": df.to_dict(orient="records")}\n
 \t\treturn json.dumps(response,default=_jupyterlab_variableinspector_default)\n
 def _jupyterlab_variableinspector_default(o):\n
-\tif isinstance(o, np.int64): return int(o)  \n
+\tif isinstance(o, np.number): return int(o)  \n
 \traise TypeError`,
-               queryCommand : "_jupyterlab_variableinspector_dict_list()",
-               matrixQueryCommand : "_jupyterlab_variableinspector_getmatrixcontent" }
-                };
-   
-    public static getScript(lang:string):Promise<Languages.LanguageModel>{
-        return new Promise(function(resolve, reject) {
-            if (lang in Languages.scripts){
-                resolve(Languages.scripts[lang] );
-            }else{
-                reject("Language " + lang + " not supported yet!");
-            } 
-        });
-       
+            queryCommand: "_jupyterlab_variableinspector_dict_list()",
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+        }
+    };
+
+    public static getScript( lang: string ): Promise<Languages.LanguageModel> {
+        return new Promise( function( resolve, reject ) {
+            if ( lang in Languages.scripts ) {
+                resolve( Languages.scripts[lang] );
+            } else {
+                reject( "Language " + lang + " not supported yet!" );
+            }
+        } );
+
     }
-        
-    
+
+
 }
 
 

@@ -60,7 +60,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const namespace = "variableinspector";
         const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
 
-        
+
         /**
          * Create and track a new inspector.
          */
@@ -106,16 +106,6 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
             }
         } );
         palette.addItem( { command, category } );
-        
-        let label_1 = "foo";
-        let command_1 = "MTXInspect";
-        app.commands.addCommand(command_1, {
-            label: label_1,
-            execute: () => {
-                manager.source.performMatrixInspection("df");
-            }
-        });
-        palette.addItem({command : command_1, category});
         return manager;
     }
 }
