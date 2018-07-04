@@ -7,7 +7,7 @@ import {
 } from '@phosphor/coreutils';
 
 import {
-    Widget, StackedLayout
+     DockLayout, Widget,
 } from '@phosphor/widgets';
 
 import {
@@ -168,9 +168,9 @@ export
         datagrid.model = dataModel;
         datagrid.title.label = "Matrix: " + name;
         datagrid.title.closable = true;
-        let lout: StackedLayout = <StackedLayout>this.parent.layout;
-        lout.addWidget( datagrid );
-        //Todo activate matrix
+        let lout: DockLayout = <DockLayout>this.parent.layout;
+        lout.addWidget( datagrid , {mode: "split-right"});
+        //todo activate/focus matrix widget
     }
 
 }

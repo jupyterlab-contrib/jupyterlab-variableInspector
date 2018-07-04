@@ -144,7 +144,7 @@ export
         let request: KernelMessage.IExecuteRequest = {
             code: this._initScript,
             stop_on_error: false,
-            store_history: false,
+            silent: true,
         };
 
         let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, ( () => { } ) );
