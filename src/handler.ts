@@ -43,17 +43,24 @@ export
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
+    private _ready : Promise<void>;
+    
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
         this._queryCommand = options.queryCommand;
         this._matrixQueryCommand = options.matrixQueryCommand;
         this._initScript = options.initScript;
-        this._connector.ready.then(() => {
-            this._initOnKernel().then(( msg ) => {
-                this._connector.iopubMessage.connect( this._queryCall );
+
+        this._ready =  this._connector.ready.then(() => {
+            this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
+            this._connector.iopubMessage.connect( this._queryCall );
+            this._connector.queryResponse.connect( this._handleQueryResponse );
+            return;
+
             } );
         } );
+        
     }
 
     /**
@@ -66,6 +73,11 @@ export
     get isDisposed(): boolean {
         return this._isDisposed;
     }
+    
+    get ready():Promise<void>{
+        return this._ready;
+    }
+    
 
     /**
      * A signal emitted when an inspector value is generated.
@@ -175,6 +187,7 @@ export
                 break;
         }
     };
+
 
 
 

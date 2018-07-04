@@ -61,6 +61,7 @@ export
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
+
         return kernel.ready.then(() => {
             let future: Kernel.IFuture = kernel.requestExecute( request );
 

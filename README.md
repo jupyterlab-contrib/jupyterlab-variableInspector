@@ -20,12 +20,11 @@ For the time being, this project is still in its first steps. Contributions in a
 ## Installation
 In this early stage you can install this extension by building it from source.
 
-Download the repository and change the absolute path in the index.ts file to point to the location of the `var_list.py` file.
-Afterwards, build the project with `npm install` and `npm run build` and use `jupyter labextension install . ` in the project's root directory.
+Download the repository and build the project with `npm install` and `npm run build` and use `jupyter labextension install . ` in the project's root directory.
 
 
 ## TODOs
-- [ ] Load inspection scipt from relative paths.
+~~- [ ] Load inspection script from relative paths.~~
 - [ ] Add a better presentation (datagrids) for dataframes and ndarrays.
 - [ ] Allow sorting the inspector table.
 - [ ] Add support for other languages.

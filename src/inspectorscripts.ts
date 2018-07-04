@@ -75,7 +75,6 @@ def _jupyterlab_variableinspector_default(o):\n
 
     }
 
-
 }
 
 

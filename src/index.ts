@@ -118,61 +118,71 @@ const consoles: JupyterLabPlugin<void> = {
     requires: [IVariableInspector, IConsoleTracker],
     autoStart: true,
     activate: ( app: JupyterLab, manager: IVariableInspector, consoles: IConsoleTracker ): void => {
-
-
-
-        const handlers: { [id: string]: VariableInspectionHandler } = {};
-
+        const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
+        
+        /**
+         * Subscribes to the creation of new consoles. If a new notebook is created, build a new handler for the consoles.
+         * Adds a promise for a instanced handler to the 'handlers' collection.
+         */
         consoles.widgetAdded.connect(( sender, consolePanel ) => {
-
-            // Get the kernel type and create a new handler if a script exists for that type of kernel.
-            let scripts: Promise<Languages.LanguageModel> = Languages.getScript( "python3" );
-            scripts.then(( result: Languages.LanguageModel ) => {
-                let initScript = result.initScript;
-                let queryCommand = result.queryCommand;
-
-                const session = consolePanel.console.session;
+            
+            handlers[consolePanel.id] = new Promise( function( resolve, reject ) {
+                const session = consolePanel.session;
                 const connector = new KernelConnector( { session } );
-                let matrixQueryCommand = result.matrixQueryCommand;
 
-                const options: VariableInspectionHandler.IOptions = {
-                    queryCommand: queryCommand,
-                    matrixQueryCommand: matrixQueryCommand,
-                    connector: connector,
-                    initScript: initScript
-                };
+                
+                connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
+                    let kerneltype: string = connector.kerneltype;
+                    let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
+                
+                    scripts.then(( result: Languages.LanguageModel ) => {
+                        let initScript = result.initScript;
+                        let queryCommand = result.queryCommand;
+                        const options: VariableInspectionHandler.IOptions = {
+                            queryCommand: queryCommand,
+                            connector: connector,
+                            initScript: initScript
+                        };
+                        const handler = new VariableInspectionHandler( options );
 
-                const handler = new VariableInspectionHandler( options );
+                        consolePanel.disposed.connect(() => {
+                            delete handlers[consolePanel.id];
+                            handler.dispose();
+                        } );
 
-                handlers[consolePanel.id] = handler;
+                        handler.ready.then(() => {
+                            resolve( handler );
+                        } );
+                    } );
 
-                consolePanel.disposed.connect(() => {
-                    delete handlers[consolePanel.id];
-                    handler.dispose();
+
+                    //Otherwise log error message.
+                    scripts.catch(( result: string ) => {
+                        reject( result );
+                    } )
                 } );
-
-            } );
-
-            scripts.catch(( result: string ) => {
-                console.log( result );
-                return;
             } );
         } );
 
+        /**
+         * If focus window changes, checks whether new focus widget is a console.
+         * In that case, retrieves the handler associated to the console after it has been
+         * initialized and updates the manager with it. 
+         */
         app.shell.currentChanged.connect(( sender, args ) => {
-
             let widget = args.newValue;
             if ( !widget || !consoles.has( widget ) ) {
                 return;
             }
-            let source = handlers[widget.id];
-            if ( source ) {
-                manager.source = source;
-                manager.source.performInspection();
-            }
-        } );
+            let future = handlers[widget.id];
+            future.then((source :VariableInspectionHandler ) => {
+                if ( source ) {
+                    manager.source = source;
+                    manager.source.performInspection();               
+                }
+            });
+        } );;
 
-        //Otherwise log error message.
         app.contextMenu.addItem( {
             command: CommandIDs.open,
             selector: ".jp-CodeConsole"
@@ -191,61 +201,70 @@ const notebooks: JupyterLabPlugin<void> = {
     requires: [IVariableInspector, INotebookTracker],
     autoStart: true,
     activate: ( app: JupyterLab, manager: IVariableInspector, notebooks: INotebookTracker ): void => {
-
-        const handlers: { [id: string]: VariableInspectionHandler } = {};
+        const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
 
         /**
-         * Watch for new notebook instances
+         * Subscribes to the creation of new notebooks. If a new notebook is created, build a new handler for the notebook.
+         * Adds a promise for a instanced handler to the 'handlers' collection.
          */
         notebooks.widgetAdded.connect(( sender, nbPanel: NotebookPanel ) => {
 
-            const session = nbPanel.session;
-            const connector = new KernelConnector( { session } );
-            connector.ready.then(() => {
+            //A promise that resolves after the initialization of the handler is done.
+            handlers[nbPanel.id] = new Promise( function( resolve, reject ) {
 
-                // Get the kernel type and create a new handler if a script exists for that type of kernel.
-                let kerneltype: string = connector.kerneltype;
-                let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
-                scripts.then(( result: Languages.LanguageModel ) => {
-                    let initScript = result.initScript;
-                    let queryCommand = result.queryCommand;
-                    let matrixQueryCommand = result.matrixQueryCommand;
+                const session = nbPanel.session;
+                const connector = new KernelConnector( { session } );
+                
+                connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
+                    let kerneltype: string = connector.kerneltype;
+                    let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
+                
+                    scripts.then(( result: Languages.LanguageModel ) => {
+                        let initScript = result.initScript;
+                        let queryCommand = result.queryCommand;
+                        const options: VariableInspectionHandler.IOptions = {
+                            queryCommand: queryCommand,
+                            connector: connector,
+                            initScript: initScript
+                        };
+                        const handler = new VariableInspectionHandler( options );
 
-                    const options: VariableInspectionHandler.IOptions = {
-                        queryCommand: queryCommand,
-                        matrixQueryCommand: matrixQueryCommand,
-                        connector: connector,
-                        initScript: initScript
-                    };
-                    const handler = new VariableInspectionHandler( options );
+                        nbPanel.disposed.connect(() => {
+                            delete handlers[nbPanel.id];
+                            handler.dispose();
+                        } );
 
-                    handlers[nbPanel.id] = handler;
-
-                    nbPanel.disposed.connect(() => {
-                        delete handlers[nbPanel.id];
-                        handler.dispose();
+                        handler.ready.then(() => {
+                            resolve( handler );
+                        } );
                     } );
-                } );
 
-                //Otherwise log error message.
-                scripts.catch(( result: string ) => {
-                    console.log( result );
-                } )
+
+                    //Otherwise log error message.
+                    scripts.catch(( result: string ) => {
+                        reject( result );
+                    } )
+                } );
             } );
         } );
 
+        /**
+         * If focus window changes, checks whether new focus widget is a notebook.
+         * In that case, retrieves the handler associated to the notebook after it has been
+         * initialized and updates the manager with it. 
+         */
         app.shell.currentChanged.connect(( sender, args ) => {
             let widget = args.newValue;
             if ( !widget || !notebooks.has( widget ) ) {
                 return;
             }
-            let source = handlers[widget.id];
-            if ( source ) {
-                manager.source = source;
-                manager.source.performInspection();
-
-
-            }
+            let future = handlers[widget.id];
+            future.then((source :VariableInspectionHandler ) => {
+                if ( source ) {
+                    manager.source = source;
+                    manager.source.performInspection();               
+                }
+            });
         } );
 
         app.contextMenu.addItem( {
