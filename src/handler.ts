@@ -55,7 +55,6 @@ export
         this._ready =  this._connector.ready.then(() => {
             this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
             this._connector.iopubMessage.connect( this._queryCall );
-            this._connector.queryResponse.connect( this._handleQueryResponse );
             return;
 
             } );

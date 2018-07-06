@@ -145,7 +145,7 @@ export
             cell = row.insertCell( 3 );
             cell.innerHTML = args[index].varShape;
             cell = row.insertCell( 4 );
-            cell.innerHTML = args[index].varContent;
+            cell.innerHTML = args[index].varContent.replace(/\\n/g,  "</br>");
         }
     }
 
