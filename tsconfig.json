@@ -8,7 +8,7 @@
     "moduleResolution": "node",
     "target": "ES5",
     "outDir": "./lib",
-    "lib": ["ES5", "ES2015.Promise", "DOM"],
+    "lib": ["ES5", "ES2015.Promise", "DOM", "es2015.core"],
     "types": []
   },
   "include": ["src/*"]

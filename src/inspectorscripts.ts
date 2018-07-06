@@ -55,7 +55,7 @@ def _getshapeof(x):
     if np and isinstance(x, np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
         return "Array [%s]" %  shape
-    return str(x)[:200]
+    return None
 
 
 def _getcontentof(x):
@@ -93,7 +93,10 @@ def _var_dic_list():
    
     public static getScript(lang:string):Promise<Languages.LanguageModel>{
         return new Promise(function(resolve, reject) {
-            if (lang in Languages.scripts){
+            if (lang.startsWith("python")){
+                resolve(Languages.scripts["python"] );
+            }
+            else if (lang in Languages.scripts){
                 resolve(Languages.scripts[lang] );
             }else{
                 reject("Language " + lang + " not supported yet!");
