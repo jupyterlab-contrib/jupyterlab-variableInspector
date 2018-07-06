@@ -50,9 +50,25 @@ def _jupyterlab_variableinspector_getshapeof(x):
         return "Array [%s]" %  shape
     return None
 
+def _jupyterlab_variableinspector_getcontentof(x):
+    # returns content in a friendly way for python variables
+    # pandas and numpy
+    if pd and isinstance(x, pd.DataFrame):
+        colnames = ', '.join(list(x.columns))
+        return "Column names: %s" % colnames
+    if pd and isinstance(x, pd.Series):
+        return "Series [%d rows]" % x.shape
+    if np and isinstance(x, np.ndarray):
+        return x.__repr__()
+    return str(x)[:200]
+
 def _jupyterlab_variableinspector_dict_list():
     values = _jupyterlab_variableinspector_nms.who_ls()
-    vardic = [{'varName': v, 'varType': type(eval(v)).__name__, 'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(v))), 'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(v))) if _jupyterlab_variableinspector_getshapeof(eval(v)) else '', 'varContent': str(eval(v))[:200], 'isMatrix': True if type(eval(v)).__name__ in ["DataFrame", "ndarray", "Series"] else False}  # noqa
+    vardic = [{'varName': v, 'varType': type(eval(v)).__name__, 
+    'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(v))), 
+    'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(v))) if _jupyterlab_variableinspector_getshapeof(eval(v)) else '', 
+    'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(v))), 
+    'isMatrix': True if type(eval(v)).__name__ in ["DataFrame", "ndarray", "Series"] else False}
             for v in values if ((str(eval(v))[0] != "<") or (isinstance(eval(v), str)))]
     return json.dumps(vardic)
 
