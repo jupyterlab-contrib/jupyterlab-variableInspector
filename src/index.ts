@@ -129,6 +129,7 @@ const consoles: JupyterLabPlugin<void> = {
             handlers[consolePanel.id] = new Promise( function( resolve, reject ) {
                 const session = consolePanel.session;
                 const connector = new KernelConnector( { session } );
+
                 
                 connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
                     let kerneltype: string = connector.kerneltype;
@@ -137,8 +138,11 @@ const consoles: JupyterLabPlugin<void> = {
                     scripts.then(( result: Languages.LanguageModel ) => {
                         let initScript = result.initScript;
                         let queryCommand = result.queryCommand;
+                        let matrixQueryCommand = result.matrixQueryCommand;
+
                         const options: VariableInspectionHandler.IOptions = {
                             queryCommand: queryCommand,
+                            matrixQueryCommand: matrixQueryCommand,
                             connector: connector,
                             initScript: initScript
                         };
@@ -221,8 +225,11 @@ const notebooks: JupyterLabPlugin<void> = {
                     scripts.then(( result: Languages.LanguageModel ) => {
                         let initScript = result.initScript;
                         let queryCommand = result.queryCommand;
+                        let matrixQueryCommand = result.matrixQueryCommand;
+
                         const options: VariableInspectionHandler.IOptions = {
                             queryCommand: queryCommand,
+                            matrixQueryCommand: matrixQueryCommand,
                             connector: connector,
                             initScript: initScript
                         };

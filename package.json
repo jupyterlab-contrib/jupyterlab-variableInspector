@@ -31,7 +31,9 @@
   "dependencies": {
     "@jupyterlab/application": "^0.16.0",
     "@jupyterlab/console": "^0.16.3",
-    "@jupyterlab/notebook": "^0.16.3"
+    "@jupyterlab/csvviewer": "^0.16.3",
+    "@jupyterlab/notebook": "^0.16.3",
+    "@phosphor/datagrid": "^0.1.6"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",
