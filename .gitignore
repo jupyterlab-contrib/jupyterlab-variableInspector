@@ -5,3 +5,4 @@ node_modules/
 .ipynb_checkpoints
 npm-debug.log
 package-lock.json
+.project
