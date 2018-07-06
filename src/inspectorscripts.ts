@@ -17,8 +17,10 @@ export
     static py_script: string = `import json
 from sys import getsizeof
 
-from IPython import get_ipythonfrom IPython.core.magics.namespace import NamespaceMagics_jupyterlab_variableinspector_nms = NamespaceMagics()
+from IPython import get_ipython
+from IPython.core.magics.namespace import NamespaceMagics
 
+_jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
 
