@@ -4,14 +4,14 @@
 
 Jupyterlab extension that shows currently used variables and their values. The goal is to provide a tool similar to the variable inspector in RStudio.
 
-This project is based on the [variable inspector extension for jupyter notebooks](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/varInspector) from where the `var_list.py`function is used. The architecture is heavly inspired by the [inpector extension included in juypterlab](https://github.com/jupyterlab/jupyterlab/tree/master/packages/inspector-extension).
+This project is inspired by the [variable inspector extension for jupyter notebooks](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/varInspector) and by the [inpector extension included in juypterlab](https://github.com/jupyterlab/jupyterlab/tree/master/packages/inspector-extension).
 
 For the time being, this project is still in its first steps. Contributions in any form are very welcome!
 
 ## Features
 ![Demogif](early_demo.gif)
 - Allows inspection of variables for both python consoles and python notebooks
-
+- Allows inspection of matrices in a datagrid-viewer. This might not work for large matrices.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ Download the repository and build the project with `npm install` and `npm run bu
 
 ## TODOs
 ~~- [ ] Load inspection script from relative paths.~~
-- [ ] Add a better presentation (datagrids) for dataframes and ndarrays.
+- [x] Add a better presentation (datagrids) for dataframes and ndarrays.
 - [ ] Allow sorting the inspector table.
 - [ ] Add support for other languages.
 
