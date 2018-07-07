@@ -64,14 +64,15 @@ def _jupyterlab_variableinspector_getcontentof(x):
         return x.__repr__()
     return str(x)[:200]
 
+
 def _jupyterlab_variableinspector_dict_list():
     values = _jupyterlab_variableinspector_nms.who_ls()
-    vardic = [{'varName': v, 'varType': type(eval(v)).__name__, 
-    'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(v))), 
-    'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(v))) if _jupyterlab_variableinspector_getshapeof(eval(v)) else '', 
-    'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(v))), 
-    'isMatrix': True if type(eval(v)).__name__ in ["DataFrame", "ndarray", "Series"] else False}
-            for v in values if ((str(eval(v))[0] != "<") or (isinstance(eval(v), str)))]
+    vardic = [{'varName': _v, 'varType': type(eval(_v)).__name__, 
+    'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(_v))), 
+    'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(_v))) if _jupyterlab_variableinspector_getshapeof(eval(_v)) else '', 
+    'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
+    'isMatrix': True if type(eval(_v)).__name__ in ["DataFrame", "ndarray", "Series"] else False}
+            for _v in values if ((str(eval(_v))[0] != "<") or (isinstance(eval(_v), str)))]
     return json.dumps(vardic)
 
 def _jupyterlab_variableinspector_getmatrixcontent(x):
