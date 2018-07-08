@@ -14,7 +14,7 @@ export
      * Init and query script for supported languages.
      */
     static scripts: { [index: string]: Languages.LanguageModel } = {
-        "python3": {
+        "python": {
             initScript:
             `import json\n
 import numpy as np\n
