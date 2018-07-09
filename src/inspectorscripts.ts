@@ -56,7 +56,7 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # returns content in a friendly way for python variables
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
-        colnames = ', '.join(list(x.columns))
+        colnames = ', '.join([str(c) for c  in x.columns])
         return "Column names: %s" % colnames
     if pd and isinstance(x, pd.Series):
         return "Series [%d rows]" % x.shape
@@ -92,7 +92,7 @@ def _jupyterlab_variableinspector_default(o):
 `;
     
     static scripts: { [index: string]: Languages.LanguageModel } = {
-        "python": {
+        "python3": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
