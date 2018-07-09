@@ -92,7 +92,7 @@ def _jupyterlab_variableinspector_default(o):
 `;
     
     static scripts: { [index: string]: Languages.LanguageModel } = {
-        "python3": {
+        "python": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"

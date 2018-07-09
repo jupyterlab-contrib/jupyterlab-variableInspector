@@ -30,7 +30,7 @@ export
 
 
     get kerneltype(): string {
-        return this._session.kernel.name;
+        return this._session.kernel.info.language_info.name;
     }
 
 
@@ -38,7 +38,7 @@ export
      *  A Promise that is fulfilled when the session associated w/ the connector is ready.
      */
     get ready(): Promise<void> {
-        return this._session.ready;
+        return this._session.kernel.ready;
     }
 
     /**
