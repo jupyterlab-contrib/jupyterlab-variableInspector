@@ -57,13 +57,17 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
-        return "Column names: %s" % colnames
-    if pd and isinstance(x, pd.Series):
-        return "Series [%d rows]" % x.shape
-    if np and isinstance(x, np.ndarray):
-        return x.__repr__()
-    return str(x)[:200]
-
+        content = "Column names: %s" % colnames 
+    elif pd and isinstance(x, pd.Series):
+        content = "Series [%d rows]" % x.shape      
+    elif np and isinstance(x, np.ndarray):
+        content = x.__repr__()
+    else:
+        content = str(x)
+    if len(content) > 150:
+        return content[:150] + " ..."
+    else:
+        return content
 
 def _jupyterlab_variableinspector_dict_list():
     values = _jupyterlab_variableinspector_nms.who_ls()
