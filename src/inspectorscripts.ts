@@ -108,7 +108,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
     return False
 
 
-def _jupyterlab_variableinspector_dict_list(max_rows):
+def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
         if isinstance(eval(v), str):
             return True
