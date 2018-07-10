@@ -100,6 +100,16 @@ def _jupyterlab_variableinspector_default(o):
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+        },
+        "python2": {
+            initScript: Languages.py_script,
+            queryCommand: "_jupyterlab_variableinspector_dict_list()",
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+        },
+        "python": {
+            initScript: Languages.py_script,
+            queryCommand: "_jupyterlab_variableinspector_dict_list()",
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
         }
     };
 
