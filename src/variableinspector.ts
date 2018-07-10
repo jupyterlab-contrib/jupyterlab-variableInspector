@@ -16,7 +16,7 @@ import {
 
 import '../style/index.css';
 
-
+const TITLE_CLASS = "jp-VarInspector-title";
 const PANEL_CLASS = "jp-VarInspector";
 const TABLE_CLASS = "jp-VarInspector-table";
 
@@ -50,8 +50,7 @@ namespace IVariableInspector {
     }
 
     export
-        type IVariableInspectorUpdate = Array<IVariable>;
-
+        type IVariableInspectorUpdate = [IVariableTitle, Array<IVariable>];
 
     export
         interface IVariable {
@@ -62,6 +61,12 @@ namespace IVariableInspector {
         varType: string;
         isMatrix: Boolean;
     }
+    export
+        interface IVariableTitle {
+        kernelName: string;
+        languageName: string;
+        contextName: string;
+        }
 }
 
 
@@ -73,13 +78,17 @@ export
 
     private _source: IVariableInspector.IInspectable | null = null;
     private _table: HTMLTableElement;
+    private _title: HTMLElement;
 
 
     constructor() {
         super();
         this.addClass( PANEL_CLASS );
+        this._title = Private.createTitle();
+        this._title.className = TITLE_CLASS;
         this._table = Private.createTable();
         this._table.className = TABLE_CLASS;
+        this.node.appendChild( this._title as HTMLElement );
         this.node.appendChild( this._table as HTMLElement );
     }
 
@@ -118,13 +127,18 @@ export
         super.dispose();
     }
 
-    protected onInspectorUpdate( sender: any, args: IVariableInspector.IVariableInspectorUpdate ): void {
+    protected onInspectorUpdate( sender: any, allArgs: IVariableInspector.IVariableInspectorUpdate): void {
 
+        let title = allArgs[0];
+        let args = allArgs[1];
+
+        this._title.innerHTML = "kernel:"+title.kernelName+",language:"+title.languageName+",context:"+title.contextName;
 
         //Render new variable state
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
         this._table.createTFoot();
+
         for ( var index = 0; index < args.length; index++ ) {
             row = this._table.tFoot.insertRow();
             if ( args[index].isMatrix ) {
@@ -195,5 +209,12 @@ namespace Private {
         let cell5 = hrow.insertCell( 4 );
         cell5.innerHTML = "Content";
         return table;
+    }
+
+    export
+        function createTitle(header="") {
+        let title = document.createElement( "p" );
+        title.innerHTML = header;
+        return title;
     }
 }

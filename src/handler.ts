@@ -177,10 +177,15 @@ export
                 let content: string = <string>payload.data["text/plain"];
                 content = content.replace( /^'|'$/g, '' ).replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
 
-                let update: IVariableInspector.IVariableInspectorUpdate;
-                update = <IVariableInspector.IVariableInspectorUpdate>JSON.parse( content );
+                let update: IVariableInspector.IVariable[];
+                update = <IVariableInspector.IVariable[]>JSON.parse( content );
 
-                this._inspected.emit( update );
+                let title: IVariableInspector.IVariableTitle;
+                title.contextName = this._connector.context;
+                title.kernelName = this._connector.kerneltype;
+                title.languageName = this._connector.kerneltype;
+
+                this._inspected.emit( [title, update] );
                 break;
             default:
                 break;

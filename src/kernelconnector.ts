@@ -29,8 +29,17 @@ export
     }
 
 
+
     get kerneltype(): string {
         return this._session.kernel.info.language_info.name;
+    }
+
+    get context(): string {
+        return this._session.kernel.name
+    }
+
+    get kernelname(): string {
+        return this._session.kernel.name;
     }
 
 
