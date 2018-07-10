@@ -24,8 +24,6 @@ _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
 
-_jupyterlab_variableinspector_maxrows = 10**6 # None for view all
-
 try:
     import numpy as np
 except ImportError:
@@ -110,7 +108,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
     return False
 
 
-def _jupyterlab_variableinspector_dict_list():
+def _jupyterlab_variableinspector_dict_list(max_rows):
     def keep_cond(v):
         if isinstance(eval(v), str):
             return True
@@ -135,30 +133,10 @@ def _jupyterlab_variableinspector_dict_list():
     return json.dumps(vardic)
 
 
-def _jupyterlab_variableinspector_getmatrixcontent(x):
-    def get_np_threshold():
-        if np and np.get_printoptions()['threshold'] != 1000: # this is the default
-            return np.get_printoptions()['threshold']
-        return _jupyterlab_variableinspector_maxrows
+def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     
-    def get_pd_threshold():
-        if pd and pd.get_option('max_rows') != 60:
-            return pd.get_option('max_rows')
-        return _jupyterlab_variableinspector_maxrows
-    
-    def get_threshold(np_thres, pd_thres):
-        if np_thres is None:
-            return pd_thres
-        elif pd_thres is None:
-            return np_thres
-        elif np_thres < 0 or pd_thres < 0:
-            return None
-        else:
-            return max(np_thres, pd_thres)
-        
-    np_threshold = get_np_threshold()
-    pd_threshold = get_pd_threshold()
-    threshold = get_threshold(np_threshold, pd_threshold)
+    # to do: add something to handle this in the future
+    threshold = max_rows
 
     if pd and pyspark and isinstance(x, pyspark.sql.DataFrame):
         df = x.limit(threshold).toPandas()
