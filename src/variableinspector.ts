@@ -63,9 +63,9 @@ namespace IVariableInspector {
     }
     export
         interface IVariableTitle {
-        kernelName: string;
-        languageName: string;
-        contextName: string;
+        kernelName?: string;
+        languageName?: string;
+        contextName?: string;
         }
 }
 
@@ -132,7 +132,7 @@ export
         let title = allArgs[0];
         let args = allArgs[1];
 
-        this._title.innerHTML = "kernel:"+title.kernelName+",language:"+title.languageName+",context:"+title.contextName;
+        this._title.innerHTML = "kernel:"+title.kernelName+", language:"+title.languageName+", context:"+title.contextName;
 
         //Render new variable state
         let row: HTMLTableRowElement;

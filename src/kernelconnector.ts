@@ -35,7 +35,9 @@ export
     }
 
     get context(): string {
-        return this._session.kernel.name
+        // dummy status - for say sending message if language not implemented
+        // or other debugging?
+        return "status - ok";
     }
 
     get kernelname(): string {

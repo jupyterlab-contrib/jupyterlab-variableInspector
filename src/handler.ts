@@ -181,9 +181,11 @@ export
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
 
                 let title: IVariableInspector.IVariableTitle;
-                title.contextName = this._connector.context;
-                title.kernelName = this._connector.kerneltype;
-                title.languageName = this._connector.kerneltype;
+                title = {
+                    contextName: this._connector.context || "",
+                    kernelName : this._connector.kernelname || "",
+                    languageName : this._connector.kerneltype || ""
+                };
 
                 this._inspected.emit( [title, update] );
                 break;
