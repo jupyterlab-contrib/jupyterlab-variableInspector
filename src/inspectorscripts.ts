@@ -79,18 +79,18 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # returns content in a friendly way for python variables
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
-        colnames = ', '.join([str(c) for c  in x.columns])
-        return "Column names: %s" % colnames
-    if pd and isinstance(x, pd.Series):
-        return "Series [%d rows]" % x.shape
-    if np and isinstance(x, np.ndarray):
-        return x.__repr__()
-    if pyspark and isinstance(x, pyspark.sql.DataFrame):
-        return x.__repr__()
-    if tf and isinstance(x, tf.Variable):
-        # This is to allow tf.Variable.__repr__ to appear
-        return x.__repr__().replace("<", "").replace(">", "").strip()
-    return str(x)[:200]
+        colnames = ', '.join(x.columns.map(str))
+        content = "Column names: %s" % colnames 
+    elif pd and isinstance(x, pd.Series):
+        content = "Series [%d rows]" % x.shape      
+    elif np and isinstance(x, np.ndarray):
+        content = x.__repr__()
+    else:
+        content = str(x)
+    if len(content) > 150:
+        return content[:150] + " ..."
+    else:
+        return content
 
 
 def _jupyterlab_variableinspector_is_matrix(x):
@@ -165,6 +165,16 @@ def _jupyterlab_variableinspector_default(o):
     
     static scripts: { [index: string]: Languages.LanguageModel } = {
         "python3": {
+            initScript: Languages.py_script,
+            queryCommand: "_jupyterlab_variableinspector_dict_list()",
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+        },
+        "python2": {
+            initScript: Languages.py_script,
+            queryCommand: "_jupyterlab_variableinspector_dict_list()",
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+        },
+        "python": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
