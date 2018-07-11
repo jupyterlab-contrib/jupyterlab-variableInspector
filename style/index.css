@@ -20,15 +20,20 @@
     background-color: #f9f9f9;
 }
 
-.jp-VarInspector-table tr:hover {background-color: #ddd;}
+.jp-VarInspector-content tr:hover {background-color: #ddd;}
+
 
 .jp-VarInspector-table thead{
 	font-size: var(--jp-ui-font-size1);
-    font-weight: bold;
     text-align: center;
     height: 50px;
     background-color: #f37726;
     color: white;
+}
+
+.jp-VarInspector-title {
+	font-size: var(--jp-ui-font-size1);
+	text-align: center;
 }
 
 

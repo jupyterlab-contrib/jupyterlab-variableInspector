@@ -19,6 +19,7 @@ import '../style/index.css';
 const TITLE_CLASS = "jp-VarInspector-title";
 const PANEL_CLASS = "jp-VarInspector";
 const TABLE_CLASS = "jp-VarInspector-table";
+const TABLE_BODY_CLASS = "jp-VarInspector-content";
 
 /**
  * The inspector panel token.
@@ -141,7 +142,7 @@ export
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
         this._table.createTFoot();
-
+        this._table.tFoot.className = TABLE_BODY_CLASS;
         for ( var index = 0; index < args.length; index++ ) {
             row = this._table.tFoot.insertRow();
             if ( args[index].isMatrix ) {
