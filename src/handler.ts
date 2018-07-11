@@ -162,9 +162,7 @@ export
         return reply;
 
     }
-
-
-
+    
     /*
      * Handle query response. Emit new signal containing the IVariableInspector.IInspectorUpdate object.
      * (TODO: query resp. could be forwarded to panel directly)
@@ -187,16 +185,12 @@ export
                     languageName : this._connector.kerneltype || ""
                 };
 
-                this._inspected.emit( [title, update] );
+                this._inspected.emit( {title: title, payload: update} );
                 break;
             default:
                 break;
         }
     };
-
-
-
-
 
     /*
      * Invokes a inspection if the signal emitted from specified session is an 'execute_input' msg.
@@ -214,8 +208,6 @@ export
                 break;
         }
     };
-
-
 }
 
 /**
@@ -234,6 +226,3 @@ namespace VariableInspectionHandler {
         initScript: string;
     }
 }
-
-
-

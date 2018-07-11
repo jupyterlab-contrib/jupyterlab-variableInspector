@@ -50,7 +50,10 @@ namespace IVariableInspector {
     }
 
     export
-        type IVariableInspectorUpdate = [IVariableTitle, Array<IVariable>];
+        interface IVariableInspectorUpdate {
+            title: IVariableTitle;
+            payload: Array<IVariable>;
+    } 
 
     export
         interface IVariable {
@@ -129,8 +132,8 @@ export
 
     protected onInspectorUpdate( sender: any, allArgs: IVariableInspector.IVariableInspectorUpdate): void {
 
-        let title = allArgs[0];
-        let args = allArgs[1];
+        let title = allArgs.title;
+        let args = allArgs.payload;
 
         this._title.innerHTML = "kernel:"+title.kernelName+", language:"+title.languageName+", context:"+title.contextName;
 
