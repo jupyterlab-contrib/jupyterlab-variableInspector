@@ -160,7 +160,6 @@ export
 
         let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, ( () => { } ) );
         return reply;
-
     }
     
     /*
@@ -225,4 +224,51 @@ namespace VariableInspectionHandler {
         matrixQueryCommand: string;
         initScript: string;
     }
+}
+
+export
+    class DummyHandler implements IDisposable, IVariableInspector.IInspectable{
+        private _isDisposed = false;
+        private _disposed = new Signal<this,void>( this );
+        private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
+        private _connector : KernelConnector;
+        
+        constructor(connector : KernelConnector) {
+            this._connector = connector;
+        }
+                
+        get disposed() : ISignal<DummyHandler, void>{
+            return this._disposed;
+        }
+       
+        get isDisposed() : boolean {
+            return this._isDisposed;
+        }
+       
+        get inspected() : ISignal<DummyHandler, IVariableInspector.IVariableInspectorUpdate>{
+            return this._inspected;
+        }
+       
+        dispose(): void {
+            if ( this.isDisposed ) {
+                return;
+            }
+            this._isDisposed = true;
+            this._disposed.emit( void 0 );
+            Signal.clearData( this );
+        }
+       
+        public performInspection(): void{
+            let title: IVariableInspector.IVariableTitle;
+            title = {
+                contextName: this._connector.context || "",
+                kernelName : this._connector.kernelname || "",
+                languageName : this._connector.kerneltype || ""
+            };
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
+        }
+        
+        public performMatrixInspection(varName : string, maxRows : number): Promise<DataModel>{
+            return new Promise(function(resolve, reject) { reject("Cannot inspect matrices w/ the DummyHandler!") });
+        }
 }

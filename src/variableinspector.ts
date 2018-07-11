@@ -46,13 +46,13 @@ namespace IVariableInspector {
         disposed: ISignal<any, void>;
         inspected: ISignal<any, IVariableInspectorUpdate>;
         performInspection(): void;
-        performMatrixInspection( varName: string ): Promise<DataModel>;
+        performMatrixInspection( varName: string, maxRows? : number ): Promise<DataModel>;
     }
 
     export
         interface IVariableInspectorUpdate {
-            title: IVariableTitle;
-            payload: Array<IVariable>;
+        title: IVariableTitle;
+        payload: Array<IVariable>;
     } 
 
     export
@@ -62,7 +62,7 @@ namespace IVariableInspector {
         varShape: string;
         varContent: string;
         varType: string;
-        isMatrix: Boolean;
+        isMatrix: boolean;
     }
     export
         interface IVariableTitle {
