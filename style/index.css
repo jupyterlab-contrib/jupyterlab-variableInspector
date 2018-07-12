@@ -26,14 +26,15 @@
 .jp-VarInspector-table thead{
 	font-size: var(--jp-ui-font-size1);
     text-align: center;
-    height: 50px;
-    background-color: #f37726;
+    background-color: #f37626;
     color: white;
+	font-weight: 600;
 }
 
 .jp-VarInspector-title {
 	font-size: var(--jp-ui-font-size1);
-	text-align: center;
+	text-align: left;
+	padding-left: 10px;
 }
 
 

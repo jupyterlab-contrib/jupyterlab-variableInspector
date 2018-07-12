@@ -69,7 +69,7 @@ namespace IVariableInspector {
         interface IVariableTitle {
         kernelName?: string;
         languageName?: string;
-        contextName?: string;
+        contextName?: string; //Context currently reserved for special information.
         }
 }
 
@@ -136,7 +136,7 @@ export
         let title = allArgs.title;
         let args = allArgs.payload;
 
-        this._title.innerHTML = "kernel:"+title.kernelName+", language:"+title.languageName+", context:"+title.contextName;
+        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
 
         //Render new variable state
         let row: HTMLTableRowElement;

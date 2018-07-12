@@ -179,7 +179,7 @@ export
 
                 let title: IVariableInspector.IVariableTitle;
                 title = {
-                    contextName: this._connector.context || "",
+                    contextName: "",
                     kernelName : this._connector.kernelname || "",
                     languageName : this._connector.kerneltype || ""
                 };
@@ -261,7 +261,7 @@ export
         public performInspection(): void{
             let title: IVariableInspector.IVariableTitle;
             title = {
-                contextName: " <b>Unsupported language</b> ",
+                contextName: ". <b>Language currently not supported.</b> ",
                 kernelName : this._connector.kernelname || "",
                 languageName : this._connector.kerneltype || ""
             };
