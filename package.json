@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^0.16.0",
+    "@jupyterlab/apputils": "^0.17.0-1",
     "@jupyterlab/console": "^0.16.3",
     "@jupyterlab/csvviewer": "^0.16.3",
     "@jupyterlab/notebook": "^0.16.3",

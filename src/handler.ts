@@ -61,6 +61,10 @@ export
         } );
         
     }
+    
+    get session(): IClientSession {
+        return this._connector.session;
+    }
 
     /**
      * A signal emitted when the handler is disposed.
@@ -177,7 +181,7 @@ export
                 let update: IVariableInspector.IVariable[];
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
 
-                let title: IVariableInspector.IVariableTitle;
+                let title: IVariableInspector.IVariableKernelInfo;
                 title = {
                     contextName: "",
                     kernelName : this._connector.kernelname || "",
@@ -236,7 +240,11 @@ export
         constructor(connector : KernelConnector) {
             this._connector = connector;
         }
-                
+        
+        get session():IClientSession {
+            return this._connector.session;
+        }
+        
         get disposed() : ISignal<DummyHandler, void>{
             return this._disposed;
         }
@@ -259,7 +267,7 @@ export
         }
        
         public performInspection(): void{
-            let title: IVariableInspector.IVariableTitle;
+            let title: IVariableInspector.IVariableKernelInfo;
             title = {
                 contextName: ". <b>Language currently not supported.</b> ",
                 kernelName : this._connector.kernelname || "",

@@ -7,12 +7,16 @@ import {
 } from '@phosphor/coreutils';
 
 import {
-     DockLayout, Widget,
+     DockLayout
 } from '@phosphor/widgets';
 
 import {
     DataGrid, DataModel
 } from "@phosphor/datagrid";
+
+import {
+    MainAreaWidget, IClientSession, Toolbar
+} from "@jupyterlab/apputils";
 
 import '../style/index.css';
 
@@ -44,6 +48,7 @@ namespace IVariableInspector {
 
     export
         interface IInspectable {
+        session: IClientSession;
         disposed: ISignal<any, void>;
         inspected: ISignal<any, IVariableInspectorUpdate>;
         performInspection(): void;
@@ -52,7 +57,7 @@ namespace IVariableInspector {
 
     export
         interface IVariableInspectorUpdate {
-        title: IVariableTitle;
+        title: IVariableKernelInfo;
         payload: Array<IVariable>;
     } 
 
@@ -66,7 +71,7 @@ namespace IVariableInspector {
         isMatrix: boolean;
     }
     export
-        interface IVariableTitle {
+        interface IVariableKernelInfo {
         kernelName?: string;
         languageName?: string;
         contextName?: string; //Context currently reserved for special information.
@@ -78,11 +83,12 @@ namespace IVariableInspector {
  * A panel that renders the variables
  */
 export
-    class VariableInspectorPanel extends Widget implements IVariableInspector {
+    class VariableInspectorPanel extends MainAreaWidget implements IVariableInspector {
 
     private _source: IVariableInspector.IInspectable | null = null;
     private _table: HTMLTableElement;
     private _title: HTMLElement;
+    private _kernelInfo : IVariableInspector.IVariableKernelInfo;
 
 
     constructor() {
@@ -94,12 +100,22 @@ export
         this._table.className = TABLE_CLASS;
         this.node.appendChild( this._title as HTMLElement );
         this.node.appendChild( this._table as HTMLElement );
+        this._kernelInfo = {contextName : "FOO" ,kernelName : "BAR", languageName : "BAZ"};
+            
+    }
+    
+    get session(): IClientSession {
+        return this._source.session;
+    }
+    
+    get kernelinfo(): IVariableInspector.IVariableKernelInfo{
+        return this._kernelInfo;
     }
 
     get source(): IVariableInspector.IInspectable | null {
         return this._source;
     }
-
+    
     set source( source: IVariableInspector.IInspectable | null ) {
 
         if ( this._source === source ) {
@@ -116,8 +132,11 @@ export
         if ( this._source ) {
             this._source.inspected.connect( this.onInspectorUpdate, this );
             this._source.disposed.connect( this.onSourceDisposed, this );
+            this.toolbar = new Toolbar();
+            this.toolbar.addItem("kernelname", Toolbar.createKernelNameItem(this._source.session));
             this._source.performInspection();
         }
+       
     }
 
     /**
@@ -136,7 +155,7 @@ export
         let title = allArgs.title;
         let args = allArgs.payload;
 
-        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
+        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "'"+title.contextName;
 
         //Render new variable state
         let row: HTMLTableRowElement;
@@ -152,7 +171,6 @@ export
                         this._showMatrix( model, name )
                     } );
                 }
-                row.bgColor = "#e5e5e5";
             }
             let cell = row.insertCell( 0 );
             cell.innerHTML = args[index].varName;
@@ -220,5 +238,5 @@ namespace Private {
         let title = document.createElement( "p" );
         title.innerHTML = header;
         return title;
-    }
-}
+    }   
+  }

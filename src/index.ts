@@ -58,7 +58,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const command = CommandIDs.open;
         const label = "Open Variable Inspector";
         const namespace = "variableinspector";
-        const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
+        const tracker = new InstanceTracker<VariableInspector>( { namespace } );
 
 
         /**
@@ -78,7 +78,6 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
 
             //Track the inspector panel
             tracker.add( panel );
-
             return panel;
         }
 
@@ -97,7 +96,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
                     manager.panel = newPanel();
                 }
                 if ( !manager.panel.isAttached ) {
-                    app.shell.addToMainArea( manager.panel );
+                    app.shell.addToMainArea( manager.panel, {mode: "split-right"} );
                 }
                 if ( manager.source ) {
                     manager.source.performInspection();

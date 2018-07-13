@@ -44,6 +44,9 @@ export
         return this._session.kernel.name;
     }
 
+    get session(): IClientSession{
+        return this._session;
+    }
 
     /**
      *  A Promise that is fulfilled when the session associated w/ the connector is ready.
