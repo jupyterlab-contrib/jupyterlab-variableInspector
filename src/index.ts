@@ -67,7 +67,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         function newPanel(): VariableInspectorPanel {
             const table = new VariableInspectorTable();
             const panel = new VariableInspectorPanel(table);
-
+        
             panel.id = "jp-variableinspector";
             panel.title.label = "Variable Inspector";
             panel.title.closable = true;
@@ -79,6 +79,8 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
 
             //Track the inspector panel
             tracker.add( panel );
+            console.log("Is revealed!");
+            console.log(panel.isRevealed);
             return panel;
         }
 

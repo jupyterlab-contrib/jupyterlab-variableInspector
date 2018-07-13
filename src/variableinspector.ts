@@ -37,7 +37,6 @@ export
 export
     interface IVariableInspector {
     source: IVariableInspector.IInspectable | null;
-
 }
 
 /**
@@ -83,7 +82,7 @@ export class VariableInspectorPanel extends MainAreaWidget implements IVariableI
     private _variableTable: VariableInspectorTable;
 
     constructor(variableTable : VariableInspectorTable) {
-        super({content: variableTable});
+        super({content: variableTable, toolbar: new Toolbar()});
         this._variableTable = variableTable;
     }
     
@@ -93,15 +92,18 @@ export class VariableInspectorPanel extends MainAreaWidget implements IVariableI
     
     set source(source : IVariableInspector.IInspectable){
         this._variableTable.source = source;
-        this.toolbar        
+        console.log(this._variableTable);
+
+        //this.updateToolbar(); 
     }
-    
+   /* 
     private updateToolbar():void{
+        console.log(this);
         //this.toolbar = new Toolbar();
         this.toolbar.addItem("KernelName", Toolbar.createKernelNameItem(this._variableTable.session));
         this.toolbar.addItem("kernelStatus", Toolbar.createKernelStatusItem(this._variableTable.session));
     }
-    
+    */
 }
 
 /**
