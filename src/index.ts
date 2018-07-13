@@ -1,5 +1,5 @@
 import {
-    IVariableInspector, VariableInspectorPanel
+    IVariableInspector, VariableInspectorPanel, VariableInspectorTable
 } from "./variableinspector";
 
 import {
@@ -58,14 +58,15 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
         const command = CommandIDs.open;
         const label = "Open Variable Inspector";
         const namespace = "variableinspector";
-        const tracker = new InstanceTracker<VariableInspector>( { namespace } );
+        const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
 
 
         /**
          * Create and track a new inspector.
          */
         function newPanel(): VariableInspectorPanel {
-            const panel = new VariableInspectorPanel();
+            const table = new VariableInspectorTable();
+            const panel = new VariableInspectorPanel(table);
 
             panel.id = "jp-variableinspector";
             panel.title.label = "Variable Inspector";
@@ -127,7 +128,7 @@ const consoles: JupyterLabPlugin<void> = {
             
             handlers[consolePanel.id] = new Promise( function( resolve, reject ) {
                 const session = consolePanel.session;
-                const connector = new KernelConnector( { session } );
+                const connector = new KernelConnector( { session: session } );
 
                 
                 connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.

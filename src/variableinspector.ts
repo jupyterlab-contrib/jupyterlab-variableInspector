@@ -7,7 +7,7 @@ import {
 } from '@phosphor/coreutils';
 
 import {
-     DockLayout
+     DockLayout, Widget
 } from '@phosphor/widgets';
 
 import {
@@ -79,11 +79,36 @@ namespace IVariableInspector {
 }
 
 
+export class VariableInspectorPanel extends MainAreaWidget implements IVariableInspector {
+    private _variableTable: VariableInspectorTable;
+
+    constructor(variableTable : VariableInspectorTable) {
+        super({content: variableTable});
+        this._variableTable = variableTable;
+    }
+    
+    get source(): IVariableInspector.IInspectable {
+        return this._variableTable.source;
+    }
+    
+    set source(source : IVariableInspector.IInspectable){
+        this._variableTable.source = source;
+        this.toolbar        
+    }
+    
+    private updateToolbar():void{
+        //this.toolbar = new Toolbar();
+        this.toolbar.addItem("KernelName", Toolbar.createKernelNameItem(this._variableTable.session));
+        this.toolbar.addItem("kernelStatus", Toolbar.createKernelStatusItem(this._variableTable.session));
+    }
+    
+}
+
 /**
  * A panel that renders the variables
  */
 export
-    class VariableInspectorPanel extends MainAreaWidget implements IVariableInspector {
+    class VariableInspectorTable extends Widget implements IVariableInspector {
 
     private _source: IVariableInspector.IInspectable | null = null;
     private _table: HTMLTableElement;
@@ -116,12 +141,18 @@ export
         return this._source;
     }
     
-    set source( source: IVariableInspector.IInspectable | null ) {
+   /*
+    * Attempts to set the source of the table
+    * Returns true if the source has been updated to a new valid source
+    * and false otherwise 
+    */
+    set source( source: IVariableInspector.IInspectable | null ){
 
         if ( this._source === source ) {
            // this._source.performInspection();
             return;
         }
+        
         //Remove old subscriptions
         if ( this._source ) {
             this._source.inspected.disconnect( this.onInspectorUpdate, this );
@@ -132,11 +163,8 @@ export
         if ( this._source ) {
             this._source.inspected.connect( this.onInspectorUpdate, this );
             this._source.disposed.connect( this.onSourceDisposed, this );
-            this.toolbar = new Toolbar();
-            this.toolbar.addItem("kernelname", Toolbar.createKernelNameItem(this._source.session));
             this._source.performInspection();
-        }
-       
+        }               
     }
 
     /**
