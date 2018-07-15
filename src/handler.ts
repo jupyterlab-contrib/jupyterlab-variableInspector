@@ -101,9 +101,9 @@ export
      * Performs an inspection of the specified matrix.
      */
 
-    public performMatrixInspection( varName: string ): Promise<DataModel> {
+    public performMatrixInspection( varName: string, maxRows=100000 ): Promise<DataModel> {
         let request: KernelMessage.IExecuteRequest = {
-            code: this._matrixQueryCommand + "(" + varName + ")",
+            code: this._matrixQueryCommand + "(" + varName + ", " + maxRows + ")",
             stop_on_error: false,
             store_history: false,
         };
