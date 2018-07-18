@@ -183,12 +183,12 @@ export
 
                 let title: IVariableInspector.IVariableKernelInfo;
                 title = {
-                    contextName: "",
+                    context: "",
                     kernelName : this._connector.kernelname || "",
                     languageName : this._connector.kerneltype || ""
                 };
 
-                this._inspected.emit( {title: title, payload: update} );
+                this._inspected.emit( {kernelInfo: title, payload: update} );
                 break;
             default:
                 break;
@@ -269,11 +269,11 @@ export
         public performInspection(): void{
             let title: IVariableInspector.IVariableKernelInfo;
             title = {
-                contextName: ". <b>Language currently not supported.</b> ",
+                context: ". <b>Language currently not supported.</b> ",
                 kernelName : this._connector.kernelname || "",
                 languageName : this._connector.kerneltype || ""
             };
-            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{kernelInfo : title, payload : []});
         }
         
         public performMatrixInspection(varName : string, maxRows : number): Promise<DataModel>{

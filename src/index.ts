@@ -1,5 +1,5 @@
 import {
-    IVariableInspector, VariableInspectorPanel, VariableInspectorTable
+    IVariableInspector, VariableInspectorPanel
 } from "./variableinspector";
 
 import {
@@ -65,8 +65,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
          * Create and track a new inspector.
          */
         function newPanel(): VariableInspectorPanel {
-            const table = new VariableInspectorTable();
-            const panel = new VariableInspectorPanel(table);
+           const panel = new VariableInspectorPanel();
         
             panel.id = "jp-variableinspector";
             panel.title.label = "Variable Inspector";
@@ -79,8 +78,6 @@ const variableinspector: JupyterLabPlugin<IVariableInspector> = {
 
             //Track the inspector panel
             tracker.add( panel );
-            console.log("Is revealed!");
-            console.log(panel.isRevealed);
             return panel;
         }
 

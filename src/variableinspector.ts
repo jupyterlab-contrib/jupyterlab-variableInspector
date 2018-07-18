@@ -7,7 +7,7 @@ import {
 } from '@phosphor/coreutils';
 
 import {
-     DockLayout, Widget
+     DockLayout, Widget, BoxPanel, BoxLayout, Panel
 } from '@phosphor/widgets';
 
 import {
@@ -15,16 +15,15 @@ import {
 } from "@phosphor/datagrid";
 
 import {
-    MainAreaWidget, IClientSession, Toolbar
+    IClientSession, Toolbar
 } from "@jupyterlab/apputils";
 
 import '../style/index.css';
 
-const TITLE_CLASS = "jp-VarInspector-title";
 const PANEL_CLASS = "jp-VarInspector";
 const TABLE_CLASS = "jp-VarInspector-table";
 const TABLE_BODY_CLASS = "jp-VarInspector-content";
-
+const TOOLBAR_BUTTON_CLASS = "jp-Toolbar-kernelName";
 /**
  * The inspector panel token.
  */
@@ -56,7 +55,7 @@ namespace IVariableInspector {
 
     export
         interface IVariableInspectorUpdate {
-        title: IVariableKernelInfo;
+        kernelInfo: IVariableKernelInfo;
         payload: Array<IVariable>;
     } 
 
@@ -73,72 +72,48 @@ namespace IVariableInspector {
         interface IVariableKernelInfo {
         kernelName?: string;
         languageName?: string;
-        contextName?: string; //Context currently reserved for special information.
+        context?: string; //Context currently reserved for special information.
         }
 }
 
-
-export class VariableInspectorPanel extends MainAreaWidget implements IVariableInspector {
-    private _variableTable: VariableInspectorTable;
-
-    constructor(variableTable : VariableInspectorTable) {
-        super({content: variableTable, toolbar: new Toolbar()});
-        this._variableTable = variableTable;
-    }
-    
-    get source(): IVariableInspector.IInspectable {
-        return this._variableTable.source;
-    }
-    
-    set source(source : IVariableInspector.IInspectable){
-        this._variableTable.source = source;
-        console.log(this._variableTable);
-
-        //this.updateToolbar(); 
-    }
-   /* 
-    private updateToolbar():void{
-        console.log(this);
-        //this.toolbar = new Toolbar();
-        this.toolbar.addItem("KernelName", Toolbar.createKernelNameItem(this._variableTable.session));
-        this.toolbar.addItem("kernelStatus", Toolbar.createKernelStatusItem(this._variableTable.session));
-    }
-    */
-}
 
 /**
  * A panel that renders the variables
  */
 export
-    class VariableInspectorTable extends Widget implements IVariableInspector {
+    class VariableInspectorPanel extends BoxPanel implements IVariableInspector {
 
     private _source: IVariableInspector.IInspectable | null = null;
     private _table: HTMLTableElement;
-    private _title: HTMLElement;
-    private _kernelInfo : IVariableInspector.IVariableKernelInfo;
+    private _kernelInfoWidget : Private.ToolbarKernelInfo = new Private.ToolbarKernelInfo();
+    private _toolbar : Toolbar<Widget>;
+    private _tableWidget : Widget;
 
 
     constructor() {
-        super();
+        super({direction : "top-to-bottom", spacing : 0} );
         this.addClass( PANEL_CLASS );
-        this._title = Private.createTitle();
-        this._title.className = TITLE_CLASS;
+        this._tableWidget = new Panel();
+        this._toolbar = new Toolbar();
+        
+        this._toolbar.addItem("Kernel Information", this._kernelInfoWidget);
+       // this._toolbar.fit();
+        this._toolbar.node.style.minHeight = 'var(--jp-private-toolbar-height)';
+        
+        let layout = <BoxLayout> this.layout;
+        layout.addWidget(this._toolbar);
+        layout.addWidget(this._tableWidget);  
+        
+        BoxPanel.setStretch(this._toolbar, 0);
+        BoxPanel.setStretch(this._tableWidget, 1);
+        
         this._table = Private.createTable();
         this._table.className = TABLE_CLASS;
-        this.node.appendChild( this._title as HTMLElement );
-        this.node.appendChild( this._table as HTMLElement );
-        this._kernelInfo = {contextName : "FOO" ,kernelName : "BAR", languageName : "BAZ"};
-            
+        this._tableWidget.node.appendChild( this._table as HTMLElement );
+        
     }
-    
-    get session(): IClientSession {
-        return this._source.session;
-    }
-    
-    get kernelinfo(): IVariableInspector.IVariableKernelInfo{
-        return this._kernelInfo;
-    }
-
+         
+   
     get source(): IVariableInspector.IInspectable | null {
         return this._source;
     }
@@ -182,11 +157,11 @@ export
 
     protected onInspectorUpdate( sender: any, allArgs: IVariableInspector.IVariableInspectorUpdate): void {
 
-        let title = allArgs.title;
+        let kernelInfo = allArgs.kernelInfo;
         let args = allArgs.payload;
 
-        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "'"+title.contextName;
-
+        this._kernelInfoWidget.content = {languageName: kernelInfo.languageName, kernelName : kernelInfo.kernelName, context : kernelInfo.context};
+        
         //Render new variable state
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
@@ -236,7 +211,6 @@ export
         datagrid.title.closable = true;
         let lout: DockLayout = <DockLayout>this.parent.layout;
         lout.addWidget( datagrid , {mode: "split-right"});
-        //todo activate/focus matrix widget
     }
 
 }
@@ -261,12 +235,19 @@ namespace Private {
         let cell5 = hrow.insertCell( 4 );
         cell5.innerHTML = "Content";
         return table;
+    }  
+    
+    export class ToolbarKernelInfo extends Widget{
+            
+        constructor() {
+            super();
+            this.addClass(TOOLBAR_BUTTON_CLASS);
+            this.node.textContent = "Loading...";
+	     }
+        
+        set content(info : IVariableInspector.IVariableKernelInfo){
+            this.node.innerHTML = "Inspecting " + info.languageName + "-kernel '" + info.kernelName + "' " + info.context;
+            
+        }
     }
-
-    export
-        function createTitle(header="") {
-        let title = document.createElement( "p" );
-        title.innerHTML = header;
-        return title;
-    }   
   }
