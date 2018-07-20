@@ -182,8 +182,9 @@ export
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
 
                 let title: IVariableInspector.IVariableKernelInfo;
+
                 title = {
-                    context: "",
+                    context: "<i>" + (this._connector.session.name || "") + "</i>",
                     kernelName : this._connector.kernelname || "",
                     languageName : this._connector.kerneltype || ""
                 };

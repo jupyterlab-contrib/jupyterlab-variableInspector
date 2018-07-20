@@ -166,7 +166,7 @@ const consoles: JupyterLabPlugin<void> = {
                             delete handlers[consolePanel.id];
                             handler.dispose();
                         } );
-                        resolve( handler );                        
+                        resolve( handler );
                     } )
                 } );
             } );
@@ -186,7 +186,7 @@ const consoles: JupyterLabPlugin<void> = {
             future.then((source :IVariableInspector.IInspectable ) => {
                 if ( source ) {
                     manager.source = source;
-                    manager.source.performInspection();               
+                    manager.source.performInspection();
                 }
             });
         } );;
@@ -221,7 +221,7 @@ const notebooks: JupyterLabPlugin<void> = {
             handlers[nbPanel.id] = new Promise( function( resolve, reject ) {
 
                 const session = nbPanel.session;
-                const connector = new KernelConnector( { session } );
+                const connector = new KernelConnector( { session: session } );
                 
                 connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
                     let kerneltype: string = connector.kerneltype;
@@ -273,7 +273,7 @@ const notebooks: JupyterLabPlugin<void> = {
             future.then((source :VariableInspectionHandler ) => {
                 if ( source ) {
                     manager.source = source;
-                    manager.source.performInspection();               
+                    manager.source.performInspection();
                 }
             });
         } );
