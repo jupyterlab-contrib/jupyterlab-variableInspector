@@ -7,7 +7,7 @@ import {
 } from "./kernelconnector";
 
 import {
-    VariableInspectionHandler
+    VariableInspectionHandler, DummyHandler
 } from "./handler";
 
 import {
@@ -118,7 +118,7 @@ const consoles: JupyterLabPlugin<void> = {
     requires: [IVariableInspector, IConsoleTracker],
     autoStart: true,
     activate: ( app: JupyterLab, manager: IVariableInspector, consoles: IConsoleTracker ): void => {
-        const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
+        const handlers: { [id: string]: Promise<IVariableInspector.IInspectable> } = {};
         
         /**
          * Subscribes to the creation of new consoles. If a new notebook is created, build a new handler for the consoles.
@@ -161,7 +161,13 @@ const consoles: JupyterLabPlugin<void> = {
 
                     //Otherwise log error message.
                     scripts.catch(( result: string ) => {
-                        reject( result );
+                        console.log(result);
+                        const handler = new DummyHandler(connector);
+                        consolePanel.disposed.connect(() => {
+                            delete handlers[consolePanel.id];
+                            handler.dispose();
+                        } );
+                        resolve( handler );                        
                     } )
                 } );
             } );
@@ -178,7 +184,7 @@ const consoles: JupyterLabPlugin<void> = {
                 return;
             }
             let future = handlers[widget.id];
-            future.then((source :VariableInspectionHandler ) => {
+            future.then((source :IVariableInspector.IInspectable ) => {
                 if ( source ) {
                     manager.source = source;
                     manager.source.performInspection();               
