@@ -102,13 +102,13 @@ def _jupyterlab_variableinspector_is_matrix(x):
         return True
     if pd and isinstance(x, pd.Series):
         return True
-    if np and isinstance(x, np.ndarray):
+    if np and isinstance(x, np.ndarray) and len(x.shape) <= 2:
         return True
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
         return True
-    if tf and isinstance(x, tf.Variable):
+    if tf and isinstance(x, tf.Variable) and len(x.shape) <= 2:
         return True
-    if tf and isinstance(x, tf.Tensor):
+    if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
         return True
     return False
 
