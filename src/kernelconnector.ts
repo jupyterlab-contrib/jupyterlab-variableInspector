@@ -29,8 +29,19 @@ export
     }
 
 
+
     get kerneltype(): string {
         return this._session.kernel.info.language_info.name;
+    }
+
+    get context(): string {
+        // dummy status - for say sending message if language not implemented
+        // or other debugging?
+        return "status - ok";
+    }
+
+    get kernelname(): string {
+        return this._session.kernel.name;
     }
 
 

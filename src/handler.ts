@@ -160,11 +160,8 @@ export
 
         let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, ( () => { } ) );
         return reply;
-
     }
-
-
-
+    
     /*
      * Handle query response. Emit new signal containing the IVariableInspector.IInspectorUpdate object.
      * (TODO: query resp. could be forwarded to panel directly)
@@ -177,19 +174,22 @@ export
                 let content: string = <string>payload.data["text/plain"];
                 content = content.replace( /^'|'$/g, '' ).replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
 
-                let update: IVariableInspector.IVariableInspectorUpdate;
-                update = <IVariableInspector.IVariableInspectorUpdate>JSON.parse( content );
+                let update: IVariableInspector.IVariable[];
+                update = <IVariableInspector.IVariable[]>JSON.parse( content );
 
-                this._inspected.emit( update );
+                let title: IVariableInspector.IVariableTitle;
+                title = {
+                    contextName: "",
+                    kernelName : this._connector.kernelname || "",
+                    languageName : this._connector.kerneltype || ""
+                };
+
+                this._inspected.emit( {title: title, payload: update} );
                 break;
             default:
                 break;
         }
     };
-
-
-
-
 
     /*
      * Invokes a inspection if the signal emitted from specified session is an 'execute_input' msg.
@@ -207,8 +207,6 @@ export
                 break;
         }
     };
-
-
 }
 
 /**
@@ -228,5 +226,49 @@ namespace VariableInspectionHandler {
     }
 }
 
-
-
+export
+    class DummyHandler implements IDisposable, IVariableInspector.IInspectable{
+        private _isDisposed = false;
+        private _disposed = new Signal<this,void>( this );
+        private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
+        private _connector : KernelConnector;
+        
+        constructor(connector : KernelConnector) {
+            this._connector = connector;
+        }
+                
+        get disposed() : ISignal<DummyHandler, void>{
+            return this._disposed;
+        }
+       
+        get isDisposed() : boolean {
+            return this._isDisposed;
+        }
+       
+        get inspected() : ISignal<DummyHandler, IVariableInspector.IVariableInspectorUpdate>{
+            return this._inspected;
+        }
+       
+        dispose(): void {
+            if ( this.isDisposed ) {
+                return;
+            }
+            this._isDisposed = true;
+            this._disposed.emit( void 0 );
+            Signal.clearData( this );
+        }
+       
+        public performInspection(): void{
+            let title: IVariableInspector.IVariableTitle;
+            title = {
+                contextName: ". <b>Language currently not supported.</b> ",
+                kernelName : this._connector.kernelname || "",
+                languageName : this._connector.kerneltype || ""
+            };
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
+        }
+        
+        public performMatrixInspection(varName : string, maxRows : number): Promise<DataModel>{
+            return new Promise(function(resolve, reject) { reject("Cannot inspect matrices w/ the DummyHandler!") });
+        }
+}
