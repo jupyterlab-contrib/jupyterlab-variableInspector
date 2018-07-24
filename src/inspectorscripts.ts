@@ -72,6 +72,9 @@ def _jupyterlab_variableinspector_getshapeof(x):
     if tf and isinstance(x, tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "Tensorflow Variable [%s]" % shape
+    if tf and isinstance(x, tf.Tensor):
+        shape = " x ".join([str(int(i)) for i in x.shape])
+        return "Tensorflow Tensor [%s]" % shape
     return None
 
 
@@ -99,11 +102,13 @@ def _jupyterlab_variableinspector_is_matrix(x):
         return True
     if pd and isinstance(x, pd.Series):
         return True
-    if np and isinstance(x, np.ndarray):
+    if np and isinstance(x, np.ndarray) and len(x.shape) <= 2:
         return True
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
         return True
-    if tf and isinstance(x, tf.Variable):
+    if tf and isinstance(x, tf.Variable) and len(x.shape) <= 2:
+        return True
+    if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
         return True
     return False
 
@@ -154,7 +159,7 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         df.columns = df.columns.map(str)
         response = {"schema": pd.io.json.build_table_schema(df), "data": df.to_dict(orient="records")}
         return json.dumps(response,default=_jupyterlab_variableinspector_default)
-    elif tf and isinstance(x, tf.Variable):
+    elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
         df = K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
 
