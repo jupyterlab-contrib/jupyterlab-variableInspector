@@ -186,7 +186,7 @@ const consoles: JupyterLabPlugin<void> = {
             }
             let future = handlers[widget.id];
             future.then((source :IVariableInspector.IInspectable ) => {
-                if ( source && ((widgetOld.title.label != widget.title.label) || widget.title.label == "") ) {
+                if ( source && (!(widgetOld) || (widgetOld.title.label != widget.title.label) || widget.title.label == "") ) {
                     manager.source = source;
                     manager.source.performInspection();
                 }
