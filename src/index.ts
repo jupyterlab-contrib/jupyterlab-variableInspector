@@ -167,7 +167,7 @@ const consoles: JupyterLabPlugin<void> = {
                             delete handlers[consolePanel.id];
                             handler.dispose();
                         } );
-                        resolve( handler );                        
+                        resolve( handler );
                     } )
                 } );
             } );
@@ -180,14 +180,15 @@ const consoles: JupyterLabPlugin<void> = {
          */
         app.shell.currentChanged.connect(( sender, args ) => {
             let widget = args.newValue;
+            let widgetOld = args.oldValue;
             if ( !widget || !consoles.has( widget ) ) {
                 return;
             }
             let future = handlers[widget.id];
             future.then((source :IVariableInspector.IInspectable ) => {
-                if ( source ) {
+                if ( source && (!(widgetOld) || (widgetOld.title.label != widget.title.label) || widget.title.label == "") ) {
                     manager.source = source;
-                    manager.source.performInspection();               
+                    manager.source.performInspection();
                 }
             });
         } );;
@@ -267,14 +268,15 @@ const notebooks: JupyterLabPlugin<void> = {
          */
         app.shell.currentChanged.connect(( sender, args ) => {
             let widget = args.newValue;
+            let widgetOld = args.oldValue;
             if ( !widget || !notebooks.has( widget ) ) {
                 return;
             }
             let future = handlers[widget.id];
             future.then((source :VariableInspectionHandler ) => {
-                if ( source ) {
+                if ( source && ((widgetOld.title.label != widget.title.label) || widget.title.label == "") ) {
                     manager.source = source;
-                    manager.source.performInspection();               
+                    manager.source.performInspection();
                 }
             });
         } );
