@@ -7,12 +7,12 @@
     "jupyterlab",
     "jupyterlab-extension"
   ],
-  "homepage": "https://github.com/my_name/jupyterlab_myextension",
+  "homepage": "https://github.com/lckr/jupyterlab-variableInspector",
   "bugs": {
-    "url": "https://github.com/my_name/jupyterlab_myextension/issues"
+    "url": "https://github.com/lckr/jupyterlab-variableInspector/issues"
   },
   "license": "BSD-3-Clause",
-  "author": "Lucas Krauss",
+  "author": "lckr",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
     "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
@@ -21,7 +21,7 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/my_name/jupyterlab_myextension.git"
+    "url": "https://github.com/lckr/jupyterlab-variableInspector.git"
   },
   "scripts": {
     "build": "tsc",

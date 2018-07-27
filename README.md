@@ -15,7 +15,7 @@ For the time being, this project is still in its first steps. Contributions in a
 
 ## Prerequisites
 
-* JupyterLab
+* JupyterLab [>= 0.33] 
 
 ## Installation
 In this early stage you can install this extension by building it from source.
@@ -24,7 +24,6 @@ Download the repository and build the project with `npm install` and `npm run bu
 
 
 ## TODOs
-~~- [ ] Load inspection script from relative paths.~~
 - [x] Add a better presentation (datagrids) for dataframes and ndarrays.
 - [ ] Allow sorting the inspector table.
 - [ ] Add support for other languages.
