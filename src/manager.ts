@@ -2,6 +2,24 @@ import {
     VariableInspectorPanel, IVariableInspector
 } from "./variableinspector"
 
+import {
+    Token
+} from '@phosphor/coreutils';
+
+import{
+    VariableInspectionHandler
+}from "./handler";
+
+export const IVariableInspectorManager = new Token<IVariableInspectorManager>("jupyterlab_extension/variableinspector:IVariableInspectorManager" );
+
+export interface IVariableInspectorManager{
+    source: IVariableInspector.IInspectable | null;
+    hasHandler(id:string) : boolean;
+    getHandler(id:string): VariableInspectionHandler;
+    addHandler(handler : VariableInspectionHandler): void;
+    
+}
+
 
 
 /**
@@ -9,11 +27,28 @@ import {
  * `IVariableInspector` instance that other plugins can communicate with.
  */
 export
-    class VariableInspectorManager implements IVariableInspector {
+    class VariableInspectorManager implements IVariableInspectorManager {
 
     private _source: IVariableInspector.IInspectable = null;
     private _panel: VariableInspectorPanel = null;
+    private _handlers : { [id : string] : VariableInspectionHandler} = {};
 
+    public hasHandler(id:string): boolean{
+        if (this._handlers[id]){
+            return true;
+        }else{
+            return false;
+        }
+    }
+   
+    public getHandler(id:string): VariableInspectionHandler{
+        return this._handlers[id];        
+    }
+
+    public addHandler(handler : VariableInspectionHandler){
+        this._handlers[handler.id] = handler;
+    }
+    
     /**
      * The current inspector panel.
      */

@@ -44,14 +44,16 @@ export
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
     private _ready : Promise<void>;
+    private _id : string;
     
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
+        this._id = options.id;
         this._queryCommand = options.queryCommand;
         this._matrixQueryCommand = options.matrixQueryCommand;
         this._initScript = options.initScript;
-
+        
         this._ready =  this._connector.ready.then(() => {
             this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
             this._connector.iopubMessage.connect( this._queryCall );
@@ -62,6 +64,10 @@ export
         
     }
 
+    get id():string{
+        return this._id;
+    }
+    
     /**
      * A signal emitted when the handler is disposed.
      */
@@ -223,6 +229,7 @@ namespace VariableInspectionHandler {
         queryCommand: string;
         matrixQueryCommand: string;
         initScript: string;
+        id : string;
     }
 }
 
