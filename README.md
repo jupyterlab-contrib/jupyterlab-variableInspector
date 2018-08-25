@@ -15,7 +15,7 @@ For the time being, this project is still in its first steps. Contributions in a
 
 ## Prerequisites
 
-* JupyterLab [>= 0.33] 
+* JupyterLab [0.34] 
 
 ## Installation
 In this early stage you can install this extension by building it from source.
