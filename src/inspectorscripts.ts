@@ -83,9 +83,9 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
-        content = "Column names: %s" % colnames 
+        content = "Column names: %s" % colnames
     elif pd and isinstance(x, pd.Series):
-        content = "Series [%d rows]" % x.shape      
+        content = "Series [%d rows]" % x.shape
     elif np and isinstance(x, np.ndarray):
         content = x.__repr__()
     else:
@@ -150,15 +150,13 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         if threshold is not None:
             x = x.head(threshold)
         x.columns = x.columns.map(str)
-        response = {"schema": pd.io.json.build_table_schema(x), "data": x.to_dict(orient="records")}
-        return json.dumps(response, default=_jupyterlab_variableinspector_default)
+        return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default)
     elif np and pd and type(x).__name__ in ["ndarray"]:
         df = pd.DataFrame(x)
         if threshold is not None:
             df = df.head(threshold)
         df.columns = df.columns.map(str)
-        response = {"schema": pd.io.json.build_table_schema(df), "data": df.to_dict(orient="records")}
-        return json.dumps(response,default=_jupyterlab_variableinspector_default)
+        return df.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default)
     elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
         df = K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
