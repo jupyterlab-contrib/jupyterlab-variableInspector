@@ -31,7 +31,7 @@ export
             switch (new_status) {
             	case "restarting":
             	    //TODO : Check for kernel availability
-            	    return this._session.kernel.ready
+            	    this._kernelRestarted.emit(this._session.kernel.ready);
             	default:
             		break;
             }

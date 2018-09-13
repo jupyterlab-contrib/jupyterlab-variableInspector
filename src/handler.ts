@@ -63,16 +63,17 @@ export
         } );
         
         this._connector.kernelRestarted.connect(( sender, kernelReady: Promise<void> ) => {
-            console.log("Restarting connector...")
-            this._ready = new Promise( function( resolve, reject ) {
-                kernelReady.then(() => {
-                    this._initOnKernel().then(( msg: KernelMessage.IExecuteReplyMsg ) => {
-                        this._connector.iopubMessage.connect( this._queryCall );
-                        console.log("Done")
-                        return;
+            
+            const title: IVariableInspector.IVariableTitle = {
+                    contextName: "<b>Restarting kernel...</b> "
+            };
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});          
 
-                    } );
-                } );
+            this._ready = kernelReady.then(() => {
+                this._initOnKernel().then(( msg: KernelMessage.IExecuteReplyMsg ) => {
+                    this._connector.iopubMessage.connect( this._queryCall );
+                    this.performInspection();
+                } );         
             } );
         } );
 
