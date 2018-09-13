@@ -135,9 +135,13 @@ export
 
         let title = allArgs.title;
         let args = allArgs.payload;
-
-        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
-
+        
+        if (title.contextName){
+            this._title.innerHTML = title.contextName;            
+        }else{
+            this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
+        }
+        
         //Render new variable state
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();

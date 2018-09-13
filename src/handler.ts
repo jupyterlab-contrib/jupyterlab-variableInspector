@@ -62,6 +62,21 @@ export
             } );
         } );
         
+        this._connector.kernelRestarted.connect(( sender, kernelReady: Promise<void> ) => {
+            
+            const title: IVariableInspector.IVariableTitle = {
+                    contextName: "<b>Restarting kernel...</b> "
+            };
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});          
+
+            this._ready = kernelReady.then(() => {
+                this._initOnKernel().then(( msg: KernelMessage.IExecuteReplyMsg ) => {
+                    this._connector.iopubMessage.connect( this._queryCall );
+                    this.performInspection();
+                } );         
+            } );
+        } );
+
     }
 
     get id():string{
