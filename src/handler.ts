@@ -62,6 +62,20 @@ export
             } );
         } );
         
+        this._connector.kernelRestarted.connect(( sender, kernelReady: Promise<void> ) => {
+            console.log("Restarting connector...")
+            this._ready = new Promise( function( resolve, reject ) {
+                kernelReady.then(() => {
+                    this._initOnKernel().then(( msg: KernelMessage.IExecuteReplyMsg ) => {
+                        this._connector.iopubMessage.connect( this._queryCall );
+                        console.log("Done")
+                        return;
+
+                    } );
+                } );
+            } );
+        } );
+
     }
 
     get id():string{
