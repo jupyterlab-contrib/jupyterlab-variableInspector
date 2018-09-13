@@ -20,6 +20,10 @@
     background-color: #f9f9f9;
 }
 
+.jp-VarInspector-table tr:nth-child(odd){
+    background-color: #ffffff;
+}
+
 .jp-VarInspector-content tr:hover {background-color: #ddd;}
 
 
