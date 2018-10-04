@@ -18,15 +18,26 @@ For the time being, this project is still in its first steps. Contributions in a
 * JupyterLab [0.34] 
 
 ## Installation
-In this early stage you can install this extension by building it from source.
+In this early stage you can install this extension by building it from source.  
 
-Download the repository and build the project with `npm install` and `npm run build` and use `jupyter labextension install . ` in the project's root directory.
+First of all, you need an installation of a current version of JupyterLab. Please refer to the [installation guide](https://github.com/jupyterlab/jupyterlab#installation).
 
 
-## TODOs
-- [x] Add a better presentation (datagrids) for dataframes and ndarrays.
-- [ ] Allow sorting the inspector table.
-- [ ] Add support for other languages.
+Next, clone this repository with `git clone https://github.com/lckr/jupyterlab-variableInspector`
+
+Once you downloaded the repository use the following steps:
+```
+cd jupyterlab-variableInspector
+npm install
+npm run build 
+jupyter labextension install . 
+``` 
+
+Afterwards confirm the installation of the extension with:
+```
+jupyter labextension list
+```
+which should print `enabled` and `OK`.
 
 
 
