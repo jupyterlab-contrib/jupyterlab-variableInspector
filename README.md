@@ -37,7 +37,7 @@ Afterwards confirm the installation of the extension with:
 ```
 jupyter labextension list
 ```
-which should print is as `enabled` and `OK`.
+which should print `enabled` and `OK`.
 
 
 
