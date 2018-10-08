@@ -156,7 +156,6 @@ export
                         this._showMatrix( model, name )
                     } );
                 }
-                row.bgColor = "#e5e5e5";
             }
             let cell = row.insertCell( 0 );
             cell.innerHTML = args[index].varName;
