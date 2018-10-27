@@ -8,3 +8,5 @@ package-lock.json
 .project
 .settings
 .ipynb
+.idea
+.iml

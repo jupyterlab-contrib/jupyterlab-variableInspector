@@ -119,6 +119,10 @@ def _jupyterlab_variableinspector_dict_list():
             return True
         if tf and isinstance(eval(v), tf.Variable):
             return True
+        if pd and pd is not None and (
+            isinstance(eval(v), pd.core.frame.DataFrame)
+            or isinstance(eval(v), pd.core.series.Series)):
+            return True
         if str(eval(v))[0] == "<":
             return False
         if  v in ['np', 'pd', 'pyspark', 'tf']:
