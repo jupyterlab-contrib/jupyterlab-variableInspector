@@ -15,7 +15,15 @@ For the time being, this project is still in its first steps. Contributions in a
 
 ## Prerequisites
 
-* JupyterLab [0.34] 
+* JupyterLab [0.35] 
+
+### Requirements for python functionality
+
+- `pandas` and `numpy` are required to enable matrix inspection.
+- `pyspark` for spark support.
+- `tensorflow` and `keras` to allow inspection of tf objects.
+
+
 
 ## Installation
 In this early stage you can install this extension by building it from source.  
