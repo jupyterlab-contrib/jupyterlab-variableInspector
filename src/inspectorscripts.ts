@@ -139,7 +139,7 @@ def _jupyterlab_variableinspector_dict_list():
     'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
     'isMatrix': _jupyterlab_variableinspector_is_matrix(eval(_v))}
             for _v in values if keep_cond(_v)]
-    return json.dumps(vardic)
+    return json.dumps(vardic, ensure_ascii=False)
 
 
 def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
