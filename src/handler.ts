@@ -193,7 +193,8 @@ export
             case "execute_result":
                 let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
-                content = content.replace( /^'|'$/g, '' ).replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+                content = content.slice(1,-1);
+                content = content.replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
 
                 let update: IVariableInspector.IVariable[];
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
