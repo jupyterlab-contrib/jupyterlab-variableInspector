@@ -115,19 +115,20 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
-        if isinstance(eval(v), str):
+        obj = eval(v)
+        if isinstance(obj, str):
             return True
-        if tf and isinstance(eval(v), tf.Variable):
+        if tf and isinstance(obj, tf.Variable):
             return True
         if pd and pd is not None and (
-            isinstance(eval(v), pd.core.frame.DataFrame)
-            or isinstance(eval(v), pd.core.series.Series)):
+            isinstance(obj, pd.core.frame.DataFrame)
+            or isinstance(obj, pd.core.series.Series)):
             return True
-        if str(eval(v))[0] == "<":
+        if str(obj)[0] == "<":
             return False
         if  v in ['np', 'pd', 'pyspark', 'tf']:
-            return eval(v) is not None
-        if str(eval(v)).startswith("_Feature"):
+            return obj is not None
+        if str(obj).startswith("_Feature"):
             # removes tf/keras objects
             return False
         return True
