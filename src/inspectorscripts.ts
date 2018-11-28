@@ -72,6 +72,9 @@ def _jupyterlab_variableinspector_getshapeof(x):
     if tf and isinstance(x, tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "Tensorflow Variable [%s]" % shape
+    if tf and isinstance(x, tf.Tensor):
+        shape = " x ".join([str(int(i)) for i in x.shape])
+        return "Tensorflow Tensor [%s]" % shape
     return None
 
 
@@ -80,9 +83,9 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
-        content = "Column names: %s" % colnames 
+        content = "Column names: %s" % colnames
     elif pd and isinstance(x, pd.Series):
-        content = "Series [%d rows]" % x.shape      
+        content = "Series [%d rows]" % x.shape
     elif np and isinstance(x, np.ndarray):
         content = x.__repr__()
     else:
@@ -99,26 +102,33 @@ def _jupyterlab_variableinspector_is_matrix(x):
         return True
     if pd and isinstance(x, pd.Series):
         return True
-    if np and isinstance(x, np.ndarray):
+    if np and isinstance(x, np.ndarray) and len(x.shape) <= 2:
         return True
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
         return True
-    if tf and isinstance(x, tf.Variable):
+    if tf and isinstance(x, tf.Variable) and len(x.shape) <= 2:
+        return True
+    if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
         return True
     return False
 
 
 def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
-        if isinstance(eval(v), str):
+        obj = eval(v)
+        if isinstance(obj, str):
             return True
-        if tf and isinstance(eval(v), tf.Variable):
+        if tf and isinstance(obj, tf.Variable):
             return True
-        if str(eval(v))[0] == "<":
+        if pd and pd is not None and (
+            isinstance(obj, pd.core.frame.DataFrame)
+            or isinstance(obj, pd.core.series.Series)):
+            return True
+        if str(obj)[0] == "<":
             return False
         if  v in ['np', 'pd', 'pyspark', 'tf']:
-            return eval(v) is not None
-        if str(eval(v)).startswith("_Feature"):
+            return obj is not None
+        if str(obj).startswith("_Feature"):
             # removes tf/keras objects
             return False
         return True
@@ -130,7 +140,7 @@ def _jupyterlab_variableinspector_dict_list():
     'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
     'isMatrix': _jupyterlab_variableinspector_is_matrix(eval(_v))}
             for _v in values if keep_cond(_v)]
-    return json.dumps(vardic)
+    return json.dumps(vardic, ensure_ascii=False)
 
 
 def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
@@ -145,16 +155,14 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         if threshold is not None:
             x = x.head(threshold)
         x.columns = x.columns.map(str)
-        response = {"schema": pd.io.json.build_table_schema(x), "data": x.to_dict(orient="records")}
-        return json.dumps(response, default=_jupyterlab_variableinspector_default)
+        return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default)
     elif np and pd and type(x).__name__ in ["ndarray"]:
         df = pd.DataFrame(x)
         if threshold is not None:
             df = df.head(threshold)
         df.columns = df.columns.map(str)
-        response = {"schema": pd.io.json.build_table_schema(df), "data": df.to_dict(orient="records")}
-        return json.dumps(response,default=_jupyterlab_variableinspector_default)
-    elif tf and isinstance(x, tf.Variable):
+        return df.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default)
+    elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
         df = K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
 

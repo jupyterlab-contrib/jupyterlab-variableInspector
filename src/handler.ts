@@ -44,14 +44,16 @@ export
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
     private _ready : Promise<void>;
+    private _id : string;
     
 
     constructor( options: VariableInspectionHandler.IOptions ) {
         this._connector = options.connector;
+        this._id = options.id;
         this._queryCommand = options.queryCommand;
         this._matrixQueryCommand = options.matrixQueryCommand;
         this._initScript = options.initScript;
-
+        
         this._ready =  this._connector.ready.then(() => {
             this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
             this._connector.iopubMessage.connect( this._queryCall );
@@ -60,8 +62,27 @@ export
             } );
         } );
         
+        this._connector.kernelRestarted.connect(( sender, kernelReady: Promise<void> ) => {
+            
+            const title: IVariableInspector.IVariableTitle = {
+                    contextName: "<b>Restarting kernel...</b> "
+            };
+            this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});          
+
+            this._ready = kernelReady.then(() => {
+                this._initOnKernel().then(( msg: KernelMessage.IExecuteReplyMsg ) => {
+                    this._connector.iopubMessage.connect( this._queryCall );
+                    this.performInspection();
+                } );         
+            } );
+        } );
+
     }
 
+    get id():string{
+        return this._id;
+    }
+    
     /**
      * A signal emitted when the handler is disposed.
      */
@@ -172,7 +193,8 @@ export
             case "execute_result":
                 let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
-                content = content.replace( /^'|'$/g, '' ).replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+                content = content.slice(1,-1);
+                content = content.replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
 
                 let update: IVariableInspector.IVariable[];
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
@@ -223,6 +245,7 @@ namespace VariableInspectionHandler {
         queryCommand: string;
         matrixQueryCommand: string;
         initScript: string;
+        id : string;
     }
 }
 

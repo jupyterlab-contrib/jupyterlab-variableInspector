@@ -1,38 +1,45 @@
 .jp-VarInspector{
     flex-direction: column;
     overflow: auto;
-	font-size: var(--jp-ui-font-size1);
+    font-size: var(--jp-ui-font-size1);
 }
 
-
-.jp-VarInspector-table{
+ .jp-VarInspector-table{
     border-collapse: collapse;
     margin: auto;
     width: 100%;
+    color: var(--jp-content-font-color1);
 }
 
+
 .jp-VarInspector-table td, .jp-VarInspector-table thead{
-    border: 1px solid #ddd;
+    border: 1px solid;
+    border-color: var(--jp-layout-color2);
     padding: 8px;
 }
 
 .jp-VarInspector-table tr:nth-child(even){
-    background-color: #f9f9f9;
+    background-color: var(--jp-layout-color1);
 }
 
-.jp-VarInspector-content tr:hover {background-color: #ddd;}
+.jp-VarInspector-content tr:hover {
+    background-color: var(--jp-layout-color2);
+}
 
 
 .jp-VarInspector-table thead{
-	font-size: var(--jp-ui-font-size1);
-    text-align: center;
-    background-color: #f37626;
-    color: white;
+	font-size: var(--jp-ui-font-size0);
+	text-align: center;
+	background-color: var(--jp-layout-color2);
+	color: var(--jp-ui-font-color1);
 	font-weight: 600;
+	letter-spacing : 1px;
+	text-transform : uppercase;
 }
 
 .jp-VarInspector-title {
 	font-size: var(--jp-ui-font-size1);
+ 	color: var(--jp-content-font-color1);
 	text-align: left;
 	padding-left: 10px;
 }

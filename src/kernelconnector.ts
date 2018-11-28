@@ -12,7 +12,7 @@ import {
 } from "@jupyterlab/services";
 
 import {
-    ISignal//, Signal, Slot
+    ISignal, Signal//, Slot
 } from "@phosphor/signaling";
 
 
@@ -23,12 +23,24 @@ export
     class KernelConnector {
 
     private _session: IClientSession;
+    private _kernelRestarted = new Signal<this, Promise<void>>(this); 
 
     constructor( options: KernelConnector.IOptions ) {
         this._session = options.session;
+        this._session.statusChanged.connect( (sender, new_status: Kernel.Status) =>{
+            switch (new_status) {
+            	case "restarting":
+            	    //TODO : Check for kernel availability
+            	    this._kernelRestarted.emit(this._session.kernel.ready);
+            	default:
+            		break;
+            }
+        });
     }
 
-
+    get kernelRestarted(): ISignal<KernelConnector, Promise<void>>{
+        return this._kernelRestarted
+    }
 
     get kerneltype(): string {
         return this._session.kernel.info.language_info.name;

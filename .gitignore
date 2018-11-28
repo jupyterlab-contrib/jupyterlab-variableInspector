@@ -6,3 +6,7 @@ node_modules/
 npm-debug.log
 package-lock.json
 .project
+.settings
+.ipynb
+.idea
+.iml

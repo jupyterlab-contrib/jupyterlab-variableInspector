@@ -135,9 +135,13 @@ export
 
         let title = allArgs.title;
         let args = allArgs.payload;
-
-        this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
-
+        
+        if (title.contextName){
+            this._title.innerHTML = title.contextName;            
+        }else{
+            this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
+        }
+        
         //Render new variable state
         let row: HTMLTableRowElement;
         this._table.deleteTFoot();
@@ -152,7 +156,6 @@ export
                         this._showMatrix( model, name )
                     } );
                 }
-                row.bgColor = "#e5e5e5";
             }
             let cell = row.insertCell( 0 );
             cell.innerHTML = args[index].varName;
