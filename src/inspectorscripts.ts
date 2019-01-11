@@ -115,23 +115,26 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
-        obj = eval(v)
-        if isinstance(obj, str):
+        try:
+            obj = eval(v)
+            if isinstance(obj, str):
+                return True
+            if tf and isinstance(obj, tf.Variable):
+                return True
+            if pd and pd is not None and (
+                isinstance(obj, pd.core.frame.DataFrame)
+                or isinstance(obj, pd.core.series.Series)):
+                return True
+            if str(obj)[0] == "<":
+                return False
+            if  v in ['np', 'pd', 'pyspark', 'tf']:
+                return obj is not None
+            if str(obj).startswith("_Feature"):
+                # removes tf/keras objects
+                return False
             return True
-        if tf and isinstance(obj, tf.Variable):
-            return True
-        if pd and pd is not None and (
-            isinstance(obj, pd.core.frame.DataFrame)
-            or isinstance(obj, pd.core.series.Series)):
-            return True
-        if str(obj)[0] == "<":
+        except:
             return False
-        if  v in ['np', 'pd', 'pyspark', 'tf']:
-            return obj is not None
-        if str(obj).startswith("_Feature"):
-            # removes tf/keras objects
-            return False
-        return True
     values = _jupyterlab_variableinspector_nms.who_ls()
     vardic = [{'varName': _v, 
     'varType': type(eval(_v)).__name__, 
