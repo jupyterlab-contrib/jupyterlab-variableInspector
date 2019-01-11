@@ -189,10 +189,6 @@ export
      */
     private _handleQueryResponse = ( response: KernelMessage.IIOPubMessage ): void => {
         let msgType = response.header.msg_type.split("_", 1)[0];
-        console.log("msgType (handleQueryResponse): "+msgType)
-        console.log("response.content: ");
-        console.log(response.content);
-        console.log(response.content.data);
         switch ( msgType ) {
             case "execute":
                 let payload = response.content as nbformat.IExecuteResult;
@@ -244,12 +240,10 @@ export
      */
     private _queryCall = ( sess: IClientSession, msg: KernelMessage.IMessage ) => {
         let msgType = msg.header.msg_type;
-        console.log("msgType (queryCall): "+msgType)
         switch ( msgType ) {
             case 'execute_input':
                 let code = msg.content.code;
                 if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) ) {
-                    console.log("code: "+code)
                     this.performInspection();
                 }
                 break;
