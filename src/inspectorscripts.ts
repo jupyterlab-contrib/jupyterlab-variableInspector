@@ -195,7 +195,7 @@ def _jupyterlab_variableinspector_default(o):
         out <- data.frame(obj.type, obj.size, obj.dim)
         names(out) <- c("varType", "varSize", "Rows", "Columns")
         out$varShape <- paste(out$Rows, " x ", out$Columns)
-        out$varContent <- paste(out$Rows, " x ", out$Columns)
+        out$varContent <- sapply(names, function(x) toString(get(x))[1])
         out$isMatrix <- FALSE
         out$varName <- row.names(out)
                             
