@@ -188,13 +188,15 @@ export
      * (TODO: query resp. could be forwarded to panel directly)
      */
     private _handleQueryResponse = ( response: KernelMessage.IIOPubMessage ): void => {
-        let msgType = response.header.msg_type;
+        let msgType = response.header.msg_type.split("_", 1)[0];
         switch ( msgType ) {
-            case "execute_result":
+            case "execute":
                 let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
-                content = content.slice(1,-1);
-                content = content.replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+                if (content.slice(0, 1) == "'" || content.slice(0, 1) == "\""){
+                    content = content.slice(1,-1);
+                    content = content.replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+                }
 
                 let update: IVariableInspector.IVariable[];
                 update = <IVariableInspector.IVariable[]>JSON.parse( content );
@@ -207,6 +209,26 @@ export
                 };
 
                 this._inspected.emit( {title: title, payload: update} );
+                break;
+            case "display":
+                let payload_display = response.content as nbformat.IExecuteResult;
+                let content_display: string = <string>payload_display.data["text/plain"];
+                if (content_display.slice(0, 1) == "'" || content_display.slice(0, 1) == "\""){
+                    content_display = content_display.slice(1,-1);
+                    content_display = content_display.replace( /\\"/g, "\"" ).replace( /\\'/g, "\'" );
+                }
+
+                let update_display: IVariableInspector.IVariable[];
+                update_display = <IVariableInspector.IVariable[]>JSON.parse( content_display );
+
+                let title_display: IVariableInspector.IVariableTitle;
+                title_display = {
+                    contextName: "",
+                    kernelName : this._connector.kernelname || "",
+                    languageName : this._connector.kerneltype || ""
+                };
+
+                this._inspected.emit( {title: title_display, payload: update_display} );
                 break;
             default:
                 break;
