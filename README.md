@@ -26,18 +26,17 @@ For the time being, this project is still in its first steps. Contributions in a
 
 
 ## Installation
-In this early stage you can install this extension by building it from source.  
-
 First of all, you need an installation of a current version of JupyterLab. Please refer to the [installation guide](https://github.com/jupyterlab/jupyterlab#installation).
 
-You can install the inspector either by running `jupyter labextension install https://github.com/lckr/jupyterlab-variableInspector`
+You can install the inspector either by running 
+`jupyter labextension install @lckr/jupyterlab_variableinspector`
 
 or by cloning the repository and build it locally following these steps:
 
 
-Next, clone this repository with `git clone https://github.com/lckr/jupyterlab-variableInspector`
+1. Clone this repository with `git clone https://github.com/lckr/jupyterlab-variableInspector
 
-Once you downloaded the repository use the following steps:
+2. Once you downloaded the repository use the following steps:
 ```
 cd jupyterlab-variableInspector
 npm install
@@ -45,7 +44,7 @@ npm run build
 jupyter labextension install . 
 ``` 
 
-Afterwards confirm the installation of the extension with:
+3. Confirm the installation of the extension with:
 ```
 jupyter labextension list
 ```
