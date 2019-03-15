@@ -174,8 +174,9 @@ def _jupyterlab_variableinspector_default(o):
     raise TypeError
 `;
 
-    static r_script: string = `
-    #.ls.objects = function (pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE, 
+    static r_script: string = `library(repr)
+
+.ls.objects = function (pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE, 
     n = 5) 
 {
     napply <- function(names, fn) sapply(names, function(x) fn(get(x, 
@@ -204,6 +205,7 @@ def _jupyterlab_variableinspector_default(o):
     obj.rownames <- sapply(obj.rownames, function(x) paste("Row names: ",x))
     obj.content[has_rownames] <- obj.rownames
                                
+                               
     obj.colnames <- napply(names, colnames)
     has_colnames <- obj.colnames != "NULL"
     obj.colnames <- sapply(obj.colnames[has_colnames], function(x) paste(x, 
@@ -213,10 +215,13 @@ def _jupyterlab_variableinspector_default(o):
     obj.colnames <- ifelse(nchar(obj.colnames) > 154, obj.colnames.short, 
         obj.colnames)
     obj.colnames <- sapply(obj.colnames, function(x) paste("Column names: ",x))
+                    
     obj.content[has_colnames] <- obj.colnames
                            
     is_function <- (obj.type == "function")
     obj.content[is_function] <- napply(names[is_function], function(x) paste(strsplit(repr_text(x),")")[[1]][1],")",sep=""))
+    obj.content <- unlist(obj.content, use.names = FALSE)
+    
 
     out <- data.frame(obj.type, obj.size, obj.dim)
     names(out) <- c("varType", "varSize", "Rows", "Columns")
@@ -226,7 +231,7 @@ def _jupyterlab_variableinspector_default(o):
     out$varName <- row.names(out)
     out <- out[, !(names(out) %in% c("Rows", "Columns"))]
     rownames(out) <- NULL
-
+    print(out)
     if (!missing(order.by)) 
         out <- out[order(out[[order.by]], decreasing = decreasing), 
             ]
