@@ -191,9 +191,9 @@ def _jupyterlab_variableinspector_default(o):
     obj.size <- napply(names, object.size)
     obj.dim <- t(napply(names, function(x) as.numeric(dim(x))[1:2]))
     obj.content <- rep("NA", length(names))
-                        
+    has_no_dim <- is.na(obj.dim)[1:length(names)]                        
+    obj.dim[has_no_dim, 1] <- napply(names, length)[has_no_dim]
     vec <- (obj.type != "function")
-    obj.dim[vec, 1] <- napply(names, length)[vec]
     obj.content[vec] <- napply(names[vec], function(x) toString(x, width = 154)[1])
                       
     obj.rownames <- napply(names, rownames)
