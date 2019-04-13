@@ -188,9 +188,9 @@ export
      * (TODO: query resp. could be forwarded to panel directly)
      */
     private _handleQueryResponse = ( response: KernelMessage.IIOPubMessage ): void => {
-        let msgType = response.header.msg_type.split("_", 1)[0];
+        let msgType = response.header.msg_type;
         switch ( msgType ) {
-            case "execute":
+            case "execute_result":
                 let payload = response.content as nbformat.IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
                 if (content.slice(0, 1) == "'" || content.slice(0, 1) == "\""){
@@ -210,7 +210,7 @@ export
 
                 this._inspected.emit( {title: title, payload: update} );
                 break;
-            case "display":
+            case "display_data":
                 let payload_display = response.content as nbformat.IExecuteResult;
                 let content_display: string = <string>payload_display.data["text/plain"];
                 if (content_display.slice(0, 1) == "'" || content_display.slice(0, 1) == "\""){
