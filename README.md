@@ -24,7 +24,7 @@ For the time being, this project is still in its first steps. Contributions in a
 - `tensorflow` and `keras` to allow inspection of tf objects.
 
 ### Requirements for R functionality
-- The `repr`library.
+- The `repr` library.
 
 
 
