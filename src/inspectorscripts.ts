@@ -66,7 +66,7 @@ def _jupyterlab_variableinspector_getshapeof(x):
         return "Series [%d rows]" % x.shape
     if np and isinstance(x, np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
-        return "Array [%s]" %  shape
+        return "Array [%s]" % shape
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
         return "Spark DataFrame [? rows x %d cols]" % len(x.columns)
     if tf and isinstance(x, tf.Variable):
@@ -75,6 +75,8 @@ def _jupyterlab_variableinspector_getshapeof(x):
     if tf and isinstance(x, tf.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "Tensorflow Tensor [%s]" % shape
+    if isinstance(x, list):
+        return "List [%s]" % len(x)
     return None
 
 
