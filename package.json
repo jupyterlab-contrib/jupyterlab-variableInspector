@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab_variableinspector",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A JupyterLab extension.",
   "keywords": [
     "jupyter",
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/lckr/jupyterlab-variableInspector/issues"
   },
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "author": "lckr",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
