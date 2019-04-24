@@ -61,22 +61,22 @@ def _jupyterlab_variableinspector_getsizeof(x):
 
 def _jupyterlab_variableinspector_getshapeof(x):
     if pd and isinstance(x, pd.DataFrame):
-        return "DataFrame [%d rows x %d cols]" % x.shape
+        return "[%d rows x %d cols]" % x.shape
     if pd and isinstance(x, pd.Series):
-        return "Series [%d rows]" % x.shape
+        return "[%d rows]" % x.shape
     if np and isinstance(x, np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
-        return "Array [%s]" % shape
+        return "[%s]" % shape
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
-        return "Spark DataFrame [? rows x %d cols]" % len(x.columns)
+        return "[? rows x %d cols]" % len(x.columns)
     if tf and isinstance(x, tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
-        return "Tensorflow Variable [%s]" % shape
+        return "[%s]" % shape
     if tf and isinstance(x, tf.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
-        return "Tensorflow Tensor [%s]" % shape
+        return "[%s]" % shape
     if isinstance(x, list):
-        return "List [%s]" % len(x)
+        return "[%s]" % len(x)
     return None
 
 
