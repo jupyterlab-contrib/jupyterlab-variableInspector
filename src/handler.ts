@@ -137,7 +137,11 @@ export
                         case "execute_result":
                             let payload = response.content as nbformat.IExecuteResult;
                             let content: string = <string>payload.data["text/plain"];
-                            let modelOptions = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
+                            let content_clean = content.replace(/^'|'$/g, "");
+                            content_clean = content_clean.replace(/\\"/g, '"')
+                            content_clean = content_clean.replace(/\\'/g, "\\\\'")
+
+                            let modelOptions = <JSONModel.IOptions>JSON.parse(content_clean);
                             let jsonModel = new JSONModel( modelOptions );
                             resolve( jsonModel );
                             break;
