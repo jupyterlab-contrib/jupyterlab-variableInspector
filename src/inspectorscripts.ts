@@ -90,12 +90,11 @@ def _jupyterlab_variableinspector_getcontentof(x):
         content = "Column names: %s" % colnames
     elif pd and isinstance(x, pd.Series):
         content = str(x.values).replace(" ", ", ")[1:-1]
+        content = content.replace("\\n", "")
     elif np and isinstance(x, np.ndarray):
         content = x.__repr__()
     else:
         content = str(x)
-
-    content = content.replace("\\n", "")
 
     if len(content) > 150:
         return content[:150] + " ..."
