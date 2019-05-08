@@ -156,12 +156,16 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     if pd and pyspark and isinstance(x, pyspark.sql.DataFrame):
         df = x.limit(threshold).toPandas()
         return _jupyterlab_variableinspector_getmatrixcontent(df.copy())
-    elif np and pd and type(x).__name__ in ["Series", "DataFrame"]:
+    elif np and pd and type(x).__name__ == "DataFrame":
         if threshold is not None:
             x = x.head(threshold)
         x.columns = x.columns.map(str)
         return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
-    elif np and pd and type(x).__name__ in ["ndarray"]:
+    elif np and pd and type(x).__name__ == "Series":
+        if threshold is not None:
+            x = x.head(threshold)
+        return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
+    elif np and pd and type(x).__name__ == "ndarray":
         df = pd.DataFrame(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
