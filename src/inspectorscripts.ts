@@ -92,6 +92,9 @@ def _jupyterlab_variableinspector_getcontentof(x):
         content = x.__repr__()
     else:
         content = str(x)
+
+    content = content.replace("\\n", "")
+
     if len(content) > 150:
         return content[:150] + " ..."
     else:
