@@ -148,19 +148,22 @@ export
         this._table.createTFoot();
         this._table.tFoot.className = TABLE_BODY_CLASS;
         for ( var index = 0; index < args.length; index++ ) {
+            let name = args[index].varName;
+            let varType = args[index].varType;
+
             row = this._table.tFoot.insertRow();
             if ( args[index].isMatrix ) {
-                let name = args[index].varName;
                 row.onclick = ( ev: MouseEvent ): any => {
                     this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
-                        this._showMatrix( model, name )
+                        this._showMatrix( model, name, varType )
                     } );
                 }
             }
+
             let cell = row.insertCell( 0 );
-            cell.innerHTML = args[index].varName;
+            cell.innerHTML = name;
             cell = row.insertCell( 1 );
-            cell.innerHTML = args[index].varType;
+            cell.innerHTML = varType;
             cell = row.insertCell( 2 );
             cell.innerHTML = args[index].varSize;
             cell = row.insertCell( 3 );
@@ -179,15 +182,16 @@ export
 
 
 
-    private _showMatrix( dataModel: DataModel, name: string ): void {
+    private _showMatrix( dataModel: DataModel, name: string, varType: string ): void {
         let datagrid = new DataGrid( {
             baseRowSize: 32,
             baseColumnSize: 128,
             baseRowHeaderSize: 64,
             baseColumnHeaderSize: 32
         } );
+        
         datagrid.model = dataModel;
-        datagrid.title.label = "Matrix: " + name;
+        datagrid.title.label = varType + ": " + name;
         datagrid.title.closable = true;
         let lout: DockLayout = <DockLayout>this.parent.layout;
         lout.addWidget( datagrid , {mode: "split-right"});
