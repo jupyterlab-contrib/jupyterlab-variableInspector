@@ -87,7 +87,7 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
-        content = "Column names: %s" % colnames
+        content = "Columns: %s" % colnames
     elif pd and isinstance(x, pd.Series):
         content = str(x.values).replace(" ", ", ")[1:-1]
         content = content.replace("\\n", "")
