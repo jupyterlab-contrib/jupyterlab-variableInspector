@@ -189,7 +189,7 @@ export
             baseRowHeaderSize: 64,
             baseColumnHeaderSize: 32
         } );
-        
+
         datagrid.model = dataModel;
         datagrid.title.label = varType + ": " + name;
         datagrid.title.closable = true;

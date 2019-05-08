@@ -117,6 +117,8 @@ def _jupyterlab_variableinspector_is_matrix(x):
         return True
     if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
         return True
+    if isinstance(x, list):
+        return True
     return False
 
 
@@ -176,6 +178,9 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
         df = K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
+    elif isinstance(x, list):
+        s = pd.Series(x)
+        return _jupyterlab_variableinspector_getmatrixcontent(s)
 
 def _jupyterlab_variableinspector_default(o):
     if isinstance(o, np.number): return int(o)  
