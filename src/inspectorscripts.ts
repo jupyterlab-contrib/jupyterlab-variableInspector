@@ -87,7 +87,7 @@ def _jupyterlab_variableinspector_getcontentof(x):
         colnames = ', '.join(x.columns.map(str))
         content = "Column names: %s" % colnames
     elif pd and isinstance(x, pd.Series):
-        content = "Series [%d rows]" % x.shape
+        content = str(x.values)
     elif np and isinstance(x, np.ndarray):
         content = x.__repr__()
     else:
