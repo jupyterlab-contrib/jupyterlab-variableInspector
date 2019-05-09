@@ -48,6 +48,7 @@ namespace IVariableInspector {
         inspected: ISignal<any, IVariableInspectorUpdate>;
         performInspection(): void;
         performMatrixInspection( varName: string, maxRows? : number ): Promise<DataModel>;
+        performDelete( varName: string ): void;
     }
 
     export
@@ -158,7 +159,7 @@ export
             cell.innerHTML = "&#128465;";
             cell.className = "jp-VarInspector-deleteButton"
             cell.onclick = ( ev: MouseEvent ): any => {
-                alert('delete');
+                this.source.performDelete( name );
             };
             
             // Add name cell and onclick event for inspection
