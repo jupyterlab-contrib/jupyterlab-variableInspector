@@ -158,6 +158,7 @@ export
             let cell = row.insertCell( 0 );
             cell.innerHTML = "&#128465;";
             cell.className = "jp-VarInspector-deleteButton"
+            cell.title = "Delete";
             cell.onclick = ( ev: MouseEvent ): any => {
                 this.source.performDelete( name );
             };
@@ -167,7 +168,8 @@ export
             cell.innerHTML = name;
             
             if ( args[index].isMatrix ) {
-              cell.className = "jp-VarInspector-varName"
+              cell.className = "jp-VarInspector-varName";
+              cell.title = "View Contents";
 
               cell.onclick = ( ev: MouseEvent ): any => {
                   this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
