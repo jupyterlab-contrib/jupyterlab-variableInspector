@@ -47,6 +47,10 @@
   text-align: center;
 }
 
+.jp-VarInspector-deleteButton:hover {
+  text-shadow: 0 0 0 red;
+}
+
 .jp-VarInspector-varName {
   font-weight: 600;
 }
