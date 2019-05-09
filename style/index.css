@@ -4,13 +4,12 @@
     font-size: var(--jp-ui-font-size1);
 }
 
- .jp-VarInspector-table{
+.jp-VarInspector-table{
     border-collapse: collapse;
     margin: auto;
     width: 100%;
     color: var(--jp-content-font-color1);
 }
-
 
 .jp-VarInspector-table td, .jp-VarInspector-table thead{
     border: 1px solid;
@@ -25,7 +24,6 @@
 .jp-VarInspector-content tr:hover {
     background-color: var(--jp-layout-color2);
 }
-
 
 .jp-VarInspector-table thead{
 	font-size: var(--jp-ui-font-size0);
@@ -44,5 +42,7 @@
 	padding-left: 10px;
 }
 
-
+.jp-VarInspector-deleteButton{
+  color: red;
+}
 
