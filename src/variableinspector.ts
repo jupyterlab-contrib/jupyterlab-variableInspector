@@ -164,8 +164,10 @@ export
             // Add name cell and onclick event for inspection
             cell = row.insertCell( 1 );
             cell.innerHTML = name;
-
+            
             if ( args[index].isMatrix ) {
+              cell.className = "jp-VarInspector-varName"
+
               cell.onclick = ( ev: MouseEvent ): any => {
                   this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
                       this._showMatrix( model, name, varType )

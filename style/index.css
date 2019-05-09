@@ -46,3 +46,10 @@
   color: red;
 }
 
+.jp-VarInspector-varName {
+  font-weight: 600;
+}
+
+.jp-VarInspector-varName:hover {
+  text-decoration: underline;
+}
