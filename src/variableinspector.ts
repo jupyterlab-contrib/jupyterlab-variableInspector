@@ -155,7 +155,7 @@ export
 
             // Add delete icon and onclick event
             let cell = row.insertCell( 0 );
-            cell.innerHTML = "&#9747;";
+            cell.innerHTML = "&#128465;";
             cell.className = "jp-VarInspector-deleteButton"
             cell.onclick = ( ev: MouseEvent ): any => {
                 alert('delete');
