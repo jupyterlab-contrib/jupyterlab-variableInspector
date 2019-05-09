@@ -45,6 +45,7 @@
 
 .jp-VarInspector-deleteButton {
   text-align: center;
+  width: 1em;
 }
 
 .jp-VarInspector-deleteButton:hover {
