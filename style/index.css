@@ -50,6 +50,7 @@
 
 .jp-VarInspector-deleteButton:hover {
   text-shadow: 0 0 0 red;
+  background-color: var(--jp-layout-color3);
 }
 
 .jp-VarInspector-varName {
@@ -57,5 +58,5 @@
 }
 
 .jp-VarInspector-varName:hover {
-  text-decoration: underline;
+  background-color: var(--jp-layout-color3);
 }
