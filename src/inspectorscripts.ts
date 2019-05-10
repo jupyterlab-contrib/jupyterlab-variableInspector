@@ -5,6 +5,7 @@ namespace Languages {
             initScript: string;
             queryCommand: string;
             matrixQueryCommand: string;
+            deleteCommand: string;
         }
 }
 
@@ -181,9 +182,14 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         s = pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
 
+
 def _jupyterlab_variableinspector_default(o):
     if isinstance(o, np.number): return int(o)  
     raise TypeError
+
+
+def _jupyterlab_variableinspector_deletevariable(x):
+    exec("del %s" % x, globals())
 `;
 
     static r_script: string = `library(repr)
@@ -251,28 +257,36 @@ def _jupyterlab_variableinspector_default(o):
         out <- head(out, n)
     jsonlite::toJSON(out)
 }
+
+.deleteVariable <- function(x) {
+    remove(list=c(x), envir=.GlobalEnv)
+}
     `;
     
     static scripts: { [index: string]: Languages.LanguageModel } = {
         "python3": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python2": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "R": {
             initScript: Languages.r_script,
             queryCommand: ".ls.objects()",
-            matrixQueryCommand: ".ls.objects"
+            matrixQueryCommand: ".ls.objects",
+            deleteCommand: ".deleteVariable"
         }
     };
 

@@ -48,6 +48,7 @@ namespace IVariableInspector {
         inspected: ISignal<any, IVariableInspectorUpdate>;
         performInspection(): void;
         performMatrixInspection( varName: string, maxRows? : number ): Promise<DataModel>;
+        performDelete( varName: string ): void;
     }
 
     export
@@ -152,23 +153,39 @@ export
             let varType = args[index].varType;
 
             row = this._table.tFoot.insertRow();
+
+            // Add delete icon and onclick event
+            let cell = row.insertCell( 0 );
+            cell.innerHTML = "&#128465;";
+            cell.className = "jp-VarInspector-deleteButton"
+            cell.title = "Delete";
+            cell.onclick = ( ev: MouseEvent ): any => {
+                this.source.performDelete( name );
+            };
+            
+            // Add name cell and onclick event for inspection
+            cell = row.insertCell( 1 );
+            cell.innerHTML = name;
+            
             if ( args[index].isMatrix ) {
-                row.onclick = ( ev: MouseEvent ): any => {
-                    this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
-                        this._showMatrix( model, name, varType )
-                    } );
-                }
+              cell.className = "jp-VarInspector-varName";
+              cell.title = "View Contents";
+
+              cell.onclick = ( ev: MouseEvent ): any => {
+                  this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
+                      this._showMatrix( model, name, varType )
+                  } );
+              }
             }
 
-            let cell = row.insertCell( 0 );
-            cell.innerHTML = name;
-            cell = row.insertCell( 1 );
-            cell.innerHTML = varType;
+            // Add remaining cells
             cell = row.insertCell( 2 );
-            cell.innerHTML = args[index].varSize;
+            cell.innerHTML = varType;
             cell = row.insertCell( 3 );
-            cell.innerHTML = args[index].varShape;
+            cell.innerHTML = args[index].varSize;
             cell = row.insertCell( 4 );
+            cell.innerHTML = args[index].varShape;
+            cell = row.insertCell( 5 );
             cell.innerHTML = args[index].varContent.replace(/\\n/g,  "</br>");
         }
     }
@@ -203,22 +220,24 @@ export
 
 namespace Private {
 
-
     export
         function createTable(): HTMLTableElement {
         let table = document.createElement( "table" );
         table.createTHead();
         let hrow = <HTMLTableRowElement>table.tHead.insertRow( 0 );
+
         let cell1 = hrow.insertCell( 0 );
-        cell1.innerHTML = "Name";
+        cell1.innerHTML = "";
         let cell2 = hrow.insertCell( 1 );
-        cell2.innerHTML = "Type";
+        cell2.innerHTML = "Name";
         let cell3 = hrow.insertCell( 2 );
-        cell3.innerHTML = "Size";
+        cell3.innerHTML = "Type";
         let cell4 = hrow.insertCell( 3 );
-        cell4.innerHTML = "Shape";
+        cell4.innerHTML = "Size";
         let cell5 = hrow.insertCell( 4 );
-        cell5.innerHTML = "Content";
+        cell5.innerHTML = "Shape";
+        let cell6 = hrow.insertCell( 5 );
+        cell6.innerHTML = "Content";
         return table;
     }
 
