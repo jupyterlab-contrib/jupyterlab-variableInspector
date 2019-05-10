@@ -5,6 +5,7 @@ namespace Languages {
             initScript: string;
             queryCommand: string;
             matrixQueryCommand: string;
+            deleteCommand: string;
         }
 }
 
@@ -61,22 +62,24 @@ def _jupyterlab_variableinspector_getsizeof(x):
 
 def _jupyterlab_variableinspector_getshapeof(x):
     if pd and isinstance(x, pd.DataFrame):
-        return "[%d rows x %d cols]" % x.shape
+        return "%d rows x %d cols" % x.shape
     if pd and isinstance(x, pd.Series):
-        return "[%d rows]" % x.shape
+        return "%d rows" % x.shape
     if np and isinstance(x, np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
-        return "[%s]" % shape
+        return "%s" % shape
     if pyspark and isinstance(x, pyspark.sql.DataFrame):
-        return "[? rows x %d cols]" % len(x.columns)
+        return "? rows x %d cols" % len(x.columns)
     if tf and isinstance(x, tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
-        return "[%s]" % shape
+        return "%s" % shape
     if tf and isinstance(x, tf.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
-        return "[%s]" % shape
+        return "%s" % shape
     if isinstance(x, list):
-        return "[%s]" % len(x)
+        return "%s" % len(x)
+    if isinstance(x, dict):
+        return "%s keys" % len(x)
     return None
 
 
@@ -85,13 +88,15 @@ def _jupyterlab_variableinspector_getcontentof(x):
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
-        content = "Column names: %s" % colnames
+        content = "Columns: %s" % colnames
     elif pd and isinstance(x, pd.Series):
-        content = "Series [%d rows]" % x.shape
+        content = str(x.values).replace(" ", ", ")[1:-1]
+        content = content.replace("\\n", "")
     elif np and isinstance(x, np.ndarray):
         content = x.__repr__()
     else:
         content = str(x)
+
     if len(content) > 150:
         return content[:150] + " ..."
     else:
@@ -111,6 +116,8 @@ def _jupyterlab_variableinspector_is_matrix(x):
     if tf and isinstance(x, tf.Variable) and len(x.shape) <= 2:
         return True
     if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
+        return True
+    if isinstance(x, list):
         return True
     return False
 
@@ -156,21 +163,33 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     if pd and pyspark and isinstance(x, pyspark.sql.DataFrame):
         df = x.limit(threshold).toPandas()
         return _jupyterlab_variableinspector_getmatrixcontent(df.copy())
-    elif np and pd and type(x).__name__ in ["Series", "DataFrame"]:
+    elif np and pd and type(x).__name__ == "DataFrame":
         if threshold is not None:
             x = x.head(threshold)
         x.columns = x.columns.map(str)
         return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
-    elif np and pd and type(x).__name__ in ["ndarray"]:
+    elif np and pd and type(x).__name__ == "Series":
+        if threshold is not None:
+            x = x.head(threshold)
+        return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
+    elif np and pd and type(x).__name__ == "ndarray":
         df = pd.DataFrame(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
         df = K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
+    elif isinstance(x, list):
+        s = pd.Series(x)
+        return _jupyterlab_variableinspector_getmatrixcontent(s)
+
 
 def _jupyterlab_variableinspector_default(o):
     if isinstance(o, np.number): return int(o)  
     raise TypeError
+
+
+def _jupyterlab_variableinspector_deletevariable(x):
+    exec("del %s" % x, globals())
 `;
 
     static r_script: string = `library(repr)
@@ -238,28 +257,36 @@ def _jupyterlab_variableinspector_default(o):
         out <- head(out, n)
     jsonlite::toJSON(out)
 }
+
+.deleteVariable <- function(x) {
+    remove(list=c(x), envir=.GlobalEnv)
+}
     `;
     
     static scripts: { [index: string]: Languages.LanguageModel } = {
         "python3": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python2": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent"
+            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "R": {
             initScript: Languages.r_script,
             queryCommand: ".ls.objects()",
-            matrixQueryCommand: ".ls.objects"
+            matrixQueryCommand: ".ls.objects",
+            deleteCommand: ".deleteVariable"
         }
     };
 

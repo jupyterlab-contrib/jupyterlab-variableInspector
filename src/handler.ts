@@ -40,6 +40,7 @@ export
     private _queryCommand: string;
     private _initScript: string;
     private _matrixQueryCommand: string;
+    private _deleteCommand: string;
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
     private _isDisposed = false;
@@ -52,6 +53,7 @@ export
         this._id = options.id;
         this._queryCommand = options.queryCommand;
         this._matrixQueryCommand = options.matrixQueryCommand;
+        this._deleteCommand = options.deleteCommand;
         this._initScript = options.initScript;
         
         this._ready =  this._connector.ready.then(() => {
@@ -121,7 +123,6 @@ export
     /**
      * Performs an inspection of the specified matrix.
      */
-
     public performMatrixInspection( varName: string, maxRows=100000 ): Promise<DataModel> {
         let request: KernelMessage.IExecuteRequest = {
             code: this._matrixQueryCommand + "(" + varName + ", " + maxRows + ")",
@@ -137,7 +138,11 @@ export
                         case "execute_result":
                             let payload = response.content as nbformat.IExecuteResult;
                             let content: string = <string>payload.data["text/plain"];
-                            let modelOptions = <JSONModel.IOptions>JSON.parse( content.replace( /^'|'$/g, "" ) );
+                            let content_clean = content.replace(/^'|'$/g, "");
+                            content_clean = content_clean.replace(/\\"/g, '"')
+                            content_clean = content_clean.replace(/\\'/g, "\\\\'")
+
+                            let modelOptions = <JSONModel.IOptions>JSON.parse(content_clean);
                             let jsonModel = new JSONModel( modelOptions );
                             resolve( jsonModel );
                             break;
@@ -152,6 +157,18 @@ export
             );
         } );
     }
+
+    /**
+     * Send a kernel request to delete a variable from the global environment
+     */
+    public performDelete(varName: string): void {
+      let request: KernelMessage.IExecuteRequest = {
+        code: this._deleteCommand + "('" + varName + "')",
+        stop_on_error: false,
+        store_history: false,
+    };
+    this._connector.fetch( request, this._handleQueryResponse );
+  }
 
 
     /*
@@ -266,6 +283,7 @@ namespace VariableInspectionHandler {
         connector: KernelConnector;
         queryCommand: string;
         matrixQueryCommand: string;
+        deleteCommand: string;
         initScript: string;
         id : string;
     }
@@ -316,4 +334,6 @@ export
         public performMatrixInspection(varName : string, maxRows : number): Promise<DataModel>{
             return new Promise(function(resolve, reject) { reject("Cannot inspect matrices w/ the DummyHandler!") });
         }
+
+        public performDelete(varName: string){}
 }

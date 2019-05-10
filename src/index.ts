@@ -143,10 +143,12 @@ const consoles: JupyterLabPlugin<void> = {
                             let initScript = result.initScript;
                             let queryCommand = result.queryCommand;
                             let matrixQueryCommand = result.matrixQueryCommand;
+                            let deleteCommand = result.deleteCommand;
                             
                             const options: VariableInspectionHandler.IOptions = {
                                     queryCommand: queryCommand,
                                     matrixQueryCommand: matrixQueryCommand,
+                                    deleteCommand: deleteCommand,
                                     connector: connector,
                                     initScript: initScript,
                                     id: session.path  //Using the sessions path as an identifier for now.
@@ -239,10 +241,12 @@ const notebooks: JupyterLabPlugin<void> = {
                         let initScript = result.initScript;
                         let queryCommand = result.queryCommand;
                         let matrixQueryCommand = result.matrixQueryCommand;
+                        let deleteCommand = result.deleteCommand;
                         
                         const options: VariableInspectionHandler.IOptions = {
                                 queryCommand: queryCommand,
                                 matrixQueryCommand: matrixQueryCommand,
+                                deleteCommand: deleteCommand,
                                 connector: connector,
                                 initScript: initScript,
                                 id: session.path  //Using the sessions path as an identifier for now.
