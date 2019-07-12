@@ -1,3 +1,4 @@
+
 import {
     IVariableInspector, VariableInspectorPanel
 } from "./variableinspector";
@@ -19,11 +20,11 @@ import {
 } from "./inspectorscripts";
 
 import {
-    ICommandPalette, InstanceTracker
+    ICommandPalette, WidgetTracker
 } from '@jupyterlab/apputils';
 
 import {
-    ILayoutRestorer, JupyterLab, JupyterLabPlugin
+    ILabShell, ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin
 } from '@jupyterlab/application'
 
 import {
@@ -45,12 +46,12 @@ namespace CommandIDs {
 /**
  * A service providing variable introspection.
  */
-const variableinspector: JupyterLabPlugin<IVariableInspectorManager> = {
+const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
         id: "jupyterlab-extension:variableinspector",
-        requires: [ICommandPalette, ILayoutRestorer],
+        requires: [ICommandPalette, ILayoutRestorer, ILabShell],
         provides: IVariableInspectorManager,
         autoStart: true,
-        activate: ( app: JupyterLab, palette: ICommandPalette, restorer: ILayoutRestorer ): IVariableInspectorManager => {
+        activate: ( app: JupyterFrontEnd, palette: ICommandPalette, restorer: ILayoutRestorer, labShell: ILabShell): IVariableInspectorManager => {
             
             
             const manager = new VariableInspectorManager();
@@ -58,7 +59,7 @@ const variableinspector: JupyterLabPlugin<IVariableInspectorManager> = {
             const command = CommandIDs.open;
             const label = "Open Variable Inspector";
             const namespace = "variableinspector";
-            const tracker = new InstanceTracker<VariableInspectorPanel>( { namespace } );
+            const tracker = new WidgetTracker<VariableInspectorPanel>( { namespace } );
             
             
             /**
@@ -97,12 +98,12 @@ const variableinspector: JupyterLabPlugin<IVariableInspectorManager> = {
                         manager.panel = newPanel();
                     }
                     if ( !manager.panel.isAttached ) {
-                        app.shell.addToMainArea( manager.panel );
+                        labShell.add( manager.panel, 'main' );
                     }
                     if ( manager.source ) {
                         manager.source.performInspection();
                     }
-                    app.shell.activateById( manager.panel.id );
+                    labShell.activateById( manager.panel.id );
                 }
             } );
             palette.addItem( { command, category } );
@@ -113,11 +114,11 @@ const variableinspector: JupyterLabPlugin<IVariableInspectorManager> = {
 /**
  * An extension that registers consoles for variable inspection.
  */
-const consoles: JupyterLabPlugin<void> = {
+const consoles: JupyterFrontEndPlugin<void> = {
         id: "jupyterlab-extension:variableinspector:consoles",
-        requires: [IVariableInspectorManager, IConsoleTracker],
+        requires: [IVariableInspectorManager, IConsoleTracker, ILabShell],
         autoStart: true,
-        activate: ( app: JupyterLab, manager: IVariableInspectorManager, consoles: IConsoleTracker ): void => {
+        activate: ( app: JupyterFrontEnd, manager: IVariableInspectorManager, consoles: IConsoleTracker, labShell: ILabShell ): void => {
             const handlers: { [id: string]: Promise<IVariableInspector.IInspectable> } = {};
             
             /**
@@ -187,7 +188,7 @@ const consoles: JupyterLabPlugin<void> = {
              * In that case, retrieves the handler associated to the console after it has been
              * initialized and updates the manager with it. 
              */
-            app.shell.currentChanged.connect(( sender, args ) => {
+            labShell.currentChanged.connect(( sender, args ) => {
                 let widget = args.newValue;
                 if ( !widget || !consoles.has( widget ) ) {
                     return;
@@ -214,11 +215,11 @@ const consoles: JupyterLabPlugin<void> = {
 /**
  * An extension that registers notebooks for variable inspection.
  */
-const notebooks: JupyterLabPlugin<void> = {
+const notebooks: JupyterFrontEndPlugin<void> = {
         id: "jupyterlab-extension:variableinspector:notebooks",
-        requires: [IVariableInspectorManager, INotebookTracker],
+        requires: [IVariableInspectorManager, INotebookTracker, ILabShell],
         autoStart: true,
-        activate: ( app: JupyterLab, manager: IVariableInspectorManager, notebooks: INotebookTracker ): void => {
+        activate: ( app: JupyterFrontEnd, manager: IVariableInspectorManager, notebooks: INotebookTracker, labShell: ILabShell ): void => {
             const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
             
             /**
@@ -277,7 +278,7 @@ const notebooks: JupyterLabPlugin<void> = {
              * In that case, retrieves the handler associated to the notebook after it has been
              * initialized and updates the manager with it. 
              */
-            app.shell.currentChanged.connect(( sender, args ) => {
+            labShell.currentChanged.connect(( sender, args ) => {
                 let widget = args.newValue;
                 if ( !widget || !notebooks.has( widget ) ) {
                     return;
@@ -302,5 +303,5 @@ const notebooks: JupyterLabPlugin<void> = {
 /**
  * Export the plugins as default.
  */
-const plugins: JupyterLabPlugin<any>[] = [variableinspector, consoles, notebooks];
+const plugins: JupyterFrontEndPlugin<any>[] = [variableinspector, consoles, notebooks];
 export default plugins;

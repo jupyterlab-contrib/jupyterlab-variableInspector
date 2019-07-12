@@ -112,22 +112,20 @@ export
      * Performs an inspection by sending an execute request with the query command to the kernel.
      */
     public performInspection(): void {
-        let request: KernelMessage.IExecuteRequest = {
+        let content: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._queryCommand,
             stop_on_error: false,
-            store_history: false,
         };
-        this._connector.fetch( request, this._handleQueryResponse );
+        this._connector.fetch( content, this._handleQueryResponse );
     }
 
     /**
      * Performs an inspection of the specified matrix.
      */
     public performMatrixInspection( varName: string, maxRows=100000 ): Promise<DataModel> {
-        let request: KernelMessage.IExecuteRequest = {
+        let request: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._matrixQueryCommand + "(" + varName + ", " + maxRows + ")",
             stop_on_error: false,
-            store_history: false,
         };
         let con = this._connector;
         return new Promise( function( resolve, reject ) {
@@ -162,12 +160,13 @@ export
      * Send a kernel request to delete a variable from the global environment
      */
     public performDelete(varName: string): void {
-      let request: KernelMessage.IExecuteRequest = {
+      let content: KernelMessage.IExecuteRequestMsg['content'] = {
         code: this._deleteCommand + "('" + varName + "')",
         stop_on_error: false,
         store_history: false,
     };
-    this._connector.fetch( request, this._handleQueryResponse );
+    
+    this._connector.fetch( content, this._handleQueryResponse );
   }
 
 
@@ -190,13 +189,13 @@ export
      * TODO: Use script based on kernel language.
      */
     private _initOnKernel(): Promise<KernelMessage.IExecuteReplyMsg> {
-        let request: KernelMessage.IExecuteRequest = {
+        let content: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._initScript,
             stop_on_error: false,
             silent: true,
         };
 
-        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( request, ( () => { } ) );
+        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( content, ( () => { } ) );
         return reply;
     }
     
@@ -255,7 +254,7 @@ export
     /*
      * Invokes a inspection if the signal emitted from specified session is an 'execute_input' msg.
      */
-    private _queryCall = ( sess: IClientSession, msg: KernelMessage.IMessage ) => {
+    private _queryCall = ( sess: IClientSession, msg: KernelMessage.IExecuteInputMsg ) => {
         let msgType = msg.header.msg_type;
         switch ( msgType ) {
             case 'execute_input':
