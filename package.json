@@ -30,14 +30,14 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^0.19.0",
-    "@jupyterlab/apputils": "^0.19.0",
-    "@jupyterlab/console": "^0.19.0",
-    "@jupyterlab/coreutils": "^2.1.4",
-    "@jupyterlab/csvviewer": "^0.18.0",
-    "@jupyterlab/notebook": "^0.19",
-    "@jupyterlab/services": "^3.1.4",
-    "@phosphor/datagrid": "^0.1.6"
+    "@jupyterlab/application": ">=1.0.0",
+    "@jupyterlab/apputils": ">=1.0.0",
+    "@jupyterlab/console": ">=1.0.0",
+    "@jupyterlab/coreutils": ">=3.0.0",
+    "@jupyterlab/csvviewer": ">=1.0.0",
+    "@jupyterlab/notebook": ">=1.0.0",
+    "@jupyterlab/services": ">=3.1.4",
+    "@phosphor/datagrid": ">=0.1.10"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",

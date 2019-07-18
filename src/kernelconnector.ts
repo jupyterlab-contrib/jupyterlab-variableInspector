@@ -80,15 +80,14 @@ export
      * @param request: IExecuteRequest to forward to the kernel.
      * @returns Promise<KernelMessage.IExecuteReplyMsg>
      */
-    fetch( request: KernelMessage.IExecuteRequest, ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
-        const kernel = this._session.kernel;
+    fetch( content: KernelMessage.IExecuteRequestMsg['content'], ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
+    const kernel = this._session.kernel;
         if ( !kernel ) {
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
-
         return kernel.ready.then(() => {
-            let future: Kernel.IFuture = kernel.requestExecute( request );
+            let future = kernel.requestExecute( content, false );
 
             future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
                 ioCallback( msg );
