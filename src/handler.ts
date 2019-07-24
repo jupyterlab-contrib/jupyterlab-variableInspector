@@ -115,6 +115,7 @@ export
         let content: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._queryCommand,
             stop_on_error: false,
+            store_history: false
         };
         this._connector.fetch( content, this._handleQueryResponse );
     }
@@ -126,6 +127,7 @@ export
         let request: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._matrixQueryCommand + "(" + varName + ", " + maxRows + ")",
             stop_on_error: false,
+            store_history: false
         };
         let con = this._connector;
         return new Promise( function( resolve, reject ) {

@@ -70,7 +70,7 @@ export
      * @param ioCallback: Callable to forward IOPub messages of the kernel to.
      * @returns Promise<KernelMessage.IExecuteReplyMsg>
      */
-    fetch( content: KernelMessage.IExecuteRequestMsg['content'], ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
+     fetch( content: KernelMessage.IExecuteRequestMsg['content'], ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
         const kernel = this._session.kernel;
         if ( !kernel ) {
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
