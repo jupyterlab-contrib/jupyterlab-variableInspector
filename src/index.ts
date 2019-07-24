@@ -109,7 +109,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
             palette.addItem( { command, category } );
             return manager;
         }
-}
+};
 
 /**
  * An extension that registers consoles for variable inspection.
@@ -137,7 +137,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
                         
                         
                         connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
-                            let kerneltype: string = connector.kerneltype;
+                            let kerneltype: string = connector.kernelType;
                         let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
                         
                         scripts.then(( result: Languages.LanguageModel ) => {
@@ -200,7 +200,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
                         manager.source.performInspection();               
                     }
                 });
-            } );;
+            } );
             
             app.contextMenu.addItem( {
                 command: CommandIDs.open,
@@ -210,7 +210,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
             
             
         }
-}
+};
 
 /**
  * An extension that registers notebooks for variable inspection.
@@ -235,7 +235,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                     const connector = new KernelConnector( { session } );
                     
                     connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
-                        let kerneltype: string = connector.kerneltype;
+                        let kerneltype: string = connector.kernelType;
                     let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
                     
                     scripts.then(( result: Languages.LanguageModel ) => {
@@ -297,7 +297,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                 selector: ".jp-Notebook"
             } );
         }
-}
+};
 
 
 /**
