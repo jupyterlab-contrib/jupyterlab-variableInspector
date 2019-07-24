@@ -58,8 +58,8 @@ export
         
         this._ready =  this._connector.ready.then(() => {
             this._initOnKernel().then(( msg:KernelMessage.IExecuteReplyMsg ) => {
-            this._connector.iopubMessage.connect( this._queryCall );
-            return;
+                this._connector.iopubMessage.connect( this._queryCall );
+                return;
 
             } );
         } );
@@ -115,6 +115,7 @@ export
         let content: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._queryCommand,
             stop_on_error: false,
+            store_history: false
         };
         this._connector.fetch( content, this._handleQueryResponse );
     }
@@ -126,6 +127,7 @@ export
         let request: KernelMessage.IExecuteRequestMsg['content'] = {
             code: this._matrixQueryCommand + "(" + varName + ", " + maxRows + ")",
             stop_on_error: false,
+            store_history: false
         };
         let con = this._connector;
         return new Promise( function( resolve, reject ) {
@@ -137,8 +139,8 @@ export
                             let payload = response.content as nbformat.IExecuteResult;
                             let content: string = <string>payload.data["text/plain"];
                             let content_clean = content.replace(/^'|'$/g, "");
-                            content_clean = content_clean.replace(/\\"/g, '"')
-                            content_clean = content_clean.replace(/\\'/g, "\\\\'")
+                            content_clean = content_clean.replace(/\\"/g, '"');
+                            content_clean = content_clean.replace(/\\'/g, "\\\\'");
 
                             let modelOptions = <JSONModel.IOptions>JSON.parse(content_clean);
                             let jsonModel = new JSONModel( modelOptions );
@@ -186,7 +188,6 @@ export
 
     /**
      * Initializes the kernel by running the set up script located at _initScriptPath.
-     * TODO: Use script based on kernel language.
      */
     private _initOnKernel(): Promise<KernelMessage.IExecuteReplyMsg> {
         let content: KernelMessage.IExecuteRequestMsg['content'] = {
@@ -195,8 +196,7 @@ export
             silent: true,
         };
 
-        let reply: Promise<KernelMessage.IExecuteReplyMsg> = this._connector.fetch( content, ( () => { } ) );
-        return reply;
+        return this._connector.fetch( content, ( () => { } ) );
     }
     
     /*
@@ -220,8 +220,8 @@ export
                 let title: IVariableInspector.IVariableTitle;
                 title = {
                     contextName: "",
-                    kernelName : this._connector.kernelname || "",
-                    languageName : this._connector.kerneltype || ""
+                    kernelName : this._connector.kernelName || "",
+                    languageName : this._connector.kernelType || ""
                 };
 
                 this._inspected.emit( {title: title, payload: update} );
@@ -240,8 +240,8 @@ export
                 let title_display: IVariableInspector.IVariableTitle;
                 title_display = {
                     contextName: "",
-                    kernelName : this._connector.kernelname || "",
-                    languageName : this._connector.kerneltype || ""
+                    kernelName : this._connector.kernelName || "",
+                    languageName : this._connector.kernelType || ""
                 };
 
                 this._inspected.emit( {title: title_display, payload: update_display} );
@@ -324,8 +324,8 @@ export
             let title: IVariableInspector.IVariableTitle;
             title = {
                 contextName: ". <b>Language currently not supported.</b> ",
-                kernelName : this._connector.kernelname || "",
-                languageName : this._connector.kerneltype || ""
+                kernelName : this._connector.kernelName || "",
+                languageName : this._connector.kernelType || ""
             };
             this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
         }

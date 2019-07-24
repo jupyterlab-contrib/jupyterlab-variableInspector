@@ -2,17 +2,12 @@ import {
     IClientSession
 } from "@jupyterlab/apputils";
 
-/*
-import {
-    DataConnector//, nbformat
-} from "@jupyterlab/coreutils";
-*/
 import {
     KernelMessage, Kernel
 } from "@jupyterlab/services";
 
 import {
-    ISignal, Signal//, Slot
+    ISignal, Signal
 } from "@phosphor/signaling";
 
 
@@ -42,17 +37,11 @@ export
         return this._kernelRestarted
     }
 
-    get kerneltype(): string {
+    get kernelType(): string {
         return this._session.kernel.info.language_info.name;
     }
 
-    get context(): string {
-        // dummy status - for say sending message if language not implemented
-        // or other debugging?
-        return "status - ok";
-    }
-
-    get kernelname(): string {
+    get kernelName(): string {
         return this._session.kernel.name;
     }
 
@@ -77,11 +66,12 @@ export
 
     /**
      * Executes the given request on the kernel associated with the connector.
-     * @param request: IExecuteRequest to forward to the kernel.
+     * @param content: IExecuteRequestMsg to forward to the kernel.
+     * @param ioCallback: Callable to forward IOPub messages of the kernel to.
      * @returns Promise<KernelMessage.IExecuteReplyMsg>
      */
-    fetch( content: KernelMessage.IExecuteRequestMsg['content'], ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
-    const kernel = this._session.kernel;
+     fetch( content: KernelMessage.IExecuteRequestMsg['content'], ioCallback: ( msg: KernelMessage.IIOPubMessage ) => any ): Promise<KernelMessage.IExecuteReplyMsg> {
+        const kernel = this._session.kernel;
         if ( !kernel ) {
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }

@@ -148,7 +148,7 @@ export
         this._table.deleteTFoot();
         this._table.createTFoot();
         this._table.tFoot.className = TABLE_BODY_CLASS;
-        for ( var index = 0; index < args.length; index++ ) {
+        for ( let index = 0; index < args.length; index++ ) {
             let name = args[index].varName;
             let varType = args[index].varType;
 
@@ -157,7 +157,7 @@ export
             // Add delete icon and onclick event
             let cell = row.insertCell( 0 );
             cell.innerHTML = "&#128465;";
-            cell.className = "jp-VarInspector-deleteButton"
+            cell.className = "jp-VarInspector-deleteButton";
             cell.title = "Delete";
             cell.onclick = ( ev: MouseEvent ): any => {
                 this.source.performDelete( name );
