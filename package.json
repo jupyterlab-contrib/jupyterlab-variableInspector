@@ -37,7 +37,7 @@
     "@jupyterlab/csvviewer": ">=1.0.0",
     "@jupyterlab/notebook": ">=1.0.0",
     "@jupyterlab/services": ">=4.0.0",
-    "@phosphor/datagrid": ">=0.1.10"
+    "@phosphor/datagrid": ">=0.1.9 <0.2.0"
   },
   "devDependencies": {
     "rimraf": "^2.6.1",
