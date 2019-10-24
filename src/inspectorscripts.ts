@@ -16,7 +16,7 @@ export
      */
 
     static py_script: string = `import json
-from sys import getsizeof
+import sys
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
 
@@ -25,29 +25,43 @@ _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
+np = None
+pd = None
+pyspark = None
+tf = None
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 
-try:
-    import pyspark
-except ImportError:
-    pyspark = None
+def _check_imported():
+    global np, pd, pyspark, tf
+    if 'numpy' in sys.modules:
+        # don't really need the try
+        try:
+            import numpy as np
+        except ImportError:
+            np = None
 
-try:
-    import tensorflow as tf
-    import keras.backend as K
-except ImportError:
-    tf = None
+    if 'pandas' in sys.modules:
+        try:
+            import pandas as pd
+        except ImportError:
+            pd = None
+
+    if 'pyspark' in sys.modules:
+        try:
+            import pyspark
+        except ImportError:
+            pyspark = None
+
+    if 'tensorflow' in sys.modules or 'keras' in sys.modules:
+        try:
+            import tensorflow as tf
+            import keras.backend as K
+        except ImportError:
+            tf = None
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
+    _check_imported()
     if type(x).__name__ in ['ndarray', 'Series']:
         return x.nbytes
     elif pyspark and isinstance(x, pyspark.sql.DataFrame):
@@ -57,10 +71,11 @@ def _jupyterlab_variableinspector_getsizeof(x):
     elif pd and type(x).__name__ == 'DataFrame':
         return x.memory_usage().sum()
     else:
-        return getsizeof(x)
+        return sys.getsizeof(x)
 
 
 def _jupyterlab_variableinspector_getshapeof(x):
+    _check_imported()
     if pd and isinstance(x, pd.DataFrame):
         return "%d rows x %d cols" % x.shape
     if pd and isinstance(x, pd.Series):
@@ -84,6 +99,7 @@ def _jupyterlab_variableinspector_getshapeof(x):
 
 
 def _jupyterlab_variableinspector_getcontentof(x):
+    _check_imported()
     # returns content in a friendly way for python variables
     # pandas and numpy
     if pd and isinstance(x, pd.DataFrame):
@@ -104,6 +120,7 @@ def _jupyterlab_variableinspector_getcontentof(x):
 
 
 def _jupyterlab_variableinspector_is_matrix(x):
+    _check_imported()
     # True if type(x).__name__ in ["DataFrame", "ndarray", "Series"] else False
     if pd and isinstance(x, pd.DataFrame):
         return True
@@ -123,6 +140,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 
 def _jupyterlab_variableinspector_dict_list():
+    _check_imported()
     def keep_cond(v):
         try:
             obj = eval(v)
@@ -156,7 +174,7 @@ def _jupyterlab_variableinspector_dict_list():
 
 
 def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
-    
+    _check_imported()    
     # to do: add something to handle this in the future
     threshold = max_rows
 
@@ -184,6 +202,7 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
 
 
 def _jupyterlab_variableinspector_default(o):
+    _check_imported()
     if isinstance(o, np.number): return int(o)  
     raise TypeError
 
