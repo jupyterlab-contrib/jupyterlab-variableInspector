@@ -16,7 +16,7 @@ export
      */
 
     static py_script: string = `import json
-from sys import getsizeof
+import sys
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
 
@@ -25,26 +25,39 @@ _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
+np = None
+pd = None
+pyspark = None
+tf = None
 
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
 
-try:
-    import pyspark
-except ImportError:
-    pyspark = None
+def _check_imported():
+    global np, pd, pyspark, tf
+    if 'numpy' in sys.modules:
+        # don't really need the try
+        try:
+            import numpy as np
+        except ImportError:
+            np = None
 
-try:
-    import tensorflow as tf
-    import keras.backend as K
-except ImportError:
-    tf = None
+    if 'pandas' in sys.modules:
+        try:
+            import pandas as pd
+        except ImportError:
+            pd = None
+
+    if 'pyspark' in sys.modules:
+        try:
+            import pyspark
+        except ImportError:
+            pyspark = None
+
+    if 'tensorflow' in sys.modules or 'keras' in sys.modules:
+        try:
+            import tensorflow as tf
+            import keras.backend as K
+        except ImportError:
+            tf = None
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
@@ -57,7 +70,7 @@ def _jupyterlab_variableinspector_getsizeof(x):
     elif pd and type(x).__name__ == 'DataFrame':
         return x.memory_usage().sum()
     else:
-        return getsizeof(x)
+        return sys.getsizeof(x)
 
 
 def _jupyterlab_variableinspector_getshapeof(x):
@@ -123,6 +136,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 
 def _jupyterlab_variableinspector_dict_list():
+    _check_imported()
     def keep_cond(v):
         try:
             obj = eval(v)
@@ -156,7 +170,6 @@ def _jupyterlab_variableinspector_dict_list():
 
 
 def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
-    
     # to do: add something to handle this in the future
     threshold = max_rows
 
