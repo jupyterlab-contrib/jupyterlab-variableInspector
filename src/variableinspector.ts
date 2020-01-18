@@ -1,6 +1,6 @@
 import {
-    OutputArea,
-    OutputAreaModel
+    OutputAreaModel,
+    SimplifiedOutputArea
 } from '@jupyterlab/outputarea';
 
 import {
@@ -208,7 +208,7 @@ export
             const rendermime = this._source.rendermime;
             if (item.isWidget && rendermime) {
                 const model = new OutputAreaModel({trusted: true});
-                const output = new OutputArea({ model, rendermime });
+                const output = new SimplifiedOutputArea({ model, rendermime });
                 output.future = this._source.performWidgetInspection(item.varName);
                 Widget.attach(output, cell);
             } else {
