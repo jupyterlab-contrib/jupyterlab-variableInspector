@@ -77,13 +77,17 @@ export
         }
 
         return kernel.ready.then(() => {
-            let future = kernel.requestExecute( content, false );
+            let future = kernel.requestExecute( content );
 
             future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
                 ioCallback( msg );
             } );
             return future.done as Promise<KernelMessage.IExecuteReplyMsg>;
         } );
+    }
+
+    execute( content: KernelMessage.IExecuteRequestMsg['content']) {
+        return this._session.kernel.requestExecute(content);
     }
 
 }

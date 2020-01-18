@@ -1,4 +1,18 @@
 import {
+    OutputArea,
+    OutputAreaModel
+} from '@jupyterlab/outputarea';
+
+import {
+    IRenderMimeRegistry
+} from '@jupyterlab/rendermime';
+
+import {
+    Kernel, 
+    KernelMessage 
+} from '@jupyterlab/services';
+
+import {
     ISignal
 } from '@phosphor/signaling';
 
@@ -46,8 +60,10 @@ namespace IVariableInspector {
         interface IInspectable {
         disposed: ISignal<any, void>;
         inspected: ISignal<any, IVariableInspectorUpdate>;
+        rendermime: IRenderMimeRegistry;
         performInspection(): void;
         performMatrixInspection( varName: string, maxRows? : number ): Promise<DataModel>;
+        performWidgetInspection( varName: string ): Kernel.IShellFuture<KernelMessage.IExecuteRequestMsg, KernelMessage.IExecuteReplyMsg>;
         performDelete( varName: string ): void;
     }
 
@@ -65,6 +81,7 @@ namespace IVariableInspector {
         varContent: string;
         varType: string;
         isMatrix: boolean;
+        isWidget: boolean;
     }
     export
         interface IVariableTitle {
@@ -149,8 +166,9 @@ export
         this._table.createTFoot();
         this._table.tFoot.className = TABLE_BODY_CLASS;
         for ( let index = 0; index < args.length; index++ ) {
-            let name = args[index].varName;
-            let varType = args[index].varType;
+            const item = args[index];
+            let name = item.varName;
+            let varType = item.varType;
 
             row = this._table.tFoot.insertRow();
 
@@ -167,7 +185,7 @@ export
             cell = row.insertCell( 1 );
             cell.innerHTML = name;
             
-            if ( args[index].isMatrix ) {
+            if ( item.isMatrix ) {
               cell.className = "jp-VarInspector-varName";
               cell.title = "View Contents";
 
@@ -182,11 +200,20 @@ export
             cell = row.insertCell( 2 );
             cell.innerHTML = varType;
             cell = row.insertCell( 3 );
-            cell.innerHTML = args[index].varSize;
+            cell.innerHTML = item.varSize;
             cell = row.insertCell( 4 );
-            cell.innerHTML = args[index].varShape;
+            cell.innerHTML = item.varShape;
             cell = row.insertCell( 5 );
-            cell.innerHTML = args[index].varContent.replace(/\\n/g,  "</br>");
+
+            const rendermime = this._source.rendermime;
+            if (item.isWidget && rendermime) {
+                const model = new OutputAreaModel({trusted: true});
+                const output = new OutputArea({ model, rendermime });
+                output.future = this._source.performWidgetInspection(item.varName);
+                Widget.attach(output, cell);
+            } else {
+                cell.innerHTML = item.varContent.replace(/\\n/g,  "</br>");
+            }
         }
     }
 

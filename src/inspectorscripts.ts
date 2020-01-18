@@ -5,6 +5,7 @@ namespace Languages {
             initScript: string;
             queryCommand: string;
             matrixQueryCommand: string;
+            widgetQueryCommand: string;
             deleteCommand: string;
         }
 }
@@ -135,6 +136,14 @@ def _jupyterlab_variableinspector_is_matrix(x):
     return False
 
 
+def _jupyterlab_variableinspector_is_widget(x):
+    try:
+        from ipywidgets import DOMWidget
+        return issubclass(x, DOMWidget)
+    except:
+        return False
+
+
 def _jupyterlab_variableinspector_dict_list():
     _check_imported()
     def keep_cond(v):
@@ -159,13 +168,18 @@ def _jupyterlab_variableinspector_dict_list():
         except:
             return False
     values = _jupyterlab_variableinspector_nms.who_ls()
-    vardic = [{'varName': _v, 
-    'varType': type(eval(_v)).__name__, 
-    'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(_v))), 
-    'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(_v))) if _jupyterlab_variableinspector_getshapeof(eval(_v)) else '', 
-    'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
-    'isMatrix': _jupyterlab_variableinspector_is_matrix(eval(_v))}
-            for _v in values if keep_cond(_v)]
+    vardic = [
+        {
+            'varName': _v,
+            'varType': type(eval(_v)).__name__, 
+            'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(_v))), 
+            'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(_v))) if _jupyterlab_variableinspector_getshapeof(eval(_v)) else '', 
+            'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
+            'isMatrix': _jupyterlab_variableinspector_is_matrix(eval(_v)),
+            'isWidget': _jupyterlab_variableinspector_is_widget(type(eval(_v)))
+        }
+        for _v in values if keep_cond(_v)
+    ]
     return json.dumps(vardic, ensure_ascii=False)
 
 
@@ -194,6 +208,10 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     elif isinstance(x, list):
         s = pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
+
+
+def _jupyterlab_variableinspector_displaywidget(widget):
+    display(widget)
 
 
 def _jupyterlab_variableinspector_default(o):
@@ -281,24 +299,28 @@ def _jupyterlab_variableinspector_deletevariable(x):
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
             deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python2": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
             deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "python": {
             initScript: Languages.py_script,
             queryCommand: "_jupyterlab_variableinspector_dict_list()",
             matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
+            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
             deleteCommand: "_jupyterlab_variableinspector_deletevariable"
         },
         "R": {
             initScript: Languages.r_script,
             queryCommand: ".ls.objects()",
             matrixQueryCommand: ".ls.objects",
+            widgetQueryCommand: "TODO",
             deleteCommand: ".deleteVariable"
         }
     };
