@@ -176,7 +176,6 @@ const consoles: JupyterFrontEndPlugin<void> = {
                                 handler.dispose();
                             } );
 
-                            // @ts-ignore
                             resolve( handler );                        
                         } )
                         } );

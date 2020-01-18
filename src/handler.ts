@@ -19,7 +19,7 @@ import {
 } from "@jupyterlab/apputils";
 
 import {
-    KernelMessage
+    KernelMessage, Kernel
 } from "@jupyterlab/services";
 
 import {
@@ -320,6 +320,7 @@ export
         private _disposed = new Signal<this,void>( this );
         private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
         private _connector : KernelConnector;
+        private _rendermime : IRenderMimeRegistry = null;
         
         constructor(connector : KernelConnector) {
             this._connector = connector;
@@ -335,6 +336,10 @@ export
        
         get inspected() : ISignal<DummyHandler, IVariableInspector.IVariableInspectorUpdate>{
             return this._inspected;
+        }
+
+        get rendermime(): IRenderMimeRegistry {
+            return this._rendermime;
         }
        
         dispose(): void {
@@ -360,9 +365,13 @@ export
             return new Promise(function(resolve, reject) { reject("Cannot inspect matrices w/ the DummyHandler!") });
         }
 
-        // @ts-ignore
-        public performWidgetInspection(varName : string): Promise<any> {
-            return new Promise(function(resolve, reject) { reject("Not implemented") });
+        public performWidgetInspection( varName: string ): Kernel.IShellFuture<KernelMessage.IExecuteRequestMsg, KernelMessage.IExecuteReplyMsg> {
+            const request: KernelMessage.IExecuteRequestMsg['content'] = {
+                code: "",
+                stop_on_error: false,
+                store_history: false
+            };
+            return this._connector.execute(request);
         }
 
         public performDelete(varName: string){}
