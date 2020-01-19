@@ -1,5 +1,7 @@
 # jupyterlab_variableinspector
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector/master?urlpath=%2Flab)
+
 Jupyterlab extension that shows currently used variables and their values. The goal is to provide a tool similar to the variable inspector in RStudio.
 
 This project is inspired by the [variable inspector extension for jupyter notebooks](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/varInspector) and by the [inspector extension included in jupyterlab](https://github.com/jupyterlab/jupyterlab/tree/master/packages/inspector-extension).
