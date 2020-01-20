@@ -1,0 +1,2 @@
+jupyter labextension install @lckr/jupyterlab_variableinspector \
+                             @jupyter-widgets/jupyterlab-manager

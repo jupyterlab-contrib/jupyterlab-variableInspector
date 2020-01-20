@@ -1,0 +1,7 @@
+name: jupyterlab-variable-inspector
+channels:
+- conda-forge
+dependencies:
+- jupyterlab=1
+- numpy
+- pandas
