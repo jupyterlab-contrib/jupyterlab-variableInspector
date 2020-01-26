@@ -150,6 +150,9 @@ export
     }
 
     protected onInspectorUpdate( sender: any, allArgs: IVariableInspector.IVariableInspectorUpdate): void {
+        if (!this.isAttached) {
+            return;
+        }
 
         let title = allArgs.title;
         let args = allArgs.payload;
