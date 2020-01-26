@@ -30,10 +30,11 @@ np = None
 pd = None
 pyspark = None
 tf = None
+ipywidgets = None
 
 
 def _check_imported():
-    global np, pd, pyspark, tf
+    global np, pd, pyspark, tf, ipywidgets
     if 'numpy' in sys.modules:
         # don't really need the try
         try:
@@ -59,6 +60,12 @@ def _check_imported():
             import keras.backend as K
         except ImportError:
             tf = None
+
+    if 'ipywidgets' in sys.modules:
+        try:
+            import ipywidgets
+        except ImportError:
+            ipywidgets = None
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
@@ -137,11 +144,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 
 def _jupyterlab_variableinspector_is_widget(x):
-    try:
-        from ipywidgets import DOMWidget
-        return issubclass(x, DOMWidget)
-    except:
-        return False
+    return ipywidgets and issubclass(x, ipywidgets.DOMWidget)
 
 
 def _jupyterlab_variableinspector_dict_list():
