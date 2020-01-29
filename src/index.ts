@@ -36,8 +36,6 @@ import {
 } from '@jupyterlab/notebook';
 
 
-
-
 namespace CommandIDs {
     export
     const open = "variableinspector:open";
@@ -144,11 +142,13 @@ const consoles: JupyterFrontEndPlugin<void> = {
                             let initScript = result.initScript;
                             let queryCommand = result.queryCommand;
                             let matrixQueryCommand = result.matrixQueryCommand;
+                            let widgetQueryCommand = result.widgetQueryCommand;
                             let deleteCommand = result.deleteCommand;
                             
                             const options: VariableInspectionHandler.IOptions = {
                                     queryCommand: queryCommand,
                                     matrixQueryCommand: matrixQueryCommand,
+                                    widgetQueryCommand,
                                     deleteCommand: deleteCommand,
                                     connector: connector,
                                     initScript: initScript,
@@ -175,6 +175,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
                                 delete handlers[consolePanel.id];
                                 handler.dispose();
                             } );
+
                             resolve( handler );                        
                         } )
                         } );
@@ -233,6 +234,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                     
                     const session = nbPanel.session;
                     const connector = new KernelConnector( { session } );
+                    const rendermime = nbPanel.content.rendermime;
                     
                     connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
                         let kerneltype: string = connector.kernelType;
@@ -242,13 +244,16 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                         let initScript = result.initScript;
                         let queryCommand = result.queryCommand;
                         let matrixQueryCommand = result.matrixQueryCommand;
+                        let widgetQueryCommand = result.widgetQueryCommand;
                         let deleteCommand = result.deleteCommand;
                         
                         const options: VariableInspectionHandler.IOptions = {
                                 queryCommand: queryCommand,
                                 matrixQueryCommand: matrixQueryCommand,
+                                widgetQueryCommand,
                                 deleteCommand: deleteCommand,
                                 connector: connector,
+                                rendermime,
                                 initScript: initScript,
                                 id: session.path  //Using the sessions path as an identifier for now.
                         };

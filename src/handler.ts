@@ -1,4 +1,8 @@
 import {
+    IRenderMimeRegistry
+} from '@jupyterlab/rendermime';
+
+import {
     IDisposable
 } from '@phosphor/disposable';
 
@@ -15,7 +19,7 @@ import {
 } from "@jupyterlab/apputils";
 
 import {
-    KernelMessage
+    KernelMessage, Kernel
 } from "@jupyterlab/services";
 
 import {
@@ -37,9 +41,11 @@ export
     class VariableInspectionHandler implements IDisposable, IVariableInspector.IInspectable {
 
     private _connector: KernelConnector;
-    private _queryCommand: string;
+    private _rendermime: IRenderMimeRegistry;
     private _initScript: string;
+    private _queryCommand: string;
     private _matrixQueryCommand: string;
+    private _widgetQueryCommand: string;
     private _deleteCommand: string;
     private _disposed = new Signal<this, void>( this );
     private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
@@ -49,10 +55,12 @@ export
     
 
     constructor( options: VariableInspectionHandler.IOptions ) {
-        this._connector = options.connector;
         this._id = options.id;
+        this._connector = options.connector;
+        this._rendermime = options.rendermime;
         this._queryCommand = options.queryCommand;
         this._matrixQueryCommand = options.matrixQueryCommand;
+        this._widgetQueryCommand = options.widgetQueryCommand;
         this._deleteCommand = options.deleteCommand;
         this._initScript = options.initScript;
         
@@ -83,6 +91,10 @@ export
 
     get id():string{
         return this._id;
+    }
+
+    get rendermime() {
+        return this._rendermime;
     }
     
     /**
@@ -118,6 +130,18 @@ export
             store_history: false
         };
         this._connector.fetch( content, this._handleQueryResponse );
+    }
+
+    /**
+     * Performs an inspection of a Jupyter Widget
+     */
+    public performWidgetInspection(varName: string) {
+        const request: KernelMessage.IExecuteRequestMsg['content'] = {
+            code: this._widgetQueryCommand + "(" + varName + ")",
+            stop_on_error: false,
+            store_history: false
+        };
+        return this._connector.execute(request);
     }
 
     /**
@@ -259,7 +283,7 @@ export
         switch ( msgType ) {
             case 'execute_input':
                 let code = msg.content.code;
-                if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) ) {
+                if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) && !( code.startsWith(this._widgetQueryCommand) ) ) {
                     this.performInspection();
                 }
                 break;
@@ -280,8 +304,10 @@ namespace VariableInspectionHandler {
     export
         interface IOptions {
         connector: KernelConnector;
+        rendermime?: IRenderMimeRegistry;
         queryCommand: string;
         matrixQueryCommand: string;
+        widgetQueryCommand: string;
         deleteCommand: string;
         initScript: string;
         id : string;
@@ -294,6 +320,7 @@ export
         private _disposed = new Signal<this,void>( this );
         private _inspected = new Signal<this, IVariableInspector.IVariableInspectorUpdate>( this );
         private _connector : KernelConnector;
+        private _rendermime : IRenderMimeRegistry = null;
         
         constructor(connector : KernelConnector) {
             this._connector = connector;
@@ -309,6 +336,10 @@ export
        
         get inspected() : ISignal<DummyHandler, IVariableInspector.IVariableInspectorUpdate>{
             return this._inspected;
+        }
+
+        get rendermime(): IRenderMimeRegistry {
+            return this._rendermime;
         }
        
         dispose(): void {
@@ -332,6 +363,15 @@ export
         
         public performMatrixInspection(varName : string, maxRows : number): Promise<DataModel>{
             return new Promise(function(resolve, reject) { reject("Cannot inspect matrices w/ the DummyHandler!") });
+        }
+
+        public performWidgetInspection( varName: string ): Kernel.IShellFuture<KernelMessage.IExecuteRequestMsg, KernelMessage.IExecuteReplyMsg> {
+            const request: KernelMessage.IExecuteRequestMsg['content'] = {
+                code: "",
+                stop_on_error: false,
+                store_history: false
+            };
+            return this._connector.execute(request);
         }
 
         public performDelete(varName: string){}

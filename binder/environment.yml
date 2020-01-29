@@ -2,6 +2,7 @@ name: jupyterlab-variable-inspector
 channels:
 - conda-forge
 dependencies:
+- ipywidgets=7
 - jupyterlab=1
 - numpy
 - pandas

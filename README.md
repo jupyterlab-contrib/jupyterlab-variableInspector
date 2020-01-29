@@ -14,6 +14,7 @@ For the time being, this project is still in its first steps. Contributions in a
 
 - Allows inspection of variables for both python consoles and python notebooks
 - Allows inspection of matrices in a datagrid-viewer. This might not work for large matrices.
+- Allows an inline and interactive inspection of Jupyter Widgets.
 
 ## Prerequisites
 
@@ -24,6 +25,17 @@ For the time being, this project is still in its first steps. Contributions in a
 - `pandas` and `numpy` are required to enable matrix inspection.
 - `pyspark` for spark support.
 - `tensorflow` and `keras` to allow inspection of tf objects.
+
+### Requirements for `ipywidgets` functionality
+
+The variable inspector can also display Jupyter interactive widgets:
+
+![ipywidgets](./ipywidgets.png)
+
+The requirements for this functionality are:
+
+- `ipywidgets`
+- Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
 
 ### Requirements for R functionality
 
