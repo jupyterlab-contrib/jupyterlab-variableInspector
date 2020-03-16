@@ -124,19 +124,24 @@ const consoles: JupyterFrontEndPlugin<void> = {
              * Adds a promise for a instanced handler to the 'handlers' collection.
              */
             consoles.widgetAdded.connect(( sender, consolePanel ) => {
-                if (manager.hasHandler(consolePanel.session.path)){
+                if (manager.hasHandler(consolePanel.sessionContext.path)){
                     handlers[consolePanel.id] = new Promise(function(resolve, reject) {
-                        resolve(manager.getHandler(consolePanel.session.path));
+                        resolve(manager.getHandler(consolePanel.sessionContext.path));
                     });
                 }else{
                     handlers[consolePanel.id] = new Promise( function( resolve, reject ) {
-                        const session = consolePanel.session;
+                        const session = consolePanel.sessionContext;
+
+                        // Create connector and init w script if it exists for kernel type.
                         const connector = new KernelConnector( { session } );
-                        
-                        
-                        connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
-                            let kerneltype: string = connector.kernelType;
-                        let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
+
+                        let scripts: Promise<Languages.LanguageModel>;
+                        scripts = connector.ready.then(() => {
+                            return connector.kernelLanguage.then(lang => {
+                                return Languages.getScript(lang);
+                            });
+                        });
+
                         
                         scripts.then(( result: Languages.LanguageModel ) => {
                             let initScript = result.initScript;
@@ -178,11 +183,10 @@ const consoles: JupyterFrontEndPlugin<void> = {
 
                             resolve( handler );                        
                         } )
-                        } );
-                    } );
+                       
+                    } );                
                 }
-                
-            } );
+            });
             
             /**
              * If focus window changes, checks whether new focus widget is a console.
@@ -232,13 +236,16 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                 //A promise that resolves after the initialization of the handler is done.
                 handlers[nbPanel.id] = new Promise( function( resolve, reject ) {
                     
-                    const session = nbPanel.session;
+                    const session = nbPanel.sessionContext;
                     const connector = new KernelConnector( { session } );
                     const rendermime = nbPanel.content.rendermime;
                     
-                    connector.ready.then(() => { // Create connector and init w script if it exists for kernel type.
-                        let kerneltype: string = connector.kernelType;
-                    let scripts: Promise<Languages.LanguageModel> = Languages.getScript( kerneltype );
+                    let scripts: Promise<Languages.LanguageModel>;
+                        scripts = connector.ready.then(() => {
+                            return connector.kernelLanguage.then(lang => {
+                                return Languages.getScript(lang);
+                            });
+                        });
                     
                     scripts.then(( result: Languages.LanguageModel ) => {
                         let initScript = result.initScript;
@@ -273,10 +280,10 @@ const notebooks: JupyterFrontEndPlugin<void> = {
                     //Otherwise log error message.
                     scripts.catch(( result: string ) => {
                         reject( result );
-                    } )
                     } );
-                } );
+                 } );
             } );
+            
             
             /**
              * If focus window changes, checks whether new focus widget is a notebook.

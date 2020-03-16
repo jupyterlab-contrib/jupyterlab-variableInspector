@@ -14,19 +14,19 @@ import {
 
 import {
     ISignal
-} from '@phosphor/signaling';
+} from '@lumino/signaling';
 
 import {
     Token
-} from '@phosphor/coreutils';
+} from '@lumino/coreutils';
 
 import {
      DockLayout, Widget,
-} from '@phosphor/widgets';
+} from '@lumino/widgets';
 
 import {
     DataGrid, DataModel
-} from "@phosphor/datagrid";
+} from "@lumino/datagrid";
 
 import '../style/index.css';
 
@@ -230,14 +230,15 @@ export
 
 
     private _showMatrix( dataModel: DataModel, name: string, varType: string ): void {
-        let datagrid = new DataGrid( {
-            baseRowSize: 32,
-            baseColumnSize: 128,
-            baseRowHeaderSize: 64,
-            baseColumnHeaderSize: 32
+        let datagrid = new DataGrid( {defaultSizes : {
+            rowHeight: 32,
+            columnWidth: 128,
+            rowHeaderWidth: 64,
+            columnHeaderHeight: 32
+        } 
         } );
 
-        datagrid.model = dataModel;
+        datagrid.dataModel = dataModel;
         datagrid.title.label = varType + ": " + name;
         datagrid.title.closable = true;
         let lout: DockLayout = <DockLayout>this.parent.layout;
