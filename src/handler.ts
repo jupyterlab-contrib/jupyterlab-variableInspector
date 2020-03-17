@@ -244,8 +244,7 @@ export
                 let title: IVariableInspector.IVariableTitle;
                 title = {
                     contextName: "",
-                    kernelName : this._connector.kernelName || "",
-                    //languageName : this._connector.kernelType || ""
+                    kernelName : this._connector.kernelName || ""
                 };
 
                 this._inspected.emit( {title: title, payload: update} );
@@ -264,8 +263,7 @@ export
                 let title_display: IVariableInspector.IVariableTitle;
                 title_display = {
                     contextName: "",
-                    kernelName : this._connector.kernelName || "",
-                    //languageName : this._connector.kernelType || ""
+                    kernelName : this._connector.kernelName || ""
                 };
 
                 this._inspected.emit( {title: title_display, payload: update_display} );
@@ -355,8 +353,7 @@ export
             let title: IVariableInspector.IVariableTitle;
             title = {
                 contextName: ". <b>Language currently not supported.</b> ",
-                kernelName : this._connector.kernelName || "",
-                //languageName : this._connector.kernelType || ""
+                kernelName : this._connector.kernelName || ""
             };
             this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
         }

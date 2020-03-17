@@ -27,7 +27,6 @@ export
             switch (new_status) {
             	case "restarting":
                 case "autorestarting":
-            	    //TODO : Check for kernel availability
             	    this._kernelRestarted.emit(this._session.ready);
             	default:
             		break;
@@ -39,7 +38,7 @@ export
         return this._kernelRestarted;
     }
 
-     get kernelLanguage(): Promise<string> {
+    get kernelLanguage(): Promise<string> {
 
         return this._session.session.kernel.info.then(infoReply => {
             return infoReply.language_info.name;
@@ -79,14 +78,12 @@ export
             return Promise.reject( new Error( "Require kernel to perform variable inspection!" ) );
         }
 
-        //return kernel..then(() => {
         let future = kernel.requestExecute( content );
 
         future.onIOPub = ( ( msg: KernelMessage.IIOPubMessage ) => {
             ioCallback( msg );
         } );
         return future.done as Promise<KernelMessage.IExecuteReplyMsg>;
-       // } );
     }
 
     execute( content: KernelMessage.IExecuteRequestMsg['content']) {

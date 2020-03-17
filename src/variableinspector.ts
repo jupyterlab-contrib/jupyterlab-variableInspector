@@ -86,7 +86,6 @@ namespace IVariableInspector {
     export
         interface IVariableTitle {
         kernelName?: string;
-        languageName?: string;
         contextName?: string; //Context currently reserved for special information.
         }
 }
@@ -160,7 +159,7 @@ export
         if (title.contextName){
             this._title.innerHTML = title.contextName;            
         }else{
-            this._title.innerHTML = "    Inspecting " + title.languageName + "-kernel '"+title.kernelName + "' "+title.contextName;
+            this._title.innerHTML = "    Inspecting '" + title.kernelName + "' "+title.contextName;
         }
         
         //Render new variable state
