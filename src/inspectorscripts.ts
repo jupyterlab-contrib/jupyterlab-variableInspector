@@ -35,33 +35,35 @@ ipywidgets = None
 
 def _check_imported():
     global np, pd, pyspark, tf, ipywidgets
-    if 'numpy' in sys.modules:
+    pkg_resources = [dist.project_name.replace("Python","") for
+                     dist in __import__("pkg_resources").working_set]
+    if 'numpy' in pkg_resources:
         # don't really need the try
         try:
             import numpy as np
         except ImportError:
             np = None
 
-    if 'pandas' in sys.modules:
+    if 'pandas' in pkg_resources:
         try:
             import pandas as pd
         except ImportError:
             pd = None
 
-    if 'pyspark' in sys.modules:
+    if 'pyspark' in pkg_resources:
         try:
             import pyspark
         except ImportError:
             pyspark = None
 
-    if 'tensorflow' in sys.modules or 'keras' in sys.modules:
+    if 'tensorflow' in pkg_resources or 'keras' in pkg_resources:
         try:
             import tensorflow as tf
             import keras.backend as K
         except ImportError:
             tf = None
 
-    if 'ipywidgets' in sys.modules:
+    if 'ipywidgets' in pkg_resources:
         try:
             import ipywidgets
         except ImportError:
@@ -162,7 +164,7 @@ def _jupyterlab_variableinspector_dict_list():
                 return True
             if str(obj)[0] == "<":
                 return False
-            if  v in ['np', 'pd', 'pyspark', 'tf']:
+            if  v in ['np', 'pd', 'pyspark', 'tf', 'ipywidgets']:
                 return obj is not None
             if str(obj).startswith("_Feature"):
                 # removes tf/keras objects
