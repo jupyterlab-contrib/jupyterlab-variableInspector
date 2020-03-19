@@ -4,7 +4,7 @@ import {
 
 import {
     IDisposable
-} from '@phosphor/disposable';
+} from '@lumino/disposable';
 
 import {
     IVariableInspector
@@ -15,7 +15,7 @@ import {
 } from "./kernelconnector";
 
 import {
-    IClientSession
+    ISessionContext
 } from "@jupyterlab/apputils";
 
 import {
@@ -24,15 +24,15 @@ import {
 
 import {
     Signal, ISignal
-} from "@phosphor/signaling"
+} from "@lumino/signaling"
 
 import {
-    nbformat
-} from "@jupyterlab/coreutils"
+   IExecuteResult
+} from "@jupyterlab/nbformat"
 
 import {
     JSONModel, DataModel
-} from "@phosphor/datagrid";
+} from "@lumino/datagrid";
 
 /**
  * An object that handles code inspection.
@@ -160,7 +160,7 @@ export
                     let msgType = response.header.msg_type;
                     switch ( msgType ) {
                         case "execute_result":
-                            let payload = response.content as nbformat.IExecuteResult;
+                            let payload = response.content as IExecuteResult;
                             let content: string = <string>payload.data["text/plain"];
                             let content_clean = content.replace(/^'|'$/g, "");
                             content_clean = content_clean.replace(/\\"/g, '"');
@@ -231,7 +231,7 @@ export
         let msgType = response.header.msg_type;
         switch ( msgType ) {
             case "execute_result":
-                let payload = response.content as nbformat.IExecuteResult;
+                let payload = response.content as IExecuteResult;
                 let content: string = <string>payload.data["text/plain"];
                 if (content.slice(0, 1) == "'" || content.slice(0, 1) == "\""){
                     content = content.slice(1,-1);
@@ -244,14 +244,13 @@ export
                 let title: IVariableInspector.IVariableTitle;
                 title = {
                     contextName: "",
-                    kernelName : this._connector.kernelName || "",
-                    languageName : this._connector.kernelType || ""
+                    kernelName : this._connector.kernelName || ""
                 };
 
                 this._inspected.emit( {title: title, payload: update} );
                 break;
             case "display_data":
-                let payload_display = response.content as nbformat.IExecuteResult;
+                let payload_display = response.content as IExecuteResult;
                 let content_display: string = <string>payload_display.data["text/plain"];
                 if (content_display.slice(0, 1) == "'" || content_display.slice(0, 1) == "\""){
                     content_display = content_display.slice(1,-1);
@@ -264,8 +263,7 @@ export
                 let title_display: IVariableInspector.IVariableTitle;
                 title_display = {
                     contextName: "",
-                    kernelName : this._connector.kernelName || "",
-                    languageName : this._connector.kernelType || ""
+                    kernelName : this._connector.kernelName || ""
                 };
 
                 this._inspected.emit( {title: title_display, payload: update_display} );
@@ -278,7 +276,7 @@ export
     /*
      * Invokes a inspection if the signal emitted from specified session is an 'execute_input' msg.
      */
-    private _queryCall = ( sess: IClientSession, msg: KernelMessage.IExecuteInputMsg ) => {
+    private _queryCall = ( sess: ISessionContext, msg: KernelMessage.IExecuteInputMsg ) => {
         let msgType = msg.header.msg_type;
         switch ( msgType ) {
             case 'execute_input':
@@ -355,8 +353,7 @@ export
             let title: IVariableInspector.IVariableTitle;
             title = {
                 contextName: ". <b>Language currently not supported.</b> ",
-                kernelName : this._connector.kernelName || "",
-                languageName : this._connector.kernelType || ""
+                kernelName : this._connector.kernelName || ""
             };
             this._inspected.emit( <IVariableInspector.IVariableInspectorUpdate>{title : title, payload : []});
         }
