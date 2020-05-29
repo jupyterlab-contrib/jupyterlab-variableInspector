@@ -26,77 +26,87 @@ _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
 
-np = None
-pd = None
-pyspark = None
-tf = None
-ipywidgets = None
+__np = None
+__pd = None
+__pyspark = None
+__tf = None
+__K = None
+__ipywidgets = None
 
 
 def _check_imported():
-    global np, pd, pyspark, tf, ipywidgets
+    global __np, __pd, __pyspark, __tf, __K, __ipywidgets
     pkg_resources = [dist.project_name.replace("Python","") for
                      dist in __import__("pkg_resources").working_set]
     if 'numpy' in pkg_resources:
         # don't really need the try
         try:
-            import numpy as np
+            import numpy as __np
         except ImportError:
-            np = None
+            __np = None
 
     if 'pandas' in pkg_resources:
         try:
-            import pandas as pd
+            import pandas as __pd
         except ImportError:
-            pd = None
+            __pd = None
 
     if 'pyspark' in pkg_resources:
         try:
-            import pyspark
+            import pyspark as __pyspark
         except ImportError:
-            pyspark = None
+            __pyspark = None
 
     if 'tensorflow' in pkg_resources or 'keras' in pkg_resources:
         try:
-            import tensorflow as tf
-            import keras.backend as K
+            import tensorflow as __tf
         except ImportError:
-            tf = None
+            __tf = None
+
+        try:
+            import keras.backend as __K
+        except ImportError:
+            try:
+                import tensorflow.keras.backend as __K
+            except ImportError:
+                __K = None
+
+
 
     if 'ipywidgets' in pkg_resources:
         try:
-            import ipywidgets
+            import ipywidgets as __ipywidgets
         except ImportError:
-            ipywidgets = None
+        __ipywidgets = None
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
     if type(x).__name__ in ['ndarray', 'Series']:
         return x.nbytes
-    elif pyspark and isinstance(x, pyspark.sql.DataFrame):
+    elif __pyspark and isinstance(x, __pyspark.sql.DataFrame):
         return "?"
-    elif tf and isinstance(x, tf.Variable):
+    elif __tf and isinstance(x, __tf.Variable):
         return "?"
-    elif pd and type(x).__name__ == 'DataFrame':
+    elif __pd and type(x).__name__ == 'DataFrame':
         return x.memory_usage().sum()
     else:
         return sys.getsizeof(x)
 
 
 def _jupyterlab_variableinspector_getshapeof(x):
-    if pd and isinstance(x, pd.DataFrame):
+    if __pd and isinstance(x, __pd.DataFrame):
         return "%d rows x %d cols" % x.shape
-    if pd and isinstance(x, pd.Series):
+    if __pd and isinstance(x, __pd.Series):
         return "%d rows" % x.shape
-    if np and isinstance(x, np.ndarray):
+    if __np and isinstance(x, __np.ndarray):
         shape = " x ".join([str(i) for i in x.shape])
         return "%s" % shape
-    if pyspark and isinstance(x, pyspark.sql.DataFrame):
+    if __pyspark and isinstance(x, __pyspark.sql.DataFrame):
         return "? rows x %d cols" % len(x.columns)
-    if tf and isinstance(x, tf.Variable):
+    if __tf and isinstance(x, __tf.Variable):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
-    if tf and isinstance(x, tf.Tensor):
+    if __tf and isinstance(x, __tf.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
     if isinstance(x, list):
@@ -109,13 +119,13 @@ def _jupyterlab_variableinspector_getshapeof(x):
 def _jupyterlab_variableinspector_getcontentof(x):
     # returns content in a friendly way for python variables
     # pandas and numpy
-    if pd and isinstance(x, pd.DataFrame):
+    if __pd and isinstance(x, __pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
         content = "Columns: %s" % colnames
-    elif pd and isinstance(x, pd.Series):
+    elif __pd and isinstance(x, __pd.Series):
         content = str(x.values).replace(" ", ", ")[1:-1]
         content = content.replace("\\n", "")
-    elif np and isinstance(x, np.ndarray):
+    elif __np and isinstance(x, __np.ndarray):
         content = x.__repr__()
     else:
         content = str(x)
@@ -128,17 +138,17 @@ def _jupyterlab_variableinspector_getcontentof(x):
 
 def _jupyterlab_variableinspector_is_matrix(x):
     # True if type(x).__name__ in ["DataFrame", "ndarray", "Series"] else False
-    if pd and isinstance(x, pd.DataFrame):
+    if __pd and isinstance(x, __pd.DataFrame):
         return True
-    if pd and isinstance(x, pd.Series):
+    if __pd and isinstance(x, __pd.Series):
         return True
-    if np and isinstance(x, np.ndarray) and len(x.shape) <= 2:
+    if __np and isinstance(x, __np.ndarray) and len(x.shape) <= 2:
         return True
-    if pyspark and isinstance(x, pyspark.sql.DataFrame):
+    if __pyspark and isinstance(x, __pyspark.sql.DataFrame):
         return True
-    if tf and isinstance(x, tf.Variable) and len(x.shape) <= 2:
+    if __tf and isinstance(x, __tf.Variable) and len(x.shape) <= 2:
         return True
-    if tf and isinstance(x, tf.Tensor) and len(x.shape) <= 2:
+    if __tf and isinstance(x, __tf.Tensor) and len(x.shape) <= 2:
         return True
     if isinstance(x, list):
         return True
@@ -146,7 +156,7 @@ def _jupyterlab_variableinspector_is_matrix(x):
 
 
 def _jupyterlab_variableinspector_is_widget(x):
-    return ipywidgets and issubclass(x, ipywidgets.DOMWidget)
+    return __ipywidgets and issubclass(x, __ipywidgets.DOMWidget)
 
 
 def _jupyterlab_variableinspector_dict_list():
@@ -156,15 +166,15 @@ def _jupyterlab_variableinspector_dict_list():
             obj = eval(v)
             if isinstance(obj, str):
                 return True
-            if tf and isinstance(obj, tf.Variable):
+            if __tf and isinstance(obj, __tf.Variable):
                 return True
-            if pd and pd is not None and (
-                isinstance(obj, pd.core.frame.DataFrame)
-                or isinstance(obj, pd.core.series.Series)):
+            if __pd and __pd is not None and (
+                isinstance(obj, __pd.core.frame.DataFrame)
+                or isinstance(obj, __pd.core.series.Series)):
                 return True
             if str(obj)[0] == "<":
                 return False
-            if  v in ['np', 'pd', 'pyspark', 'tf', 'ipywidgets']:
+            if  v in ['__np', '__pd', '__pyspark', '__tf', '__K', '__ipywidgets']:
                 return obj is not None
             if str(obj).startswith("_Feature"):
                 # removes tf/keras objects
@@ -192,26 +202,26 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     # to do: add something to handle this in the future
     threshold = max_rows
 
-    if pd and pyspark and isinstance(x, pyspark.sql.DataFrame):
+    if __pd and __pyspark and isinstance(x, __pyspark.sql.DataFrame):
         df = x.limit(threshold).toPandas()
         return _jupyterlab_variableinspector_getmatrixcontent(df.copy())
-    elif np and pd and type(x).__name__ == "DataFrame":
+    elif __np and __pd and type(x).__name__ == "DataFrame":
         if threshold is not None:
             x = x.head(threshold)
         x.columns = x.columns.map(str)
         return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
-    elif np and pd and type(x).__name__ == "Series":
+    elif __np and __pd and type(x).__name__ == "Series":
         if threshold is not None:
             x = x.head(threshold)
         return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
-    elif np and pd and type(x).__name__ == "ndarray":
-        df = pd.DataFrame(x)
+    elif __np and __pd and type(x).__name__ == "ndarray":
+        df = __pd.DataFrame(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
-    elif tf and (isinstance(x, tf.Variable) or isinstance(x, tf.Tensor)):
-        df = K.get_value(x)
+    elif __tf and (isinstance(x, __tf.Variable) or isinstance(x, __tf.Tensor)):
+        df = __K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif isinstance(x, list):
-        s = pd.Series(x)
+        s = __pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
 
 
@@ -220,7 +230,7 @@ def _jupyterlab_variableinspector_displaywidget(widget):
 
 
 def _jupyterlab_variableinspector_default(o):
-    if isinstance(o, np.number): return int(o)  
+    if isinstance(o, __np.number): return int(o)  
     raise TypeError
 
 
