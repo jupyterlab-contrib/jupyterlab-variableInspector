@@ -77,7 +77,7 @@ def _check_imported():
         try:
             import ipywidgets as __ipywidgets
         except ImportError:
-        __ipywidgets = None
+            __ipywidgets = None
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
