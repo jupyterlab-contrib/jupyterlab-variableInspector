@@ -36,32 +36,19 @@ __ipywidgets = None
 
 def _check_imported():
     global __np, __pd, __pyspark, __tf, __K, __ipywidgets
-    pkg_resources = [dist.project_name.replace("Python","") for
-                     dist in __import__("pkg_resources").working_set]
-    if 'numpy' in pkg_resources:
+
+    if 'numpy' in sys.modules:
         # don't really need the try
-        try:
-            import numpy as __np
-        except ImportError:
-            __np = None
+        import numpy as __np
 
-    if 'pandas' in pkg_resources:
-        try:
-            import pandas as __pd
-        except ImportError:
-            __pd = None
+    if 'pandas' in sys.modules:
+        import pandas as __pd
 
-    if 'pyspark' in pkg_resources:
-        try:
-            import pyspark as __pyspark
-        except ImportError:
-            __pyspark = None
+    if 'pyspark' in sys.modules:
+        import pyspark as __pyspark
 
-    if 'tensorflow' in pkg_resources or 'keras' in pkg_resources:
-        try:
-            import tensorflow as __tf
-        except ImportError:
-            __tf = None
+    if 'tensorflow' in sys.modules or 'keras' in sys.modules:
+        import tensorflow as __tf
 
         try:
             import keras.backend as __K
@@ -71,13 +58,8 @@ def _check_imported():
             except ImportError:
                 __K = None
 
-
-
-    if 'ipywidgets' in pkg_resources:
-        try:
-            import ipywidgets as __ipywidgets
-        except ImportError:
-            __ipywidgets = None
+    if 'ipywidgets' in sys.modules:
+        import ipywidgets as __ipywidgets
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
