@@ -5,6 +5,7 @@
 }
 
 .jp-VarInspector-table {
+  font-family: monospace;
   border-collapse: collapse;
   margin: auto;
   width: 100%;
