@@ -281,7 +281,7 @@ export
         switch ( msgType ) {
             case 'execute_input':
                 let code = msg.content.code;
-                if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) && !( code.startsWith(this._widgetQueryCommand) ) ) {
+                if ( !( code == this._queryCommand ) && !( code == this._matrixQueryCommand ) && !(this._widgetQueryCommand.length > 0 && code.startsWith(this._widgetQueryCommand) ) ) {
                     this.performInspection();
                 }
                 break;
