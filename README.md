@@ -53,7 +53,7 @@ The requirements for this functionality are:
 ## Install
 
 ```bash
-pip install lckr_jupyterlab_variableinspector
+pip install lckr-jupyterlab-variableinspector
 ```
 
 
