@@ -45,7 +45,7 @@ namespace CommandIDs {
  * A service providing variable introspection.
  */
 const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
-        id: "jupyterlab-extension:variableinspector",
+        id: "@lckr/jupyterlab_variableinspector",
         requires: [ICommandPalette, ILayoutRestorer, ILabShell],
         provides: IVariableInspectorManager,
         autoStart: true,
@@ -105,7 +105,10 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
                 }
             } );
             palette.addItem( { command, category } );
+
+            console.log('JupyterLab extension @lckr/jupyterlab_variableinspector is activated!');
             return manager;
+
         }
 };
 
@@ -113,7 +116,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
  * An extension that registers consoles for variable inspection.
  */
 const consoles: JupyterFrontEndPlugin<void> = {
-        id: "jupyterlab-extension:variableinspector:consoles",
+        id: "@lckr/jupyterlab-variableinspector:consoles",
         requires: [IVariableInspectorManager, IConsoleTracker, ILabShell],
         autoStart: true,
         activate: ( app: JupyterFrontEnd, manager: IVariableInspectorManager, consoles: IConsoleTracker, labShell: ILabShell ): void => {
@@ -221,7 +224,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
  * An extension that registers notebooks for variable inspection.
  */
 const notebooks: JupyterFrontEndPlugin<void> = {
-        id: "jupyterlab-extension:variableinspector:notebooks",
+        id: "@lckr/jupyterlab-variableinspector:notebooks",
         requires: [IVariableInspectorManager, INotebookTracker, ILabShell],
         autoStart: true,
         activate: ( app: JupyterFrontEnd, manager: IVariableInspectorManager, notebooks: INotebookTracker, labShell: ILabShell ): void => {

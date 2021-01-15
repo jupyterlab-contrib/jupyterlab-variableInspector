@@ -1,0 +1,5 @@
+{
+  "packageManager": "python",
+  "packageName": "lckr_jupyterlab_variableinspector",
+  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package lckr_jupyterlab_variableinspector"
+}

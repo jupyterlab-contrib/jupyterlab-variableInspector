@@ -1,69 +1,63 @@
-# jupyterlab_variableinspector
+# lckr_jupyterlab_variableinspector
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector/master?urlpath=%2Flab)
+![Github Actions Status](https://github.com/lckr/jupyterlab-variableInspector.git/workflows/Build/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector.git/master?urlpath=lab)
 
-Jupyterlab extension that shows currently used variables and their values. The goal is to provide a tool similar to the variable inspector in RStudio.
+Variable inspector extension for JupyterLab
 
-This project is inspired by the [variable inspector extension for jupyter notebooks](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/varInspector) and by the [inspector extension included in jupyterlab](https://github.com/jupyterlab/jupyterlab/tree/master/packages/inspector-extension).
 
-For the time being, this project is still in its first steps. Contributions in any form are very welcome!
 
-## Features
+## Requirements
 
-![Demogif](early_demo.gif)
+* JupyterLab >= 3.0
 
-- Allows inspection of variables for both python consoles and python notebooks
-- Allows inspection of matrices in a datagrid-viewer. This might not work for large matrices.
-- Allows an inline and interactive inspection of Jupyter Widgets.
+## Install
 
-## Prerequisites
-
-- JupyterLab [1.0]
-
-### Requirements for Python functionality
-
-- `pandas` and `numpy` are required to enable matrix inspection.
-- `pyspark` for spark support.
-- `tensorflow` and `keras` to allow inspection of tf objects.
-
-### Requirements for `ipywidgets` functionality
-
-The variable inspector can also display Jupyter interactive widgets:
-
-![ipywidgets](./ipywidgets.png)
-
-The requirements for this functionality are:
-
-- `ipywidgets`
-- Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
-
-### Requirements for R functionality
-
-- The `repr` library.
-
-## Installation
-
-First of all, you need an installation of a current version of JupyterLab. Please refer to the [installation guide](https://github.com/jupyterlab/jupyterlab#installation).
-
-You can install the inspector either by running
-`jupyter labextension install @lckr/jupyterlab_variableinspector`
-
-or by cloning the repository and build it locally following these steps:
-
-1. Clone this repository with `git clone https://github.com/lckr/jupyterlab-variableInspector`
-
-2. Once you downloaded the repository use the following steps:
-
-```
-cd jupyterlab-variableInspector
-npm install
-npm run build
-jupyter labextension install .
+```bash
+pip install lckr_jupyterlab_variableinspector
 ```
 
-3. Confirm the installation of the extension with:
 
+## Contributing
+
+### Development install
+
+Note: You will need NodeJS to build the extension package.
+
+The `jlpm` command is JupyterLab's pinned version of
+[yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
+`yarn` or `npm` in lieu of `jlpm` below.
+
+```bash
+# Clone the repo to your local environment
+# Change directory to the lckr_jupyterlab_variableinspector directory
+# Install package in development mode
+pip install -e .
+# Link your development version of the extension with JupyterLab
+jupyter labextension develop . --overwrite
+# Rebuild extension Typescript source after making changes
+jlpm run build
 ```
-jupyter labextension list
+
+You can watch the source directory and run JupyterLab at the same time in different terminals to watch for changes in the extension's source and automatically rebuild the extension.
+
+```bash
+# Watch the source directory in one terminal, automatically rebuilding when needed
+jlpm run watch
+# Run JupyterLab in another terminal
+jupyter lab
 ```
-which should print `enabled` and `OK`.
+
+With the watch command running, every saved change will immediately be built locally and available in your running JupyterLab. Refresh JupyterLab to load the change in your browser (you may need to wait several seconds for the extension to be rebuilt).
+
+By default, the `jlpm run build` command generates the source maps for this extension to make it easier to debug using the browser dev tools. To also generate source maps for the JupyterLab core extensions, you can run the following command:
+
+```bash
+jupyter lab build --minimize=False
+```
+
+### Uninstall
+
+```bash
+pip uninstall lckr_jupyterlab_variableinspector
+```
