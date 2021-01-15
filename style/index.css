@@ -1,3 +1,4 @@
+
 @import url('base.css');
 
 .jp-VarInspector {
@@ -7,6 +8,7 @@
   }
   
   .jp-VarInspector-table {
+    font-family: monospace;
     border-collapse: collapse;
     margin: auto;
     width: 100%;
@@ -53,4 +55,4 @@
   .jp-VarInspector-varName {
     font-weight: 600;
   }
-  
+
