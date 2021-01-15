@@ -1,6 +1,5 @@
 # jupyterlab_variableinspector
-
-![Github Actions Status](https://github.com/lckr/jupyterlab-variableInspector.git/workflows/Build/badge.svg)
+![Github Actions Status](https://github.com/lckr/jupyterlab-variableInspector/workflows/Build/badge.svg)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector.git/master?urlpath=lab)
 
 Jupyterlab extension that shows currently used variables and their values. The goal is to provide a tool similar to the variable inspector in RStudio.
