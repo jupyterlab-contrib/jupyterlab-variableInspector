@@ -334,3 +334,5 @@ def _jupyterlab_variableinspector_deletevariable(x):
                 reject( "Language " + lang + " not supported yet!" );
             }
         } );
+    }
+}
