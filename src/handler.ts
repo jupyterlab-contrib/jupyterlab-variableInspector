@@ -292,7 +292,7 @@ export class VariableInspectionHandler
           !(code === this._queryCommand) &&
           !(code === this._matrixQueryCommand) &&
           !code.startsWith(this._widgetQueryCommand) &&
-          !(this._widgetQueryCommand.length > 0
+          !(this._widgetQueryCommand.length > 0)
         ) {
           this.performInspection();
         }
