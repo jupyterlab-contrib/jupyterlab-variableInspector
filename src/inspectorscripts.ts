@@ -1,22 +1,19 @@
-export
-namespace Languages {
-    export
-        type LanguageModel = {
-            initScript: string;
-            queryCommand: string;
-            matrixQueryCommand: string;
-            widgetQueryCommand: string;
-            deleteCommand: string;
-        }
+export namespace Languages {
+  export type LanguageModel = {
+    initScript: string;
+    queryCommand: string;
+    matrixQueryCommand: string;
+    widgetQueryCommand: string;
+    deleteCommand: string;
+  };
 }
 
-export
-    abstract class Languages {
-    /**
-     * Init and query script for supported languages.
-     */
+export abstract class Languages {
+  /**
+   * Init and query script for supported languages.
+   */
 
-    static py_script: string = `import json
+  static py_script = `import json
 import sys
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
@@ -220,7 +217,7 @@ def _jupyterlab_variableinspector_deletevariable(x):
     exec("del %s" % x, globals())
 `;
 
-    static r_script: string = `library(repr)
+  static r_script = `library(repr)
 
 .ls.objects = function (pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE, 
     n = 5) 
@@ -290,50 +287,45 @@ def _jupyterlab_variableinspector_deletevariable(x):
     remove(list=c(x), envir=.GlobalEnv)
 }
     `;
-    
-    static scripts: { [index: string]: Languages.LanguageModel } = {
-        "python3": {
-            initScript: Languages.py_script,
-            queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
-            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
-            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
-        },
-        "python2": {
-            initScript: Languages.py_script,
-            queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
-            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
-            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
-        },
-        "python": {
-            initScript: Languages.py_script,
-            queryCommand: "_jupyterlab_variableinspector_dict_list()",
-            matrixQueryCommand: "_jupyterlab_variableinspector_getmatrixcontent",
-            widgetQueryCommand: "_jupyterlab_variableinspector_displaywidget",
-            deleteCommand: "_jupyterlab_variableinspector_deletevariable"
-        },
-        "R": {
-            initScript: Languages.r_script,
-            queryCommand: ".ls.objects()",
-            matrixQueryCommand: ".ls.objects",
-            widgetQueryCommand: "TODO",
-            deleteCommand: ".deleteVariable"
-        }
-    };
 
-    public static getScript( lang: string ): Promise<Languages.LanguageModel> {
-        return new Promise( function( resolve, reject ) {
-            if ( lang in Languages.scripts ) {
-                resolve( Languages.scripts[lang] );
-            } else {
-                reject( "Language " + lang + " not supported yet!" );
-            }
-        } );
-
+  static scripts: { [index: string]: Languages.LanguageModel } = {
+    python3: {
+      initScript: Languages.py_script,
+      queryCommand: '_jupyterlab_variableinspector_dict_list()',
+      matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
+      widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+    },
+    python2: {
+      initScript: Languages.py_script,
+      queryCommand: '_jupyterlab_variableinspector_dict_list()',
+      matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
+      widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+    },
+    python: {
+      initScript: Languages.py_script,
+      queryCommand: '_jupyterlab_variableinspector_dict_list()',
+      matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
+      widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+    },
+    R: {
+      initScript: Languages.r_script,
+      queryCommand: '.ls.objects()',
+      matrixQueryCommand: '.ls.objects',
+      widgetQueryCommand: 'TODO',
+      deleteCommand: '.deleteVariable'
     }
+  };
 
+  public static getScript(lang: string): Promise<Languages.LanguageModel> {
+    return new Promise((resolve, reject) => {
+      if (lang in Languages.scripts) {
+        resolve(Languages.scripts[lang]);
+      } else {
+        reject('Language ' + lang + ' not supported yet!');
+      }
+    });
+  }
 }
-
-
-
