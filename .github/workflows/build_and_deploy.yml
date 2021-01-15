@@ -1,7 +1,8 @@
 name: Build
 on: 
-  push:
-    branches: master
+  release:
+    types: [published]
+
 
 jobs:
   build-n-publish:
@@ -32,7 +33,6 @@ jobs:
     - name: Package
       run: python setup.py sdist
     - name: Publish distribution 📦 to PyPI
-      if: startsWith(github.ref, 'refs/tags')
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
