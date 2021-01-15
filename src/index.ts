@@ -35,6 +35,10 @@ import {
     INotebookTracker, NotebookPanel
 } from '@jupyterlab/notebook';
 
+import {
+  listIcon
+} from "@jupyterlab/ui-components";
+
 
 namespace CommandIDs {
     export
@@ -68,6 +72,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
                 
                 panel.id = "jp-variableinspector";
                 panel.title.label = "Variable Inspector";
+                panel.title.icon = listIcon;
                 panel.title.closable = true;
                 panel.disposed.connect(() => {
                     if ( manager.panel === panel ) {

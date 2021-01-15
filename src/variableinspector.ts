@@ -28,6 +28,10 @@ import {
     DataGrid, DataModel
 } from "@lumino/datagrid";
 
+import {
+    closeIcon, searchIcon
+} from "@jupyterlab/ui-components";
+
 import '../style/index.css';
 
 const TITLE_CLASS = "jp-VarInspector-title";
@@ -169,6 +173,8 @@ export
         this._table.tFoot.className = TABLE_BODY_CLASS;
         for ( let index = 0; index < args.length; index++ ) {
             const item = args[index];
+            console.log(item);
+
             let name = item.varName;
             let varType = item.varType;
 
@@ -176,36 +182,41 @@ export
 
             // Add delete icon and onclick event
             let cell = row.insertCell( 0 );
-            cell.innerHTML = "&#128465;";
-            cell.className = "jp-VarInspector-deleteButton";
-            cell.title = "Delete";
-            cell.onclick = ( ev: MouseEvent ): any => {
+            cell.title = "Delete Variable";
+            const ico = closeIcon.element();            
+            ico.onclick = ( ev: MouseEvent ): any => {
                 this.source.performDelete( name );
             };
+            cell.append(ico);
             
-            // Add name cell and onclick event for inspection
-            cell = row.insertCell( 1 );
-            cell.innerHTML = name;
-            
+            // Add onclick event for inspection
+            cell = row.insertCell( 1 );            
             if ( item.isMatrix ) {
-              cell.className = "jp-VarInspector-varName";
               cell.title = "View Contents";
-
-              cell.onclick = ( ev: MouseEvent ): any => {
+              const ico = searchIcon.element();
+              ico.onclick = ( ev: MouseEvent ): any => {
+                  console.log("Click on " + name);
                   this._source.performMatrixInspection( name ).then(( model: DataModel ) => {
                       this._showMatrix( model, name, varType )
                   } );
-              }
+              };
+              cell.append(ico);
+            } else {
+                cell.innerHTML = "";
             }
+     
+            cell = row.insertCell( 2 );
+            cell.className = "jp-VarInspector-varName";
+            cell.innerHTML = name;
 
             // Add remaining cells
-            cell = row.insertCell( 2 );
-            cell.innerHTML = varType;
             cell = row.insertCell( 3 );
-            cell.innerHTML = item.varSize;
+            cell.innerHTML = varType;
             cell = row.insertCell( 4 );
-            cell.innerHTML = item.varShape;
+            cell.innerHTML = item.varSize;
             cell = row.insertCell( 5 );
+            cell.innerHTML = item.varShape;
+            cell = row.insertCell( 6 );
 
             const rendermime = this._source.rendermime;
             if (item.isWidget && rendermime) {
@@ -259,15 +270,17 @@ namespace Private {
         let cell1 = hrow.insertCell( 0 );
         cell1.innerHTML = "";
         let cell2 = hrow.insertCell( 1 );
-        cell2.innerHTML = "Name";
+        cell2.innerHTML = "";
         let cell3 = hrow.insertCell( 2 );
-        cell3.innerHTML = "Type";
+        cell3.innerHTML = "Name";
         let cell4 = hrow.insertCell( 3 );
-        cell4.innerHTML = "Size";
+        cell4.innerHTML = "Type";
         let cell5 = hrow.insertCell( 4 );
-        cell5.innerHTML = "Shape";
+        cell5.innerHTML = "Size";
         let cell6 = hrow.insertCell( 5 );
-        cell6.innerHTML = "Content";
+        cell6.innerHTML = "Shape";
+        let cell7 = hrow.insertCell( 6 );
+        cell7.innerHTML = "Content";
         return table;
     }
 

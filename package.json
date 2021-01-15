@@ -51,6 +51,7 @@
     "@jupyterlab/csvviewer": "^3.0.3",
     "@jupyterlab/notebook": "^3.0.3",
     "@jupyterlab/services": "^6.0.2",
+    "@jupyterlab/ui-components": "^3.0.2",
     "@lumino/datagrid": "^0.5"
   },
   "devDependencies": {
