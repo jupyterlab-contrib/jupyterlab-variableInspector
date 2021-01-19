@@ -316,6 +316,15 @@ def _jupyterlab_variableinspector_deletevariable(x):
       matrixQueryCommand: '.ls.objects',
       widgetQueryCommand: 'TODO',
       deleteCommand: '.deleteVariable'
+    },
+    scala: {
+      initScript:
+        '_root_.almond.api.JupyterAPIHolder.value.VariableInspector.init()',
+      queryCommand:
+        '_root_.almond.api.JupyterAPIHolder.value.VariableInspector.dictList()',
+      matrixQueryCommand: '', // TODO
+      widgetQueryCommand: '', // TODO
+      deleteCommand: '' // TODO
     }
   };
 

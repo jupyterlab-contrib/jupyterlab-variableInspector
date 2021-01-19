@@ -166,6 +166,7 @@ export class VariableInspectorPanel extends Widget
       // Add delete icon and onclick event
       let cell = row.insertCell(0);
       cell.title = 'Delete Variable';
+      cell.className = 'jp-VarInspector-deleteButton';
       const ico = closeIcon.element();
       ico.onclick = (ev: MouseEvent): any => {
         this.source.performDelete(name);
@@ -176,6 +177,7 @@ export class VariableInspectorPanel extends Widget
       cell = row.insertCell(1);
       if (item.isMatrix) {
         cell.title = 'View Contents';
+        cell.className = 'jp-VarInspector-inspectButton';
         const ico = searchIcon.element();
         ico.onclick = (ev: MouseEvent): any => {
           console.log('Click on ' + name);
