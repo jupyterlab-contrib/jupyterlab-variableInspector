@@ -16,6 +16,7 @@ Contributions in any form are very welcome!
 - Allows inspection of variables for both consoles and notebooks.
   - This extension is currently targets `python` as a main language but also supports the following languages with different levels of feature completeness
     - `R`  
+    - `scala` via the [almond kernel](https://github.com/almond-sh/almond)
 - Allows inspection of matrices in a datagrid-viewer. This might not work for large matrices.
 - Allows an inline and interactive inspection of Jupyter Widgets.
   
