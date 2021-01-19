@@ -1,6 +1,6 @@
 {
   "name": "@lckr/jupyterlab_variableinspector",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Variable inspector extension for JupyterLab",
   "keywords": [
     "jupyter",
