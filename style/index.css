@@ -35,6 +35,7 @@
     text-align: center;
     background-color: var(--jp-layout-color2);
     color: var(--jp-ui-font-color1);
+    font-family: sans-serif;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -51,6 +52,12 @@
     text-align: center;
     width: 1em;
   }
+
+  .jp-VarInspector-inspectButton {
+    text-align: center;
+    width: 1em;
+  }
+    
     
   .jp-VarInspector-varName {
     font-weight: 600;

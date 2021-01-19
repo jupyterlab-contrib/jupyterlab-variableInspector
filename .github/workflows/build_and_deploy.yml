@@ -1,4 +1,5 @@
-name: Build
+name: Deploy
+
 on: 
   release:
     types: [published]
