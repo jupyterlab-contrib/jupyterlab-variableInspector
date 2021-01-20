@@ -35,7 +35,8 @@ __ipywidgets = None
 def _check_imported():
     global __np, __pd, __pyspark, __tf, __K, __torch, __ipywidgets
 
-    if 'numpy' in sys.modules:
+    if '
+' in sys.modules:
         # don't really need the try
         import numpy as __np
 
@@ -211,7 +212,8 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         df = __K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif __torch and __pd and isinstance(x, torch.Tensor):
-        return x.cpu().numpy()
+        df = x.cpu().numpy()
+        return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif isinstance(x, list):
         s = __pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
