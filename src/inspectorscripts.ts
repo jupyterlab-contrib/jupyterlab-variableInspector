@@ -96,6 +96,7 @@ def _jupyterlab_variableinspector_getshapeof(x):
         return "%s" % shape
     if __torch and isinstance(x, __torch.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
+        return "%s" % shape
     if isinstance(x, list):
         return "%s" % len(x)
     if isinstance(x, dict):
