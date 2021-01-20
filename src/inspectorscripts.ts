@@ -210,6 +210,8 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
     elif __tf and (isinstance(x, __tf.Variable) or isinstance(x, __tf.Tensor)):
         df = __K.get_value(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
+    elif __torch and __pd and isinstance(x, torch.Tensor):
+        return x.cpu().numpy()
     elif isinstance(x, list):
         s = __pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
