@@ -1,39 +1,43 @@
 # jupyterlab_variableinspector
-
+![PyPi_Version](https://img.shields.io/pypi/v/lckr-jupyterlab-variableinspector)
 ![Build](https://github.com/lckr/jupyterlab-variableInspector/workflows/Build/badge.svg)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector.git/master?urlpath=lab)
 
-Jupyterlab extension that shows currently used variables and their values. The goal is to provide a tool similar to the variable inspector in RStudio.
-
-This project is inspired by the [variable inspector extension for jupyter notebooks](https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tree/master/src/jupyter_contrib_nbextensions/nbextensions/varInspector) and by the [inspector extension included in jupyterlab](https://github.com/jupyterlab/jupyterlab/tree/master/packages/inspector-extension).
-
-Contributions in any form are very welcome!
+Jupyterlab extension that shows currently used variables and their values.  
+Contributions in any form are welcome!
 
 ## Features
 
 ![Demogif](early_demo.gif)
 
 - Allows inspection of variables for both consoles and notebooks.
-  - This extension is currently targets `python` as a main language but also supports the following languages with different levels of feature completeness
-    - `R`  
-    - `scala` via the [almond kernel](https://github.com/almond-sh/almond)
 - Allows inspection of matrices in a datagrid-viewer. This might not work for large matrices.
 - Allows an inline and interactive inspection of Jupyter Widgets.
+
+### Supported Languages
+- This extension is currently targets `python` as a main language but also supports the following languages with different levels of feature completeness
+  - `R`  
+  - `scala` via the [almond kernel](https://github.com/almond-sh/almond)
+
   
-**Caveat** In order to allow variabale inspection, all content that is displayed first need to be sent from the kernel to the front end.  
+### How it Works
+In order to allow variabale inspection, all content that is displayed first need to be sent from the kernel to the front end.  
 Therefore, opening large data frames with the datagrid viewer can dramatically increase your occupied memory and *significantly slow down* your browser.  
 Use at your own risk.
 
 
 ## Requirements
-
 * JupyterLab >= 3.0
 
-### Requirements for Python functionality
-
+### Requirements for `python` functionality
 - `pandas` and `numpy` are required to enable matrix inspection.
 - `pyspark` for spark support.
 - `tensorflow` and `keras` to allow inspection of tf objects.
+- `torch` for PyTorch support.
+
+### Requirements for `R` functionality
+- The `repr` library.
+  
 
 ### Requirements for `ipywidgets` functionality
 
@@ -46,10 +50,7 @@ The requirements for this functionality are:
 - `ipywidgets`
 - Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
 
-### Requirements for R functionality
 
-- The `repr` library.
-  
 
 ## Install
 
