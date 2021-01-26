@@ -212,7 +212,10 @@ export class VariableInspectorPanel extends Widget
         output.future = this._source.performWidgetInspection(item.varName);
         Widget.attach(output, cell);
       } else {
-        cell.innerHTML = item.varContent.replace(/\\n/g, '</br>');
+        cell.innerHTML = Private.escapeHtml(item.varContent).replace(
+          /\\n/g,
+          '</br>'
+        );
       }
     }
   }
@@ -248,6 +251,21 @@ export class VariableInspectorPanel extends Widget
 }
 
 namespace Private {
+  const entityMap = new Map<string, string>(
+    Object.entries({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;'
+    })
+  );
+
+  export function escapeHtml(source: string): string {
+    return String(source).replace(/[&<>"'/]/g, (s: string) => entityMap.get(s));
+  }
+
   export function createTable(): HTMLTableElement {
     const table = document.createElement('table');
     table.createTHead();
