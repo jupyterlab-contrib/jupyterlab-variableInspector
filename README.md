@@ -7,6 +7,8 @@
 Jupyterlab extension that shows currently used variables and their values.  
 Contributions in any form are welcome!
 
+
+
 ## Features
 
 ![Demogif](early_demo.gif)
@@ -52,8 +54,8 @@ The requirements for this functionality are:
 - Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
 
 
-
 ## Install
+**NOTE:** The main way to install this extension is via pip as described below. 
 
 ```bash
 pip install lckr-jupyterlab-variableinspector
