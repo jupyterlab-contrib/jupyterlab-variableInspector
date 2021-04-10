@@ -1,10 +1,7 @@
-name: Deploy v2
+name: Deploy 
 
 on: 
-  workflow_dispatch:
-    inputs:
-      tags:
-          description: 'Test scenario tags'  
+  workflow_dispatch
 
 jobs:
   build:
@@ -38,11 +35,10 @@ jobs:
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@master
       with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-      
+        password: ${{ secrets.PYPI_API_TOKEN }}
       
   publish:
+    name: Deploy NPM
     needs: build
     runs-on: ubuntu-latest
     steps:
