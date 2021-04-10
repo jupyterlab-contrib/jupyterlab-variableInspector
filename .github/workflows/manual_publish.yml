@@ -1,14 +1,11 @@
-name: Deploy v2
+name: Deploy 
 
 on: 
-  workflow_dispatch:
-    inputs:
-      tags:
-          description: 'Test scenario tags'  
+  workflow_dispatch
 
 jobs:
   build:
-    name: Build
+    name: Build and Deploy PyPi
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -35,26 +32,27 @@ jobs:
         python -m jupyterlab.browser_check
     - name: Package
       run: python setup.py sdist
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.PYPI_API_TOKEN }}
       
   publish:
+    name: Deploy NPM
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup
-        uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-      - name: Publish to npm
-        run: |
-          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-          npm publish --dry-run --ignore-scripts
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+    - name: Publish to npm
+      run: |
+        npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+        npm publish --ignore-scripts
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 

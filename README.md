@@ -60,7 +60,11 @@ The requirements for this functionality are:
 ```bash
 pip install lckr-jupyterlab-variableinspector
 ```
-
+Alternatively, one can install the extension from npmjs via:
+```bash
+jupyter labextension install @lckr/jupyterlab_variableinspector
+```
+or via the extension manager that comes built-in with Jupyterlab
 
 ## Contributing
 
