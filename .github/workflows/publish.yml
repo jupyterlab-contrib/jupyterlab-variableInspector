@@ -1,12 +1,14 @@
-name: Deploy
+name: Deploy v2
 
 on: 
   workflow_dispatch:
-
+    inputs:
+      tags:
+          description: 'Test scenario tags'  
 
 jobs:
   build:
-    name: Build and publish PyPI and TestPyPI
+    name: Build
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -33,8 +35,8 @@ jobs:
         python -m jupyterlab.browser_check
     - name: Package
       run: python setup.py sdist
+      
   publish:
-    if: github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
     steps:
