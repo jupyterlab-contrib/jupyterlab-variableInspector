@@ -80,7 +80,8 @@ export namespace IVariableInspector {
 /**
  * A panel that renders the variables
  */
-export class VariableInspectorPanel extends Widget
+export class VariableInspectorPanel
+  extends Widget
   implements IVariableInspector {
   private _source: IVariableInspector.IInspectable | null = null;
   private _table: HTMLTableElement;
@@ -237,8 +238,8 @@ export class VariableInspectorPanel extends Widget
         rowHeight: 32,
         columnWidth: 128,
         rowHeaderWidth: 64,
-        columnHeaderHeight: 32
-      }
+        columnHeaderHeight: 32,
+      },
     });
 
     datagrid.dataModel = dataModel;
@@ -258,7 +259,7 @@ namespace Private {
       '>': '&gt;',
       '"': '&quot;',
       "'": '&#39;',
-      '/': '&#x2F;'
+      '/': '&#x2F;',
     })
   );
 

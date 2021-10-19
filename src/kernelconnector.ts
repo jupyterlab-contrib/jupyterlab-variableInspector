@@ -4,7 +4,7 @@ import { KernelMessage } from '@jupyterlab/services';
 import { IShellFuture } from '@jupyterlab/services/lib/kernel/kernel';
 import {
   IExecuteReplyMsg,
-  IExecuteRequestMsg
+  IExecuteRequestMsg,
 } from '@jupyterlab/services/lib/kernel/messages';
 
 import { ISignal, Signal } from '@lumino/signaling';
@@ -37,7 +37,7 @@ export class KernelConnector {
   }
 
   get kernelLanguage(): Promise<string> {
-    return this._session.session.kernel.info.then(infoReply => {
+    return this._session.session.kernel.info.then((infoReply) => {
       return infoReply.language_info.name;
     });
   }
