@@ -1,6 +1,6 @@
 import {
   VariableInspectorPanel,
-  IVariableInspector
+  IVariableInspector,
 } from './variableinspector';
 
 import { Token } from '@lumino/coreutils';

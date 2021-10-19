@@ -1,6 +1,6 @@
 import {
   IVariableInspector,
-  VariableInspectorPanel
+  VariableInspectorPanel,
 } from './variableinspector';
 
 import { KernelConnector } from './kernelconnector';
@@ -17,7 +17,7 @@ import {
   ILabShell,
   ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 
 import { IConsoleTracker } from '@jupyterlab/console';
@@ -77,7 +77,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
     restorer.restore(tracker, {
       command,
       args: () => null,
-      name: () => 'variableinspector'
+      name: () => 'variableinspector',
     });
 
     // Add command to palette
@@ -94,7 +94,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
           manager.source.performInspection();
         }
         labShell.activateById(manager.panel.id);
-      }
+      },
     });
     palette.addItem({ command, category });
 
@@ -102,7 +102,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
       'JupyterLab extension @lckr/jupyterlab_variableinspector is activated!'
     );
     return manager;
-  }
+  },
 };
 
 /**
@@ -139,7 +139,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
           const connector = new KernelConnector({ session });
           const scripts: Promise<Languages.LanguageModel> = connector.ready.then(
             () => {
-              return connector.kernelLanguage.then(lang => {
+              return connector.kernelLanguage.then((lang) => {
                 return Languages.getScript(lang);
               });
             }
@@ -159,7 +159,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
               deleteCommand: deleteCommand,
               connector: connector,
               initScript: initScript,
-              id: session.path //Using the sessions path as an identifier for now.
+              id: session.path, //Using the sessions path as an identifier for now.
             };
             const handler = new VariableInspectionHandler(options);
             manager.addHandler(handler);
@@ -209,9 +209,9 @@ const consoles: JupyterFrontEndPlugin<void> = {
 
     app.contextMenu.addItem({
       command: CommandIDs.open,
-      selector: '.jp-CodeConsole'
+      selector: '.jp-CodeConsole',
     });
-  }
+  },
 };
 
 /**
@@ -242,7 +242,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
 
         const scripts: Promise<Languages.LanguageModel> = connector.ready.then(
           () => {
-            return connector.kernelLanguage.then(lang => {
+            return connector.kernelLanguage.then((lang) => {
               return Languages.getScript(lang);
             });
           }
@@ -263,7 +263,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
             connector: connector,
             rendermime,
             initScript: initScript,
-            id: session.path //Using the sessions path as an identifier for now.
+            id: session.path, //Using the sessions path as an identifier for now.
           };
           const handler = new VariableInspectionHandler(options);
           manager.addHandler(handler);
@@ -305,9 +305,9 @@ const notebooks: JupyterFrontEndPlugin<void> = {
 
     app.contextMenu.addItem({
       command: CommandIDs.open,
-      selector: '.jp-Notebook'
+      selector: '.jp-Notebook',
     });
-  }
+  },
 };
 
 /**
@@ -316,6 +316,6 @@ const notebooks: JupyterFrontEndPlugin<void> = {
 const plugins: JupyterFrontEndPlugin<any>[] = [
   variableinspector,
   consoles,
-  notebooks
+  notebooks,
 ];
 export default plugins;

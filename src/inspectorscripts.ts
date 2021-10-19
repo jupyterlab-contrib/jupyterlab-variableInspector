@@ -308,28 +308,28 @@ def _jupyterlab_variableinspector_deletevariable(x):
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
     },
     python2: {
       initScript: Languages.py_script,
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
     },
     python: {
       initScript: Languages.py_script,
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
     },
     R: {
       initScript: Languages.r_script,
       queryCommand: '.ls.objects()',
       matrixQueryCommand: '.ls.objects',
       widgetQueryCommand: 'TODO',
-      deleteCommand: '.deleteVariable'
+      deleteCommand: '.deleteVariable',
     },
     scala: {
       initScript:
@@ -338,8 +338,8 @@ def _jupyterlab_variableinspector_deletevariable(x):
         '_root_.almond.api.JupyterAPIHolder.value.VariableInspector.dictList()',
       matrixQueryCommand: '', // TODO
       widgetQueryCommand: '', // TODO
-      deleteCommand: '' // TODO
-    }
+      deleteCommand: '', // TODO
+    },
   };
 
   public static getScript(lang: string): Promise<Languages.LanguageModel> {
