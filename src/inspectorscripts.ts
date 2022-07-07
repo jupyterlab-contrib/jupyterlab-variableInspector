@@ -31,6 +31,7 @@ __tf = None
 __K = None
 __torch = None
 __ipywidgets = None
+__xr = None
 
 
 def _attempt_import(module):
@@ -41,7 +42,7 @@ def _attempt_import(module):
 
 
 def _check_imported():
-    global __np, __pd, __pyspark, __tf, __K, __torch, __ipywidgets
+    global __np, __pd, __pyspark, __tf, __K, __torch, __ipywidgets, __xr
 
     __np = _attempt_import('numpy')
     __pd = _attempt_import('pandas')
@@ -50,6 +51,7 @@ def _check_imported():
     __K = _attempt_import('keras.backend') or _attempt_import('tensorflow.keras.backend')
     __torch = _attempt_import('torch')
     __ipywidgets = _attempt_import('ipywidgets')
+    __xr = _attempt_import('xarray')
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
@@ -86,6 +88,9 @@ def _jupyterlab_variableinspector_getshapeof(x):
     if __torch and isinstance(x, __torch.Tensor):
         shape = " x ".join([str(int(i)) for i in x.shape])
         return "%s" % shape
+    if __xr and isinstance(x, __xr.DataArray):
+        shape = " x ".join([str(int(i)) for i in x.shape])
+        return "%s" % shape
     if isinstance(x, list):
         return "%s" % len(x)
     if isinstance(x, dict):
@@ -104,6 +109,8 @@ def _jupyterlab_variableinspector_getcontentof(x):
         content = content.replace("\\n", "")
     elif __np and isinstance(x, __np.ndarray):
         content = x.__repr__()
+    elif __xr and isinstance(x, __xr.DataArray):
+        content = x.values.__repr__()
     else:
         content = str(x)
 
@@ -129,6 +136,8 @@ def _jupyterlab_variableinspector_is_matrix(x):
         return True
     if __torch and isinstance(x, __torch.Tensor) and len(x.shape) <= 2:
         return True
+    if __xr and isinstance(x, __xr.DataArray) and len(x.shape) <= 2:
+        return True
     if isinstance(x, list):
         return True
     return False
@@ -151,9 +160,11 @@ def _jupyterlab_variableinspector_dict_list():
                 isinstance(obj, __pd.core.frame.DataFrame)
                 or isinstance(obj, __pd.core.series.Series)):
                 return True
+            if __xr and __xr is not None and isinstance(obj, __xr.DataArray):
+                return True
             if str(obj)[0] == "<":
                 return False
-            if  v in ['__np', '__pd', '__pyspark', '__tf', '__K', '__torch', '__ipywidgets']:
+            if  v in ['__np', '__pd', '__pyspark', '__tf', '__K', '__torch', '__ipywidgets', '__xr']:
                 return obj is not None
             if str(obj).startswith("_Feature"):
                 # removes tf/keras objects
@@ -201,6 +212,9 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif __torch and isinstance(x, __torch.Tensor):
         df = x.cpu().numpy()
+        return _jupyterlab_variableinspector_getmatrixcontent(df)
+    elif __xr and isinstance(x, __xr.DataArray):
+        df = x.to_numpy()
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif isinstance(x, list):
         s = __pd.Series(x)
