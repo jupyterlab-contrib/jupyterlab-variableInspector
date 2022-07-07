@@ -111,3 +111,6 @@ dmypy.json
 
 # OSX files
 .DS_Store
+
+# virtualenv
+venv
