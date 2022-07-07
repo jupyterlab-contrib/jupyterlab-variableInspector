@@ -15,6 +15,7 @@ export abstract class Languages {
 
   static py_script = `import json
 import sys
+from importlib import __import__
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
 
@@ -32,35 +33,23 @@ __torch = None
 __ipywidgets = None
 
 
+def _attempt_import(module):
+    try:
+        return __import__(module)
+    except ImportError:
+        return None
+
+
 def _check_imported():
     global __np, __pd, __pyspark, __tf, __K, __torch, __ipywidgets
 
-    if 'numpy' in sys.modules:
-        # don't really need the try
-        import numpy as __np
-
-    if 'pandas' in sys.modules:
-        import pandas as __pd
-
-    if 'pyspark' in sys.modules:
-        import pyspark as __pyspark
-
-    if 'tensorflow' in sys.modules or 'keras' in sys.modules:
-        import tensorflow as __tf
-
-        try:
-            import keras.backend as __K
-        except ImportError:
-            try:
-                import tensorflow.keras.backend as __K
-            except ImportError:
-                __K = None
-
-    if 'torch' in sys.modules:
-        import torch as __torch
-
-    if 'ipywidgets' in sys.modules:
-        import ipywidgets as __ipywidgets
+    __np = _attempt_import('numpy')
+    __pd = _attempt_import('pandas')
+    __pyspark = _attempt_import('pyspark')
+    __tf = _attempt_import('tensorflow')
+    __K = _attempt_import('keras.backend') or _attempt_import('tensorflow.keras.backend')
+    __torch = _attempt_import('torch')
+    __ipywidgets = _attempt_import('ipywidgets')
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
