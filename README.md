@@ -24,7 +24,7 @@ Contributions in any form are welcome!
 
   
 ### How it Works
-In order to allow variabale inspection, all content that is displayed first need to be sent from the kernel to the front end.  
+In order to allow variable inspection, all content that is displayed first need to be sent from the kernel to the front end.  
 Therefore, opening large data frames with the datagrid viewer can dramatically increase your occupied memory and *significantly slow down* your browser.  
 Use at your own risk.
 
