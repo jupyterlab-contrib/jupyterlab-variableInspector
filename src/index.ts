@@ -44,7 +44,6 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
       const panel = new VariableInspectorPanel();
 
       panel.id = 'jp-variableinspector';
-      panel.title.label = 'Variable Inspector';
       panel.title.icon = listIcon;
       panel.title.closable = true;
       panel.disposed.connect(() => {
