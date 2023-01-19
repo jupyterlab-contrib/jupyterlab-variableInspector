@@ -11,11 +11,10 @@ import { VariableInspectorManager, IVariableInspectorManager } from './manager';
 
 import { Languages } from './inspectorscripts';
 
-import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
+import { WidgetTracker } from '@jupyterlab/apputils';
 
 import {
   ILabShell,
-  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
@@ -26,28 +25,15 @@ import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
 import { listIcon } from '@jupyterlab/ui-components';
 
-namespace CommandIDs {
-  export const open = 'variableinspector:open';
-}
-
 /**
  * A service providing variable introspection.
  */
 const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
   id: '@lckr/jupyterlab_variableinspector',
-  requires: [ICommandPalette, ILayoutRestorer, ILabShell],
   provides: IVariableInspectorManager,
   autoStart: true,
-  activate: (
-    app: JupyterFrontEnd,
-    palette: ICommandPalette,
-    restorer: ILayoutRestorer,
-    labShell: ILabShell
-  ): IVariableInspectorManager => {
+  activate: (app: JupyterFrontEnd): IVariableInspectorManager => {
     const manager = new VariableInspectorManager();
-    const category = 'Variable Inspector';
-    const command = CommandIDs.open;
-    const label = 'Open Variable Inspector';
     const namespace = 'variableinspector';
     const tracker = new WidgetTracker<VariableInspectorPanel>({ namespace });
 
@@ -67,36 +53,17 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
         }
       });
 
-      //Track the inspector panel
+      // Track the inspector panel
       tracker.add(panel);
 
       return panel;
     }
 
-    // Enable state restoration
-    restorer.restore(tracker, {
-      command,
-      args: () => null,
-      name: () => 'variableinspector',
-    });
-
-    // Add command to palette
-    app.commands.addCommand(command, {
-      label,
-      execute: () => {
-        if (!manager.panel || manager.panel.isDisposed) {
-          manager.panel = newPanel();
-        }
-        if (!manager.panel.isAttached) {
-          labShell.add(manager.panel, 'main');
-        }
-        if (manager.source) {
-          manager.source.performInspection();
-        }
-        labShell.activateById(manager.panel.id);
-      },
-    });
-    palette.addItem({ command, category });
+    manager.panel = newPanel();
+    if (manager.source) {
+      manager.source.performInspection();
+    }
+    app.shell.add(manager.panel, 'right');
 
     console.log(
       'JupyterLab extension @lckr/jupyterlab_variableinspector is activated!'
@@ -206,11 +173,6 @@ const consoles: JupyterFrontEndPlugin<void> = {
         }
       });
     });
-
-    app.contextMenu.addItem({
-      command: CommandIDs.open,
-      selector: '.jp-CodeConsole',
-    });
   },
 };
 
@@ -301,11 +263,6 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           manager.source.performInspection();
         }
       });
-    });
-
-    app.contextMenu.addItem({
-      command: CommandIDs.open,
-      selector: '.jp-Notebook',
     });
   },
 };
