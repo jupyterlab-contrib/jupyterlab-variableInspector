@@ -60,6 +60,12 @@ If you are using JupyterLab 3 or above, you can install the extension with `pip`
 pip install lckr-jupyterlab-variableinspector
 ```
 
+Or with `conda`:
+
+```bash
+conda install -c conda-forge jupyterlab-variableinspector
+```
+
 ### JupyterLab 2
 
 If you are using JupyterLab 2, you can install the extension with the following command:
