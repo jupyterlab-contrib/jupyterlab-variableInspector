@@ -7,8 +7,6 @@
 Jupyterlab extension that shows currently used variables and their values.  
 Contributions in any form are welcome!
 
-
-
 ## Features
 
 ![Demogif](early_demo.gif)
@@ -50,21 +48,25 @@ The variable inspector can also display Jupyter interactive widgets:
 
 The requirements for this functionality are:
 
-- `ipywidgets`
-- Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
-
+- `ipywidgets`, which can be installed with `pip install ipywidgets`.
 
 ## Install
-**NOTE:** The main way to install this extension is via pip as described below. 
+
+### JupyterLab 3+
+
+If you are using JupyterLab 3 or above, you can install the extension with `pip`:
 
 ```bash
 pip install lckr-jupyterlab-variableinspector
 ```
-Alternatively, one can install the extension from npmjs via:
+
+### JupyterLab 2
+
+If you are using JupyterLab 2, you can install the extension with the following command:
+
 ```bash
 jupyter labextension install @lckr/jupyterlab_variableinspector
 ```
-or via the extension manager that comes built-in with Jupyterlab
 
 ## Contributing
 
