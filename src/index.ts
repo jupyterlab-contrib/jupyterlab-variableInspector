@@ -22,7 +22,7 @@ import {
 
 import { IConsoleTracker } from '@jupyterlab/console';
 
-import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
+import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { listIcon } from '@jupyterlab/ui-components';
 
@@ -229,11 +229,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
   ): void => {
     const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
 
-    /**
-     * Subscribes to the creation of new notebooks. If a new notebook is created, build a new handler for the notebook.
-     * Adds a promise for a instanced handler to the 'handlers' collection.
-     */
-    notebooks.widgetAdded.connect((sender, nbPanel: NotebookPanel) => {
+    function addNotebookHandler(sender: any, nbPanel: any) {
       //A promise that resolves after the initialization of the handler is done.
       handlers[nbPanel.id] = new Promise((resolve, reject) => {
         const session = nbPanel.sessionContext;
@@ -282,7 +278,13 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           reject(result);
         });
       });
-    });
+    }
+
+    /**
+     * Subscribes to the creation of new notebooks. If a new notebook is created, build a new handler for the notebook.
+     * Adds a promise for a instanced handler to the 'handlers' collection.
+     */
+    notebooks.widgetAdded.connect(addNotebookHandler);
 
     /**
      * If focus window changes, checks whether new focus widget is a notebook.
@@ -291,8 +293,11 @@ const notebooks: JupyterFrontEndPlugin<void> = {
      */
     labShell.currentChanged.connect((sender, args) => {
       const widget = args.newValue;
-      if (!widget || !notebooks.has(widget)) {
+      if (!widget || !notebooks.has(widget) || widget.isDisposed) {
         return;
+      }
+      if (!handlers.hasOwnProperty(widget.id)) {
+        addNotebookHandler(undefined, widget)
       }
       const future = handlers[widget.id];
       future.then((source: VariableInspectionHandler) => {
