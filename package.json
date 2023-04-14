@@ -29,7 +29,7 @@
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
-    "build:lib": "tsc -sourceMap",
+    "build:lib": "tsc",
     "build:prod": "jlpm run build:lib && jlpm run build:labextension",
     "clean": "jlpm run clean:lib",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
@@ -41,7 +41,7 @@
     "prepare": "jlpm run clean && jlpm run build:prod",
     "watch": "run-p watch:src watch:labextension",
     "watch:labextension": "jupyter labextension watch .",
-    "watch:src": "tsc -w -sourceMap"
+    "watch:src": "tsc -w"
   },
   "dependencies": {
     "@jupyterlab/application": "^4.0.0-beta.0",
