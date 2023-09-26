@@ -1,12 +1,12 @@
 # jupyterlab_variableinspector
+
+[![Extension status](https://img.shields.io/badge/status-ready-success 'ready to be used')](https://jupyterlab-contrib.github.io/)
 ![PyPi_Version](https://img.shields.io/pypi/v/lckr-jupyterlab-variableinspector)
-![Build](https://github.com/lckr/jupyterlab-variableInspector/workflows/Build/badge.svg)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector.git/master?urlpath=lab)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+![Build](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/workflows/Build/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-variableInspector.git/master?urlpath=lab)
 
 Jupyterlab extension that shows currently used variables and their values.  
 Contributions in any form are welcome!
-
 
 
 ## Features
@@ -30,6 +30,7 @@ Use at your own risk.
 
 
 ## Requirements
+
 * JupyterLab >= 3.0
 
 ### Requirements for `python` functionality
@@ -51,7 +52,6 @@ The variable inspector can also display Jupyter interactive widgets:
 The requirements for this functionality are:
 
 - `ipywidgets`
-- Support for widgets in JupyterLab: `jupyter labextension install @jupyter-widgets/jupyterlab-manager`
 
 
 ## Install
@@ -60,11 +60,14 @@ The requirements for this functionality are:
 ```bash
 pip install lckr-jupyterlab-variableinspector
 ```
-Alternatively, one can install the extension from npmjs via:
+
+or via the extension manager that comes built-in with Jupyterlab
+
+For JupyterLab v2 or earlier, you can install the extension from npmjs via:
+
 ```bash
 jupyter labextension install @lckr/jupyterlab_variableinspector
 ```
-or via the extension manager that comes built-in with Jupyterlab
 
 ## Contributing
 

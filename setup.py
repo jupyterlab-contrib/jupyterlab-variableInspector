@@ -61,7 +61,7 @@ with open("README.md", "r") as fh:
 setup_args = dict(
     name=name,
     version=version,
-    url="https://github.com/lckr/jupyterlab-variableInspector.git",
+    url="https://github.com/jupyterlab-contrib/jupyterlab-variableInspector.git",
     author="lckr",
     description="Variable inspector extension for JupyterLab",
     long_description= long_description,
