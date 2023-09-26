@@ -8,9 +8,9 @@
     "jupyterlab-extension",
     "variable inspector"
   ],
-  "homepage": "https://github.com/lckr/jupyterlab-variableInspector",
+  "homepage": "https://github.com/jupyterlab-contrib/jupyterlab-variableInspector",
   "bugs": {
-    "url": "https://github.com/lckr/jupyterlab-variableInspector/issues"
+    "url": "https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/issues"
   },
   "license": "MIT",
   "author": "lckr",
@@ -23,7 +23,7 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lckr/jupyterlab-variableInspector.git"
+    "url": "https://github.com/jupyterlab-contrib/jupyterlab-variableInspector.git"
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
