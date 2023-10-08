@@ -1,8 +1,9 @@
 # jupyterlab_variableinspector
+
+[![Extension status](https://img.shields.io/badge/status-ready-success 'ready to be used')](https://jupyterlab-contrib.github.io/)
 ![PyPi_Version](https://img.shields.io/pypi/v/lckr-jupyterlab-variableinspector)
-![Build](https://github.com/lckr/jupyterlab-variableInspector/workflows/Build/badge.svg)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lckr/jupyterlab-variableInspector.git/master?urlpath=lab)
-[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+![Build](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/workflows/Build/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-variableInspector.git/master?urlpath=lab)
 
 Jupyterlab extension that shows currently used variables and their values.  
 Contributions in any form are welcome!
@@ -28,6 +29,7 @@ Use at your own risk.
 
 
 ## Requirements
+
 * JupyterLab >= 3.0
 
 ### Requirements for `python` functionality
@@ -65,6 +67,8 @@ Or with `conda`:
 ```bash
 conda install -c conda-forge jupyterlab-variableinspector
 ```
+
+or via the extension manager that comes built-in with Jupyterlab
 
 ### JupyterLab 2
 
