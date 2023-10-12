@@ -5,6 +5,7 @@
     flex-direction: column;
     overflow: auto;
     font-size: var(--jp-ui-font-size1);
+    background: var(--jp-layout-color1);
   }
   
   .jp-VarInspector-table {
