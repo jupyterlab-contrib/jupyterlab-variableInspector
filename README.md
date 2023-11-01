@@ -17,30 +17,31 @@ Contributions in any form are welcome!
 - Allows an inline and interactive inspection of Jupyter Widgets.
 
 ### Supported Languages
+
 - This extension is currently targets `python` as a main language but also supports the following languages with different levels of feature completeness
-  - `R`  
+  - `R`
   - `scala` via the [almond kernel](https://github.com/almond-sh/almond)
 
-  
 ### How it Works
-In order to allow variable inspection, all content that is displayed first need to be sent from the kernel to the front end.  
-Therefore, opening large data frames with the datagrid viewer can dramatically increase your occupied memory and *significantly slow down* your browser.  
-Use at your own risk.
 
+In order to allow variable inspection, all content that is displayed first need to be sent from the kernel to the front end.  
+Therefore, opening large data frames with the datagrid viewer can dramatically increase your occupied memory and _significantly slow down_ your browser.  
+Use at your own risk.
 
 ## Requirements
 
-* JupyterLab >= 3.0
+- JupyterLab >= 3.0
 
 ### Requirements for `python` functionality
+
 - `pandas` and `numpy` are required to enable matrix inspection.
 - `pyspark` for spark support.
 - `tensorflow` and `keras` to allow inspection of tf objects.
 - `torch` for PyTorch support.
 
 ### Requirements for `R` functionality
+
 - The `repr` library.
-  
 
 ### Requirements for `ipywidgets` functionality
 

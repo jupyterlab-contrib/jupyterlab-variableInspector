@@ -1,10 +1,12 @@
 import { ISessionContext } from '@jupyterlab/apputils';
 
 import { KernelMessage } from '@jupyterlab/services';
+
 import { IShellFuture } from '@jupyterlab/services/lib/kernel/kernel';
+
 import {
   IExecuteReplyMsg,
-  IExecuteRequestMsg,
+  IExecuteRequestMsg
 } from '@jupyterlab/services/lib/kernel/messages';
 
 import { ISignal, Signal } from '@lumino/signaling';
@@ -37,7 +39,11 @@ export class KernelConnector {
   }
 
   get kernelLanguage(): Promise<string> {
-    return this._session.session.kernel.info.then((infoReply) => {
+    if (!this._session.session?.kernel) {
+      return Promise.resolve('');
+    }
+
+    return this._session.session.kernel.info.then(infoReply => {
       return infoReply.language_info.name;
     });
   }
@@ -70,7 +76,7 @@ export class KernelConnector {
     content: KernelMessage.IExecuteRequestMsg['content'],
     ioCallback: (msg: KernelMessage.IIOPubMessage) => any
   ): Promise<KernelMessage.IExecuteReplyMsg> {
-    const kernel = this._session.session.kernel;
+    const kernel = this._session.session?.kernel;
     if (!kernel) {
       return Promise.reject(
         new Error('Require kernel to perform variable inspection!')
@@ -88,6 +94,9 @@ export class KernelConnector {
   execute(
     content: KernelMessage.IExecuteRequestMsg['content']
   ): IShellFuture<IExecuteRequestMsg, IExecuteReplyMsg> {
+    if (!this._session.session?.kernel) {
+      throw new Error('No session available.');
+    }
     return this._session.session.kernel.requestExecute(content);
   }
 }

@@ -1,52 +1,102 @@
-///* eslint-disable @typescript-eslint/camelcase */
-import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
-
-import { IDisposable } from '@lumino/disposable';
-
-import { IVariableInspector } from './variableinspector';
-
-import { KernelConnector } from './kernelconnector';
-
 import { ISessionContext } from '@jupyterlab/apputils';
-
-import { KernelMessage, Kernel } from '@jupyterlab/services';
-
-import { Signal, ISignal } from '@lumino/signaling';
 
 import { IExecuteResult } from '@jupyterlab/nbformat';
 
-import { JSONModel, DataModel } from '@lumino/datagrid';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
+
+import { KernelMessage, Kernel } from '@jupyterlab/services';
+
 import {
   IExecuteInputMsg,
   IExecuteReplyMsg,
-  IExecuteRequestMsg,
+  IExecuteRequestMsg
 } from '@jupyterlab/services/lib/kernel/messages';
+
+import { Signal, ISignal } from '@lumino/signaling';
+
+import { JSONModel, DataModel } from '@lumino/datagrid';
+
+import { IVariableInspector } from './tokens';
+
+import { KernelConnector } from './kernelconnector';
+
+abstract class AbstractHandler implements IVariableInspector.IInspectable {
+  private _isDisposed = false;
+  private _disposed = new Signal<this, void>(this);
+  protected _inspected = new Signal<
+    IVariableInspector.IInspectable,
+    IVariableInspector.IVariableInspectorUpdate
+  >(this);
+  protected _connector: KernelConnector;
+  protected _rendermime: IRenderMimeRegistry | null = null;
+
+  constructor(connector: KernelConnector) {
+    this._connector = connector;
+  }
+
+  get disposed(): ISignal<this, void> {
+    return this._disposed;
+  }
+
+  get isDisposed(): boolean {
+    return this._isDisposed;
+  }
+
+  get inspected(): ISignal<
+    IVariableInspector.IInspectable,
+    IVariableInspector.IVariableInspectorUpdate
+  > {
+    return this._inspected;
+  }
+
+  get rendermime(): IRenderMimeRegistry | null {
+    return this._rendermime;
+  }
+
+  abstract performInspection(): void;
+
+  abstract performMatrixInspection(
+    varName: string,
+    maxRows: number
+  ): Promise<DataModel>;
+
+  abstract performWidgetInspection(
+    varName: string
+  ): Kernel.IShellFuture<
+    KernelMessage.IExecuteRequestMsg,
+    KernelMessage.IExecuteReplyMsg
+  >;
+
+  dispose(): void {
+    if (this.isDisposed) {
+      return;
+    }
+    this._isDisposed = true;
+    this._disposed.emit();
+    Signal.clearData(this);
+  }
+
+  performDelete(varName: string): void {
+    //noop
+  }
+}
 
 /**
  * An object that handles code inspection.
  */
-export class VariableInspectionHandler
-  implements IDisposable, IVariableInspector.IInspectable {
-  private _connector: KernelConnector;
-  private _rendermime: IRenderMimeRegistry;
+export class VariableInspectionHandler extends AbstractHandler {
   private _initScript: string;
   private _queryCommand: string;
   private _matrixQueryCommand: string;
   private _widgetQueryCommand: string;
   private _deleteCommand: string;
-  private _disposed = new Signal<this, void>(this);
-  private _inspected = new Signal<
-    this,
-    IVariableInspector.IVariableInspectorUpdate
-  >(this);
-  private _isDisposed = false;
   private _ready: Promise<void>;
   private _id: string;
 
   constructor(options: VariableInspectionHandler.IOptions) {
+    super(options.connector);
     this._id = options.id;
-    this._connector = options.connector;
-    this._rendermime = options.rendermime;
+    this._rendermime = options.rendermime ?? null;
     this._queryCommand = options.queryCommand;
     this._matrixQueryCommand = options.matrixQueryCommand;
     this._widgetQueryCommand = options.widgetQueryCommand;
@@ -63,11 +113,11 @@ export class VariableInspectionHandler
     this._connector.kernelRestarted.connect(
       (sender, kernelReady: Promise<void>) => {
         const title: IVariableInspector.IVariableTitle = {
-          contextName: '<b>Restarting kernel...</b> ',
+          contextName: '<b>Restarting kernel...</b> '
         };
         this._inspected.emit({
           title: title,
-          payload: [],
+          payload: []
         } as IVariableInspector.IVariableInspectorUpdate);
 
         this._ready = kernelReady.then(() => {
@@ -84,43 +134,17 @@ export class VariableInspectionHandler
     return this._id;
   }
 
-  get rendermime(): IRenderMimeRegistry {
-    return this._rendermime;
-  }
-
-  /**
-   * A signal emitted when the handler is disposed.
-   */
-  get disposed(): ISignal<VariableInspectionHandler, void> {
-    return this._disposed;
-  }
-
-  get isDisposed(): boolean {
-    return this._isDisposed;
-  }
-
   get ready(): Promise<void> {
     return this._ready;
   }
-
-  /**
-   * A signal emitted when an inspector value is generated.
-   */
-  get inspected(): ISignal<
-    VariableInspectionHandler,
-    IVariableInspector.IVariableInspectorUpdate
-  > {
-    return this._inspected;
-  }
-
   /**
    * Performs an inspection by sending an execute request with the query command to the kernel.
    */
-  public performInspection(): void {
+  performInspection(): void {
     const content: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._queryCommand,
       stop_on_error: false,
-      store_history: false,
+      store_history: false
     };
     this._connector.fetch(content, this._handleQueryResponse);
   }
@@ -128,13 +152,13 @@ export class VariableInspectionHandler
   /**
    * Performs an inspection of a Jupyter Widget
    */
-  public performWidgetInspection(
+  performWidgetInspection(
     varName: string
   ): Kernel.IShellFuture<IExecuteRequestMsg, IExecuteReplyMsg> {
     const request: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._widgetQueryCommand + '(' + varName + ')',
       stop_on_error: false,
-      store_history: false,
+      store_history: false
     };
     return this._connector.execute(request);
   }
@@ -142,14 +166,14 @@ export class VariableInspectionHandler
   /**
    * Performs an inspection of the specified matrix.
    */
-  public performMatrixInspection(
+  performMatrixInspection(
     varName: string,
     maxRows = 100000
   ): Promise<DataModel> {
     const request: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._matrixQueryCommand + '(' + varName + ', ' + maxRows + ')',
       stop_on_error: false,
-      store_history: false,
+      store_history: false
     };
     const con = this._connector;
     return new Promise((resolve, reject) => {
@@ -182,26 +206,14 @@ export class VariableInspectionHandler
   /**
    * Send a kernel request to delete a variable from the global environment
    */
-  public performDelete(varName: string): void {
+  performDelete(varName: string): void {
     const content: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._deleteCommand + "('" + varName + "')",
       stop_on_error: false,
-      store_history: false,
+      store_history: false
     };
 
     this._connector.fetch(content, this._handleQueryResponse);
-  }
-
-  /*
-   * Disposes the kernel connector.
-   */
-  dispose(): void {
-    if (this.isDisposed) {
-      return;
-    }
-    this._isDisposed = true;
-    this._disposed.emit(void 0);
-    Signal.clearData(this);
   }
 
   /**
@@ -211,7 +223,7 @@ export class VariableInspectionHandler
     const content: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._initScript,
       stop_on_error: false,
-      silent: true,
+      silent: true
     };
 
     return this._connector.fetch(content, () => {
@@ -239,7 +251,7 @@ export class VariableInspectionHandler
         const update = JSON.parse(content) as IVariableInspector.IVariable[];
         const title = {
           contextName: '',
-          kernelName: this._connector.kernelName || '',
+          kernelName: this._connector.kernelName || ''
         };
 
         this._inspected.emit({ title: title, payload: update });
@@ -266,7 +278,7 @@ export class VariableInspectionHandler
 
         const titleDisplay = {
           contextName: '',
-          kernelName: this._connector.kernelName || '',
+          kernelName: this._connector.kernelName || ''
         };
 
         this._inspected.emit({ title: titleDisplay, payload: updateDisplay });
@@ -322,61 +334,23 @@ export namespace VariableInspectionHandler {
   }
 }
 
-export class DummyHandler
-  implements IDisposable, IVariableInspector.IInspectable {
-  private _isDisposed = false;
-  private _disposed = new Signal<this, void>(this);
-  private _inspected = new Signal<
-    this,
-    IVariableInspector.IVariableInspectorUpdate
-  >(this);
-  private _connector: KernelConnector;
-  private _rendermime: IRenderMimeRegistry = null;
-
+export class DummyHandler extends AbstractHandler {
   constructor(connector: KernelConnector) {
-    this._connector = connector;
+    super(connector);
   }
 
-  get disposed(): ISignal<DummyHandler, void> {
-    return this._disposed;
-  }
-
-  get isDisposed(): boolean {
-    return this._isDisposed;
-  }
-
-  get inspected(): ISignal<
-    DummyHandler,
-    IVariableInspector.IVariableInspectorUpdate
-  > {
-    return this._inspected;
-  }
-
-  get rendermime(): IRenderMimeRegistry {
-    return this._rendermime;
-  }
-
-  dispose(): void {
-    if (this.isDisposed) {
-      return;
-    }
-    this._isDisposed = true;
-    this._disposed.emit(void 0);
-    Signal.clearData(this);
-  }
-
-  public performInspection(): void {
-    const title = {
+  performInspection(): void {
+    const title: IVariableInspector.IVariableTitle = {
       contextName: '. <b>Language currently not supported.</b> ',
-      kernelName: this._connector.kernelName || '',
-    } as IVariableInspector.IVariableTitle;
+      kernelName: this._connector.kernelName || ''
+    };
     this._inspected.emit({
       title: title,
-      payload: [],
+      payload: []
     } as IVariableInspector.IVariableInspectorUpdate);
   }
 
-  public performMatrixInspection(
+  performMatrixInspection(
     varName: string,
     maxRows: number
   ): Promise<DataModel> {
@@ -385,7 +359,7 @@ export class DummyHandler
     });
   }
 
-  public performWidgetInspection(
+  performWidgetInspection(
     varName: string
   ): Kernel.IShellFuture<
     KernelMessage.IExecuteRequestMsg,
@@ -394,12 +368,8 @@ export class DummyHandler
     const request: KernelMessage.IExecuteRequestMsg['content'] = {
       code: '',
       stop_on_error: false,
-      store_history: false,
+      store_history: false
     };
     return this._connector.execute(request);
-  }
-
-  public performDelete(varName: string): void {
-    //noop
   }
 }

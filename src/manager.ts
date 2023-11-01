@@ -1,33 +1,19 @@
-import {
-  VariableInspectorPanel,
-  IVariableInspector,
-} from './variableinspector';
-
-import { Token } from '@lumino/coreutils';
-
 import { VariableInspectionHandler } from './handler';
 
-export const IVariableInspectorManager = new Token<IVariableInspectorManager>(
-  'jupyterlab_extension/variableinspector:IVariableInspectorManager'
-);
+import { VariableInspectorPanel } from './variableinspector';
 
-export interface IVariableInspectorManager {
-  source: IVariableInspector.IInspectable | null;
-  hasHandler(id: string): boolean;
-  getHandler(id: string): VariableInspectionHandler;
-  addHandler(handler: VariableInspectionHandler): void;
-}
+import { IVariableInspector, IVariableInspectorManager } from './tokens';
 
 /**
  * A class that manages variable inspector widget instances and offers persistent
  * `IVariableInspector` instance that other plugins can communicate with.
  */
 export class VariableInspectorManager implements IVariableInspectorManager {
-  private _source: IVariableInspector.IInspectable = null;
-  private _panel: VariableInspectorPanel = null;
+  private _source: IVariableInspector.IInspectable | null = null;
+  private _panel: VariableInspectorPanel | null = null;
   private _handlers: { [id: string]: VariableInspectionHandler } = {};
 
-  public hasHandler(id: string): boolean {
+  hasHandler(id: string): boolean {
     if (this._handlers[id]) {
       return true;
     } else {
@@ -35,22 +21,22 @@ export class VariableInspectorManager implements IVariableInspectorManager {
     }
   }
 
-  public getHandler(id: string): VariableInspectionHandler {
+  getHandler(id: string): VariableInspectionHandler {
     return this._handlers[id];
   }
 
-  public addHandler(handler: VariableInspectionHandler): void {
+  addHandler(handler: VariableInspectionHandler): void {
     this._handlers[handler.id] = handler;
   }
 
   /**
    * The current inspector panel.
    */
-  get panel(): VariableInspectorPanel {
+  get panel(): VariableInspectorPanel | null {
     return this._panel;
   }
 
-  set panel(panel: VariableInspectorPanel) {
+  set panel(panel: VariableInspectorPanel | null) {
     if (this.panel === panel) {
       return;
     }
@@ -64,11 +50,11 @@ export class VariableInspectorManager implements IVariableInspectorManager {
   /**
    * The source of events the inspector panel listens for.
    */
-  get source(): IVariableInspector.IInspectable {
+  get source(): IVariableInspector.IInspectable | null {
     return this._source;
   }
 
-  set source(source: IVariableInspector.IInspectable) {
+  set source(source: IVariableInspector.IInspectable | null) {
     if (this._source === source) {
       return;
     }
