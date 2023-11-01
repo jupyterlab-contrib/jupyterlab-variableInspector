@@ -184,15 +184,12 @@ const consoles: JupyterFrontEndPlugin<void> = {
           });
         });
       }
+
+      setSource(labShell);
     });
 
-    /**
-     * If focus window changes, checks whether new focus widget is a console.
-     * In that case, retrieves the handler associated to the console after it has been
-     * initialized and updates the manager with it.
-     */
-    labShell.currentChanged.connect((sender, args) => {
-      const widget = args.newValue;
+    const setSource = (sender: ILabShell, args?: ILabShell.IChangedArgs) => {
+      const widget = args?.newValue ?? sender.currentWidget;
       if (!widget || !consoles.has(widget)) {
         return;
       }
@@ -203,7 +200,14 @@ const consoles: JupyterFrontEndPlugin<void> = {
           manager.source.performInspection();
         }
       });
-    });
+    };
+    /**
+     * If focus window changes, checks whether new focus widget is a console.
+     * In that case, retrieves the handler associated to the console after it has been
+     * initialized and updates the manager with it.
+     */
+    setSource(labShell);
+    labShell.currentChanged.connect(setSource);
 
     app.contextMenu.addItem({
       command: CommandIDs.open,
@@ -279,15 +283,12 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           reject(result);
         });
       });
+
+      setSource(labShell);
     });
 
-    /**
-     * If focus window changes, checks whether new focus widget is a notebook.
-     * In that case, retrieves the handler associated to the notebook after it has been
-     * initialized and updates the manager with it.
-     */
-    labShell.currentChanged.connect((sender, args) => {
-      const widget = args.newValue;
+    const setSource = (sender: ILabShell, args?: ILabShell.IChangedArgs) => {
+      const widget = args?.newValue ?? sender.currentWidget;
       if (!widget || !notebooks.has(widget) || widget.isDisposed) {
         return;
       }
@@ -298,7 +299,14 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           manager.source.performInspection();
         }
       });
-    });
+    };
+    /**
+     * If focus window changes, checks whether new focus widget is a notebook.
+     * In that case, retrieves the handler associated to the notebook after it has been
+     * initialized and updates the manager with it.
+     */
+    setSource(labShell);
+    labShell.currentChanged.connect(setSource);
 
     app.contextMenu.addItem({
       command: CommandIDs.open,

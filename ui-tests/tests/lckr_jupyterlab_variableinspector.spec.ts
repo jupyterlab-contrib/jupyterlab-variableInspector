@@ -1,21 +1,19 @@
 import { expect, test } from '@jupyterlab/galata';
 
-/**
- * Don't load JupyterLab webpage before running the tests.
- * This is required to ensure we capture all log messages.
- */
-test.use({ autoGoto: false });
 
-test('should emit an activation console message', async ({ page }) => {
-  const logs: string[] = [];
+test('test', async ({ page }) => {
+  await page.getByText('Python 3 (ipykernel)').first().click();
+  await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
+  await page.getByLabel('notebook content').getByRole('textbox').fill('a = 1');
+  await page.keyboard.press('Shift+Enter');
+  await page.getByRole('textbox').nth(2).fill('b = "hello"');
+  await page.keyboard.press('Control+Enter');
 
-  page.on('console', message => {
-    logs.push(message.text());
+  await page.getByRole('tabpanel').click({
+    button: 'right'
   });
+  await page.getByRole('menu').getByText('Open Variable Inspector').click();
 
-  await page.goto();
-
-  expect(
-    logs.filter(s => s === 'JupyterLab extension @lckr/jupyterlab_variableinspector is activated!')
-  ).toHaveLength(1);
+  await expect(page.getByRole('row').nth(1)).toHaveText(/aint281$/)
+  await expect(page.getByRole('row').last()).toHaveText(/bstr46hello$/)
 });
