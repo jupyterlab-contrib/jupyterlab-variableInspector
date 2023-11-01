@@ -94,7 +94,6 @@ export class VariableInspectorPanel
     this._table.tFoot!.className = TABLE_BODY_CLASS;
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
-      console.log(item);
 
       const name = item.varName;
       const varType = item.varType;

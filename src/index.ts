@@ -292,7 +292,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
         return;
       }
       const future = handlers[widget.id];
-      future.then((source: VariableInspectionHandler) => {
+      future?.then((source: VariableInspectionHandler) => {
         if (source) {
           manager.source = source;
           manager.source.performInspection();
