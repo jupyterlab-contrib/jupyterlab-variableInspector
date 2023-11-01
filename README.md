@@ -1,6 +1,5 @@
 # jupyterlab_variableinspector
 
-<<<<<<< before updating
 [![Extension status](https://img.shields.io/badge/status-ready-success 'ready to be used')](https://jupyterlab-contrib.github.io/)
 ![PyPi_Version](https://img.shields.io/pypi/v/lckr-jupyterlab-variableinspector)
 ![Build](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/workflows/Build/badge.svg)
@@ -28,10 +27,6 @@ Contributions in any form are welcome!
 In order to allow variable inspection, all content that is displayed first need to be sent from the kernel to the front end.  
 Therefore, opening large data frames with the datagrid viewer can dramatically increase your occupied memory and _significantly slow down_ your browser.  
 Use at your own risk.
-=======
-[![Github Actions Status](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/workflows/Build/badge.svg)](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/actions/workflows/build.yml)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-variableInspector/main?urlpath=lab)
-Variable inspector extension for JupyterLab
->>>>>>> after updating
 
 ## Requirements
 
