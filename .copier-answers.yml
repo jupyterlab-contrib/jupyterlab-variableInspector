@@ -9,6 +9,6 @@ kind: frontend
 labextension_name: '@lckr/jupyterlab_variableinspector'
 project_short_description: Variable inspector extension for JupyterLab
 python_name: lckr_jupyterlab_variableinspector
-repository: https://github.com/lckr/jupyterlab-variableInspector.git
-test: false
+repository: https://github.com/jupyterlab-contrib/jupyterlab-variableInspector
+test: true
 

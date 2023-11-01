@@ -12,6 +12,10 @@ lckr_jupyterlab_variableinspector/labextension
 # Version file is handled by hatchling
 lckr_jupyterlab_variableinspector/_version.py
 
+# Integration tests
+ui-tests/test-results/
+ui-tests/playwright-report/
+
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
 
