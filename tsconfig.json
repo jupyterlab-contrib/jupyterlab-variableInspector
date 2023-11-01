@@ -17,9 +17,8 @@
     "rootDir": "src",
     "sourceMap": true,
     "strict": true,
-    "strictNullChecks": false,
-    "target": "ES2018",
-    "types": []
+    "strictNullChecks": true,
+    "target": "ES2018"
   },
   "include": ["src/*"]
 }

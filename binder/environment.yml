@@ -2,20 +2,20 @@
 # this environment may also be used locally on Linux/MacOS/Windows, e.g.
 #
 #   conda env update --file binder/environment.yml
-#   conda activate lckr_jupyterlab_variableinspector-demo
+#   conda activate lckr-jupyterlab-variableinspector-demo
 #
-name: lckr_jupyterlab_variableinspector-demo
+name: lckr-jupyterlab-variableinspector-demo
 
 channels:
   - conda-forge
 
 dependencies:
   # runtime dependencies
-  - python >=3.8,<3.9.0a0
-  - jupyterlab >=3,<4.0.0a0
+  - python >=3.10,<3.11.0a0
+  - jupyterlab >=4.0.0,<5
   # labextension build dependencies
-  - nodejs >=14,<15
+  - nodejs >=18,<19
   - pip
   - wheel
   # additional packages for demos
-  # - ipywidgets
+  - ipywidgets
