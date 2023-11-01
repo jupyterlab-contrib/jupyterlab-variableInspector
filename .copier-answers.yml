@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.2.3
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: ''
+author_name: lckr
+has_binder: true
+has_settings: false
+kind: frontend
+labextension_name: '@lckr/jupyterlab_variableinspector'
+project_short_description: Variable inspector extension for JupyterLab
+python_name: lckr_jupyterlab_variableinspector
+repository: https://github.com/jupyterlab-contrib/jupyterlab-variableInspector
+test: true
+

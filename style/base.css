@@ -1,0 +1,60 @@
+.jp-VarInspector {
+  flex-direction: column;
+  overflow: auto;
+  font-size: var(--jp-ui-font-size1);
+}
+
+.jp-VarInspector-table {
+  font-family: monospace;
+  border-collapse: collapse;
+  margin: auto;
+  width: 100%;
+  color: var(--jp-content-font-color1);
+}
+
+.jp-VarInspector-table td,
+.jp-VarInspector-table thead {
+  border: 1px solid;
+  border-color: var(--jp-layout-color2);
+  padding: 8px;
+}
+
+.jp-VarInspector-table tr:nth-child(even) {
+  background-color: var(--jp-layout-color1);
+}
+
+.jp-VarInspector-content tr:hover {
+  background-color: var(--jp-layout-color2);
+}
+
+.jp-VarInspector-table thead {
+  font-size: var(--jp-ui-font-size0);
+  text-align: center;
+  background-color: var(--jp-layout-color2);
+  color: var(--jp-ui-font-color1);
+  font-family: sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.jp-VarInspector-title {
+  font-size: var(--jp-ui-font-size1);
+  color: var(--jp-content-font-color1);
+  text-align: left;
+  padding-left: 10px;
+}
+
+.jp-VarInspector-deleteButton {
+  text-align: center;
+  width: 1em;
+}
+
+.jp-VarInspector-inspectButton {
+  text-align: center;
+  width: 1em;
+}
+
+.jp-VarInspector-varName {
+  font-weight: 600;
+}

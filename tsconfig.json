@@ -15,10 +15,10 @@
     "resolveJsonModule": true,
     "outDir": "lib",
     "rootDir": "src",
+    "sourceMap": true,
     "strict": true,
-    "strictNullChecks": false,
-    "target": "es2017",
-    "types": []
+    "strictNullChecks": true,
+    "target": "ES2018"
   },
   "include": ["src/*"]
 }

@@ -1,23 +1,10 @@
-import {
-  IVariableInspector,
-  VariableInspectorPanel,
-} from './variableinspector';
-
-import { KernelConnector } from './kernelconnector';
-
-import { VariableInspectionHandler, DummyHandler } from './handler';
-
-import { VariableInspectorManager, IVariableInspectorManager } from './manager';
-
-import { Languages } from './inspectorscripts';
-
 import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
 import {
   ILabShell,
   ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
+  JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
 import { IConsoleTracker } from '@jupyterlab/console';
@@ -25,6 +12,18 @@ import { IConsoleTracker } from '@jupyterlab/console';
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
 import { listIcon } from '@jupyterlab/ui-components';
+
+import { DummyHandler, VariableInspectionHandler } from './handler';
+
+import { Languages } from './inspectorscripts';
+
+import { KernelConnector } from './kernelconnector';
+
+import { VariableInspectorManager } from './manager';
+
+import { VariableInspectorPanel } from './variableinspector';
+
+import { IVariableInspector, IVariableInspectorManager } from './tokens';
 
 namespace CommandIDs {
   export const open = 'variableinspector:open';
@@ -76,8 +75,8 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
     // Enable state restoration
     restorer.restore(tracker, {
       command,
-      args: () => null,
-      name: () => 'variableinspector',
+      args: () => ({}),
+      name: () => 'variableinspector'
     });
 
     // Add command to palette
@@ -94,7 +93,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
           manager.source.performInspection();
         }
         labShell.activateById(manager.panel.id);
-      },
+      }
     });
     palette.addItem({ command, category });
 
@@ -102,7 +101,7 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
       'JupyterLab extension @lckr/jupyterlab_variableinspector is activated!'
     );
     return manager;
-  },
+  }
 };
 
 /**
@@ -137,13 +136,12 @@ const consoles: JupyterFrontEndPlugin<void> = {
 
           // Create connector and init w script if it exists for kernel type.
           const connector = new KernelConnector({ session });
-          const scripts: Promise<Languages.LanguageModel> = connector.ready.then(
-            () => {
-              return connector.kernelLanguage.then((lang) => {
+          const scripts: Promise<Languages.LanguageModel> =
+            connector.ready.then(() => {
+              return connector.kernelLanguage.then(lang => {
                 return Languages.getScript(lang);
               });
-            }
-          );
+            });
 
           scripts.then((result: Languages.LanguageModel) => {
             const initScript = result.initScript;
@@ -159,7 +157,7 @@ const consoles: JupyterFrontEndPlugin<void> = {
               deleteCommand: deleteCommand,
               connector: connector,
               initScript: initScript,
-              id: session.path, //Using the sessions path as an identifier for now.
+              id: session.path //Using the sessions path as an identifier for now.
             };
             const handler = new VariableInspectionHandler(options);
             manager.addHandler(handler);
@@ -186,15 +184,12 @@ const consoles: JupyterFrontEndPlugin<void> = {
           });
         });
       }
+
+      setSource(labShell);
     });
 
-    /**
-     * If focus window changes, checks whether new focus widget is a console.
-     * In that case, retrieves the handler associated to the console after it has been
-     * initialized and updates the manager with it.
-     */
-    labShell.currentChanged.connect((sender, args) => {
-      const widget = args.newValue;
+    const setSource = (sender: ILabShell, args?: ILabShell.IChangedArgs) => {
+      const widget = args?.newValue ?? sender.currentWidget;
       if (!widget || !consoles.has(widget)) {
         return;
       }
@@ -205,13 +200,20 @@ const consoles: JupyterFrontEndPlugin<void> = {
           manager.source.performInspection();
         }
       });
-    });
+    };
+    /**
+     * If focus window changes, checks whether new focus widget is a console.
+     * In that case, retrieves the handler associated to the console after it has been
+     * initialized and updates the manager with it.
+     */
+    setSource(labShell);
+    labShell.currentChanged.connect(setSource);
 
     app.contextMenu.addItem({
       command: CommandIDs.open,
-      selector: '.jp-CodeConsole',
+      selector: '.jp-CodeConsole'
     });
-  },
+  }
 };
 
 /**
@@ -241,10 +243,9 @@ const notebooks: JupyterFrontEndPlugin<void> = {
         const rendermime = nbPanel.content.rendermime;
 
         const scripts: Promise<Languages.LanguageModel> = connector.ready.then(
-          () => {
-            return connector.kernelLanguage.then((lang) => {
-              return Languages.getScript(lang);
-            });
+          async () => {
+            const lang = await connector.kernelLanguage;
+            return Languages.getScript(lang);
           }
         );
 
@@ -263,7 +264,7 @@ const notebooks: JupyterFrontEndPlugin<void> = {
             connector: connector,
             rendermime,
             initScript: initScript,
-            id: session.path, //Using the sessions path as an identifier for now.
+            id: session.path //Using the sessions path as an identifier for now.
           };
           const handler = new VariableInspectionHandler(options);
           manager.addHandler(handler);
@@ -282,32 +283,36 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           reject(result);
         });
       });
+
+      setSource(labShell);
     });
 
-    /**
-     * If focus window changes, checks whether new focus widget is a notebook.
-     * In that case, retrieves the handler associated to the notebook after it has been
-     * initialized and updates the manager with it.
-     */
-    labShell.currentChanged.connect((sender, args) => {
-      const widget = args.newValue;
-      if (!widget || !notebooks.has(widget)) {
+    const setSource = (sender: ILabShell, args?: ILabShell.IChangedArgs) => {
+      const widget = args?.newValue ?? sender.currentWidget;
+      if (!widget || !notebooks.has(widget) || widget.isDisposed) {
         return;
       }
       const future = handlers[widget.id];
-      future.then((source: VariableInspectionHandler) => {
+      future?.then((source: VariableInspectionHandler) => {
         if (source) {
           manager.source = source;
           manager.source.performInspection();
         }
       });
-    });
+    };
+    /**
+     * If focus window changes, checks whether new focus widget is a notebook.
+     * In that case, retrieves the handler associated to the notebook after it has been
+     * initialized and updates the manager with it.
+     */
+    setSource(labShell);
+    labShell.currentChanged.connect(setSource);
 
     app.contextMenu.addItem({
       command: CommandIDs.open,
-      selector: '.jp-Notebook',
+      selector: '.jp-Notebook'
     });
-  },
+  }
 };
 
 /**
@@ -316,6 +321,6 @@ const notebooks: JupyterFrontEndPlugin<void> = {
 const plugins: JupyterFrontEndPlugin<any>[] = [
   variableinspector,
   consoles,
-  notebooks,
+  notebooks
 ];
 export default plugins;

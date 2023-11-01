@@ -1,20 +1,12 @@
 import { OutputAreaModel, SimplifiedOutputArea } from '@jupyterlab/outputarea';
 
-import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
-
-import { Kernel, KernelMessage } from '@jupyterlab/services';
-
-import { ISignal } from '@lumino/signaling';
-
-import { Token } from '@lumino/coreutils';
-
-import { DockLayout, Widget } from '@lumino/widgets';
+import { closeIcon, searchIcon } from '@jupyterlab/ui-components';
 
 import { DataGrid, DataModel } from '@lumino/datagrid';
 
-import { closeIcon, searchIcon } from '@jupyterlab/ui-components';
+import { DockLayout, Widget } from '@lumino/widgets';
 
-import '../style/index.css';
+import { IVariableInspector } from './tokens';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
@@ -22,67 +14,12 @@ const TABLE_CLASS = 'jp-VarInspector-table';
 const TABLE_BODY_CLASS = 'jp-VarInspector-content';
 
 /**
- * The inspector panel token.
- */
-export const IVariableInspector = new Token<IVariableInspector>(
-  'jupyterlab_extension/variableinspector:IVariableInspector'
-);
-
-/**
- * An interface for an inspector.
- */
-export interface IVariableInspector {
-  source: IVariableInspector.IInspectable | null;
-}
-
-/**
- * A namespace for inspector interfaces.
- */
-export namespace IVariableInspector {
-  export interface IInspectable {
-    disposed: ISignal<any, void>;
-    inspected: ISignal<any, IVariableInspectorUpdate>;
-    rendermime: IRenderMimeRegistry;
-    performInspection(): void;
-    performMatrixInspection(
-      varName: string,
-      maxRows?: number
-    ): Promise<DataModel>;
-    performWidgetInspection(
-      varName: string
-    ): Kernel.IShellFuture<
-      KernelMessage.IExecuteRequestMsg,
-      KernelMessage.IExecuteReplyMsg
-    >;
-    performDelete(varName: string): void;
-  }
-
-  export interface IVariableInspectorUpdate {
-    title: IVariableTitle;
-    payload: Array<IVariable>;
-  }
-
-  export interface IVariable {
-    varName: string;
-    varSize: string;
-    varShape: string;
-    varContent: string;
-    varType: string;
-    isMatrix: boolean;
-    isWidget: boolean;
-  }
-  export interface IVariableTitle {
-    kernelName?: string;
-    contextName?: string; //Context currently reserved for special information.
-  }
-}
-
-/**
  * A panel that renders the variables
  */
 export class VariableInspectorPanel
   extends Widget
-  implements IVariableInspector {
+  implements IVariableInspector
+{
   private _source: IVariableInspector.IInspectable | null = null;
   private _table: HTMLTableElement;
   private _title: HTMLElement;
@@ -154,15 +91,14 @@ export class VariableInspectorPanel
     let row: HTMLTableRowElement;
     this._table.deleteTFoot();
     this._table.createTFoot();
-    this._table.tFoot.className = TABLE_BODY_CLASS;
+    this._table.tFoot!.className = TABLE_BODY_CLASS;
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
-      console.log(item);
 
       const name = item.varName;
       const varType = item.varType;
 
-      row = this._table.tFoot.insertRow();
+      row = this._table.tFoot!.insertRow();
 
       // Add delete icon and onclick event
       let cell = row.insertCell(0);
@@ -170,7 +106,7 @@ export class VariableInspectorPanel
       cell.className = 'jp-VarInspector-deleteButton';
       const ico = closeIcon.element();
       ico.onclick = (ev: MouseEvent): any => {
-        this.source.performDelete(name);
+        this.source?.performDelete(name);
       };
       cell.append(ico);
 
@@ -183,7 +119,7 @@ export class VariableInspectorPanel
         ico.onclick = (ev: MouseEvent): any => {
           console.log('Click on ' + name);
           this._source
-            .performMatrixInspection(name)
+            ?.performMatrixInspection(name)
             .then((model: DataModel) => {
               this._showMatrix(model, name, varType);
             });
@@ -206,11 +142,11 @@ export class VariableInspectorPanel
       cell.innerHTML = item.varShape;
       cell = row.insertCell(6);
 
-      const rendermime = this._source.rendermime;
+      const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
         const model = new OutputAreaModel({ trusted: true });
         const output = new SimplifiedOutputArea({ model, rendermime });
-        output.future = this._source.performWidgetInspection(item.varName);
+        output.future = this._source!.performWidgetInspection(item.varName);
         Widget.attach(output, cell);
       } else {
         cell.innerHTML = Private.escapeHtml(item.varContent).replace(
@@ -238,14 +174,14 @@ export class VariableInspectorPanel
         rowHeight: 32,
         columnWidth: 128,
         rowHeaderWidth: 64,
-        columnHeaderHeight: 32,
-      },
+        columnHeaderHeight: 32
+      }
     });
 
     datagrid.dataModel = dataModel;
     datagrid.title.label = varType + ': ' + name;
     datagrid.title.closable = true;
-    const lout: DockLayout = this.parent.layout as DockLayout;
+    const lout: DockLayout = this.parent!.layout as DockLayout;
     lout.addWidget(datagrid, { mode: 'split-right' });
     //todo activate/focus matrix widget
   }
@@ -259,18 +195,21 @@ namespace Private {
       '>': '&gt;',
       '"': '&quot;',
       "'": '&#39;',
-      '/': '&#x2F;',
+      '/': '&#x2F;'
     })
   );
 
   export function escapeHtml(source: string): string {
-    return String(source).replace(/[&<>"'/]/g, (s: string) => entityMap.get(s));
+    return String(source).replace(
+      /[&<>"'/]/g,
+      (s: string) => entityMap.get(s)!
+    );
   }
 
   export function createTable(): HTMLTableElement {
     const table = document.createElement('table');
     table.createTHead();
-    const hrow = table.tHead.insertRow(0) as HTMLTableRowElement;
+    const hrow = table.tHead!.insertRow(0) as HTMLTableRowElement;
 
     const cell1 = hrow.insertCell(0);
     cell1.innerHTML = '';

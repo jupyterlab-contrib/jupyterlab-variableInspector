@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 **Describe the bug**
@@ -12,6 +11,7 @@ A clear and concise description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -24,10 +24,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Your Environment(please complete the following information):**
- - OS (**important**): [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version of this extension you are using
 
+- OS (**important**): [e.g. iOS]
+- Browser [e.g. chrome, safari]
+- Version of this extension you are using
 
 **Additional context**
 Add any other context about the problem here.
