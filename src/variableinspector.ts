@@ -18,11 +18,11 @@ const TABLE_BODY_CLASS = 'jp-VarInspector-content';
  */
 export class VariableInspectorPanel
   extends Widget
-  implements IVariableInspector
-{
+  implements IVariableInspector {
   private _source: IVariableInspector.IInspectable | null = null;
   private _table: HTMLTableElement;
   private _title: HTMLElement;
+  private _filtered: { type: Array<string> };
 
   constructor() {
     super();
@@ -33,6 +33,7 @@ export class VariableInspectorPanel
     this._table.className = TABLE_CLASS;
     this.node.appendChild(this._title as HTMLElement);
     this.node.appendChild(this._table as HTMLElement);
+    this._filtered = { type: ['str'] };
   }
 
   get source(): IVariableInspector.IInspectable | null {
@@ -97,6 +98,9 @@ export class VariableInspectorPanel
 
       const name = item.varName;
       const varType = item.varType;
+      if (this._filtered.type.includes(varType.toLowerCase())) {
+        continue;
+      }
 
       row = this._table.tFoot!.insertRow();
 
