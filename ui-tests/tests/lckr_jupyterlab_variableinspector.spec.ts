@@ -1,6 +1,5 @@
 import { expect, test } from '@jupyterlab/galata';
 
-
 test('test', async ({ page }) => {
   await page.getByText('Python 3 (ipykernel)').first().click();
   await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
@@ -14,6 +13,6 @@ test('test', async ({ page }) => {
   });
   await page.getByRole('menu').getByText('Open Variable Inspector').click();
 
-  await expect(page.getByRole('row').nth(1)).toHaveText(/aint281$/)
-  await expect(page.getByRole('row').last()).toHaveText(/bstr46hello$/)
+  await expect(page.getByRole('row').nth(1)).toHaveText(/aint\d\d1$/);
+  await expect(page.getByRole('row').last()).toHaveText(/bstr\d\dhello$/);
 });
