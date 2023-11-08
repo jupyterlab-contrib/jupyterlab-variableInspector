@@ -18,7 +18,7 @@ const TABLE_TYPE_CLASS = 'jp-VarInspector-typeName';
 const FILTER_INPUT_CLASS = 'filter-input';
 const FILTER_BUTTON_CLASS = 'filter-button';
 const FILTER_LIST_CLASS = 'filter-list';
-const FILTERED_BUTTON_CLASS = 'filtered-button';
+const FILTERED_BUTTON_CLASS = 'filtered-variable-button';
 
 /**
  * A panel that renders the variables
@@ -73,7 +73,10 @@ export class VariableInspectorPanel
       ) as HTMLUListElement;
       const newFilteredButton = Private.createFilteredButton(filterType);
       newFilteredButton.addEventListener('click', () => {
-        this.onFilterChange(newFilteredButton.innerHTML, false);
+        const filterText = newFilteredButton.querySelector(
+          '.filtered-variable-button-text'
+        ) as HTMLDivElement;
+        this.onFilterChange(filterText.innerHTML, false);
         this.addFilteredOutRows();
         newFilteredButton.remove();
       });
@@ -318,8 +321,12 @@ namespace Private {
 
   export function createFilterTable(): HTMLDivElement {
     const container = document.createElement('div');
+    container.className = 'filter-container';
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'jp-InputGroup filter-search-container';
     const input = document.createElement('input');
     input.setAttribute('type', 'text');
+    input.setAttribute('placeholder', 'Filter out variables by type');
     input.className = FILTER_INPUT_CLASS;
     const filterButton = document.createElement('button');
     const buttonText = document.createTextNode('Filter');
@@ -328,16 +335,23 @@ namespace Private {
     const list = document.createElement('ul');
     list.className = FILTER_LIST_CLASS;
 
-    container.appendChild(input);
-    container.appendChild(filterButton);
+    searchContainer.appendChild(input);
+    searchContainer.appendChild(filterButton);
+    container.appendChild(searchContainer);
     container.appendChild(list);
     return container;
   }
 
   export function createFilteredButton(filterName: string): HTMLButtonElement {
     const filteredButton = document.createElement('button');
-    const buttonText = document.createTextNode(filterName);
+    const buttonText = document.createElement('div');
+    buttonText.className = 'filtered-variable-button-text';
+    buttonText.innerHTML = filterName;
+    const icon = closeIcon.element({
+      container: filteredButton
+    });
     filteredButton.appendChild(buttonText);
+    filteredButton.appendChild(icon);
     filteredButton.className = FILTERED_BUTTON_CLASS;
     return filteredButton;
   }
