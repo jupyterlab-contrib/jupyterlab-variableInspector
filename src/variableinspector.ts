@@ -14,23 +14,28 @@ const TABLE_CLASS = 'jp-VarInspector-table';
 const TABLE_BODY_CLASS = 'jp-VarInspector-content';
 const TABLE_ROW_CLASS = 'jp-VarInspector-table-row';
 const TABLE_ROW_HIDDEN_CLASS = 'jp-VarInspector-table-row-hidden';
-const TABLE_TYPE_CLASS = 'jp-VarInspector-typeName';
+const TABLE_TYPE_CLASS = 'jp-VarInspector-type';
+const TABLE_NAME_CLASS = 'jp-VarInspector-varName';
+const FILTER_TYPE_CLASS = 'filter-type';
 const FILTER_INPUT_CLASS = 'filter-input';
 const FILTER_BUTTON_CLASS = 'filter-button';
 const FILTER_LIST_CLASS = 'filter-list';
 const FILTERED_BUTTON_CLASS = 'filtered-variable-button';
+
+type FILTER_TYPES = 'type' | 'name';
 
 /**
  * A panel that renders the variables
  */
 export class VariableInspectorPanel
   extends Widget
-  implements IVariableInspector {
+  implements IVariableInspector
+{
   private _source: IVariableInspector.IInspectable | null = null;
   private _filteredTable: HTMLDivElement;
   private _table: HTMLTableElement;
   private _title: HTMLElement;
-  private _filtered: Array<string>;
+  private _filtered: { type: Array<string>; name: Array<string> };
 
   constructor() {
     super();
@@ -43,11 +48,14 @@ export class VariableInspectorPanel
     this.node.appendChild(this._title as HTMLElement);
     this.node.appendChild(this._filteredTable as HTMLElement);
     this.node.appendChild(this._table as HTMLElement);
-    this._filtered = [];
+    this._filtered = { type: [], name: [] };
     this.intializeFilteredTable();
   }
 
   protected intializeFilteredTable() {
+    const filterType = this._filteredTable.querySelector(
+      '.' + FILTER_TYPE_CLASS
+    ) as HTMLSelectElement;
     const filterInput = this._filteredTable.querySelector(
       '.' + FILTER_INPUT_CLASS
     ) as HTMLInputElement;
@@ -55,35 +63,49 @@ export class VariableInspectorPanel
       '.' + FILTER_BUTTON_CLASS
     ) as HTMLButtonElement;
     filterButton.addEventListener('click', () => {
-      this.onFilterChange(filterInput.value, true);
+      this.onFilterChange(
+        filterType.value as FILTER_TYPES,
+        filterInput.value,
+        true
+      );
     });
   }
 
-  protected onFilterChange(filterType: string, isAdding: Boolean) {
-    if (filterType == '') {
+  protected onFilterChange(
+    filterType: FILTER_TYPES,
+    varName: string,
+    isAdding: boolean
+  ) {
+    if (varName === '') {
       return;
     }
     if (isAdding) {
-      if (this._filtered.includes(filterType.toLowerCase())) {
+      if (this._filtered[filterType].includes(varName.toLowerCase())) {
         return;
       }
-      this._filtered.push(filterType.toLowerCase());
+      this._filtered[filterType].push(varName.toLowerCase());
       const filterList = this._filteredTable.querySelector(
         '.' + FILTER_LIST_CLASS
       ) as HTMLUListElement;
-      const newFilteredButton = Private.createFilteredButton(filterType);
+      console.log(varName, filterType);
+      const newFilteredButton = Private.createFilteredButton(
+        varName,
+        filterType
+      );
       newFilteredButton.addEventListener('click', () => {
         const filterText = newFilteredButton.querySelector(
           '.filtered-variable-button-text'
         ) as HTMLDivElement;
-        this.onFilterChange(filterText.innerHTML, false);
+        this.onFilterChange(filterType, filterText.innerHTML, false);
         this.addFilteredOutRows();
         newFilteredButton.remove();
       });
       filterList.appendChild(newFilteredButton);
       this.filterOutTable();
     } else {
-      this._filtered = this._filtered.filter(filter => filter != filterType);
+      this._filtered[filterType] = this._filtered[filterType].filter(
+        filter => filter !== varName
+      );
     }
   }
 
@@ -92,10 +114,16 @@ export class VariableInspectorPanel
       '.' + TABLE_ROW_HIDDEN_CLASS
     ) as NodeListOf<HTMLTableRowElement>;
     for (let i = 0; i < rows.length; i++) {
+      const rowName = rows[i].querySelector(
+        '.' + TABLE_NAME_CLASS
+      ) as HTMLTableCellElement;
       const rowType = rows[i].querySelector(
         '.' + TABLE_TYPE_CLASS
       ) as HTMLTableCellElement;
-      if (!this._filtered.includes(rowType.innerHTML.toLowerCase())) {
+      if (
+        !this._filtered['name'].includes(rowName.innerHTML.toLowerCase()) &&
+        !this._filtered['type'].includes(rowType.innerHTML.toLowerCase())
+      ) {
         rows[i].className = TABLE_ROW_CLASS;
       }
     }
@@ -106,10 +134,16 @@ export class VariableInspectorPanel
       '.' + TABLE_ROW_CLASS
     ) as NodeListOf<HTMLTableRowElement>;
     for (let i = 0; i < rows.length; i++) {
+      const rowName = rows[i].querySelector(
+        '.' + TABLE_NAME_CLASS
+      ) as HTMLTableCellElement;
       const rowType = rows[i].querySelector(
         '.' + TABLE_TYPE_CLASS
       ) as HTMLTableCellElement;
-      if (this._filtered.includes(rowType.innerHTML.toLowerCase())) {
+      if (
+        this._filtered['name'].includes(rowName.innerHTML.toLowerCase()) ||
+        this._filtered['type'].includes(rowType.innerHTML.toLowerCase())
+      ) {
         rows[i].className = TABLE_ROW_HIDDEN_CLASS;
       }
     }
@@ -180,7 +214,9 @@ export class VariableInspectorPanel
 
       row = this._table.tFoot!.insertRow();
       row.className = TABLE_ROW_CLASS;
-      if (this._filtered.includes(varType.toLowerCase())) {
+      if (this._filtered['type'].includes(varType.toLowerCase())) {
+        row.className = TABLE_ROW_HIDDEN_CLASS;
+      } else if (this._filtered['name'].includes(name.toLowerCase())) {
         row.className = TABLE_ROW_HIDDEN_CLASS;
       }
 
@@ -214,7 +250,7 @@ export class VariableInspectorPanel
       }
 
       cell = row.insertCell(2);
-      cell.className = 'jp-VarInspector-varName';
+      cell.className = TABLE_NAME_CLASS;
       cell.innerHTML = name;
 
       // Add remaining cells
@@ -322,11 +358,21 @@ namespace Private {
   export function createFilterTable(): HTMLDivElement {
     const container = document.createElement('div');
     container.className = 'filter-container';
+    const filterType = document.createElement('select');
+    filterType.className = FILTER_TYPE_CLASS;
+    const varTypeOption = document.createElement('option');
+    varTypeOption.value = 'type';
+    varTypeOption.innerHTML = 'Type';
+    const nameOption = document.createElement('option');
+    nameOption.value = 'name';
+    nameOption.innerHTML = 'Name';
+    filterType.appendChild(varTypeOption);
+    filterType.appendChild(nameOption);
     const searchContainer = document.createElement('div');
     searchContainer.className = 'jp-InputGroup filter-search-container';
     const input = document.createElement('input');
     input.setAttribute('type', 'text');
-    input.setAttribute('placeholder', 'Filter out variables by type');
+    input.setAttribute('placeholder', 'Filter out variable');
     input.className = FILTER_INPUT_CLASS;
     const filterButton = document.createElement('button');
     const buttonText = document.createTextNode('Filter');
@@ -335,6 +381,7 @@ namespace Private {
     const list = document.createElement('ul');
     list.className = FILTER_LIST_CLASS;
 
+    searchContainer.appendChild(filterType);
     searchContainer.appendChild(input);
     searchContainer.appendChild(filterButton);
     container.appendChild(searchContainer);
@@ -342,8 +389,13 @@ namespace Private {
     return container;
   }
 
-  export function createFilteredButton(filterName: string): HTMLButtonElement {
+  export function createFilteredButton(
+    filterName: string,
+    filterType: FILTER_TYPES
+  ): HTMLButtonElement {
     const filteredButton = document.createElement('button');
+    filteredButton.value = filterType;
+    filteredButton.title = filterType;
     const buttonText = document.createElement('div');
     buttonText.className = 'filtered-variable-button-text';
     buttonText.innerHTML = filterName;
