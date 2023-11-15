@@ -71,6 +71,17 @@ export class VariableInspectorPanel
     });
   }
 
+  // Checks if string is in the filtered array
+  protected stringInFilter(string: string, filterType: FILTER_TYPES) {
+    // console.log(this._filtered[filterType]);
+    for (let i = 0; i < this._filtered[filterType].length; i++) {
+      if (string.match(new RegExp(this._filtered[filterType][i]))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   protected onFilterChange(
     filterType: FILTER_TYPES,
     varName: string,
@@ -80,14 +91,13 @@ export class VariableInspectorPanel
       return;
     }
     if (isAdding) {
-      if (this._filtered[filterType].includes(varName.toLowerCase())) {
+      if (this._filtered[filterType].includes(varName)) {
         return;
       }
-      this._filtered[filterType].push(varName.toLowerCase());
+      this._filtered[filterType].push(varName);
       const filterList = this._filteredTable.querySelector(
         '.' + FILTER_LIST_CLASS
       ) as HTMLUListElement;
-      console.log(varName, filterType);
       const newFilteredButton = Private.createFilteredButton(
         varName,
         filterType
@@ -103,6 +113,8 @@ export class VariableInspectorPanel
       filterList.appendChild(newFilteredButton);
       this.filterOutTable();
     } else {
+      console.log(this._filtered[filterType]);
+      console.log(varName);
       this._filtered[filterType] = this._filtered[filterType].filter(
         filter => filter !== varName
       );
@@ -121,8 +133,8 @@ export class VariableInspectorPanel
         '.' + TABLE_TYPE_CLASS
       ) as HTMLTableCellElement;
       if (
-        !this._filtered['name'].includes(rowName.innerHTML.toLowerCase()) &&
-        !this._filtered['type'].includes(rowType.innerHTML.toLowerCase())
+        !this.stringInFilter(rowName.innerHTML, 'name') &&
+        !this._filtered['type'].includes(rowType.innerHTML)
       ) {
         rows[i].className = TABLE_ROW_CLASS;
       }
@@ -141,8 +153,8 @@ export class VariableInspectorPanel
         '.' + TABLE_TYPE_CLASS
       ) as HTMLTableCellElement;
       if (
-        this._filtered['name'].includes(rowName.innerHTML.toLowerCase()) ||
-        this._filtered['type'].includes(rowType.innerHTML.toLowerCase())
+        this.stringInFilter(rowName.innerHTML, 'name') ||
+        this._filtered['type'].includes(rowType.innerHTML)
       ) {
         rows[i].className = TABLE_ROW_HIDDEN_CLASS;
       }
@@ -214,9 +226,9 @@ export class VariableInspectorPanel
 
       row = this._table.tFoot!.insertRow();
       row.className = TABLE_ROW_CLASS;
-      if (this._filtered['type'].includes(varType.toLowerCase())) {
+      if (this._filtered['type'].includes(varType)) {
         row.className = TABLE_ROW_HIDDEN_CLASS;
-      } else if (this._filtered['name'].includes(name.toLowerCase())) {
+      } else if (this.stringInFilter(name, 'name')) {
         row.className = TABLE_ROW_HIDDEN_CLASS;
       }
 
