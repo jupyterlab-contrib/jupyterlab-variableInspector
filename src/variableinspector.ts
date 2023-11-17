@@ -8,6 +8,8 @@ import { DockLayout, Widget } from '@lumino/widgets';
 
 import { IVariableInspector } from './tokens';
 
+import wildcardMatch from 'wildcard-match';
+
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
@@ -75,7 +77,8 @@ export class VariableInspectorPanel
   protected stringInFilter(string: string, filterType: FILTER_TYPES) {
     // console.log(this._filtered[filterType]);
     for (let i = 0; i < this._filtered[filterType].length; i++) {
-      if (string.match(new RegExp(this._filtered[filterType][i]))) {
+      const isMatch = wildcardMatch(this._filtered[filterType][i]);
+      if (isMatch(string)) {
         return true;
       }
     }
@@ -113,8 +116,6 @@ export class VariableInspectorPanel
       filterList.appendChild(newFilteredButton);
       this.filterOutTable();
     } else {
-      console.log(this._filtered[filterType]);
-      console.log(varName);
       this._filtered[filterType] = this._filtered[filterType].filter(
         filter => filter !== varName
       );
