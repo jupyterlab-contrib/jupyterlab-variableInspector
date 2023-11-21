@@ -54,6 +54,7 @@ export class VariableInspectorPanel
     this.intializeFilteredTable();
   }
 
+  //Sets up the filter table so when the filter button is pressed, a new filter is created
   protected intializeFilteredTable() {
     const filterType = this._filteredTable.querySelector(
       '.' + FILTER_TYPE_CLASS
@@ -84,6 +85,13 @@ export class VariableInspectorPanel
     }
     return false;
   }
+  /*
+    Either adds a new filter or removes a previously existing filter based
+    Params:
+    filterType: By what type the varName is filtering on
+    varName: The name of the variable we are trying to filter out
+    isAdding: If we are adding a new filter or removing a previous filter
+  */
 
   protected onFilterChange(
     filterType: FILTER_TYPES,
@@ -122,6 +130,10 @@ export class VariableInspectorPanel
     }
   }
 
+  /*
+  Goes through each filtered out row and checks if they should still be filtered
+  If not, the row becomes visible again
+  */
   protected addFilteredOutRows() {
     const rows = this._table.querySelectorAll(
       '.' + TABLE_ROW_HIDDEN_CLASS
@@ -142,6 +154,10 @@ export class VariableInspectorPanel
     }
   }
 
+  /*
+  Goes through each row and checks if the row should be filtered out
+  A row is filtered out if it matches any of the values in the _filtered object
+  */
   protected filterOutTable() {
     const rows = this._table.querySelectorAll(
       '.' + TABLE_ROW_CLASS
@@ -403,6 +419,7 @@ namespace Private {
     return container;
   }
 
+  //Creates a button with given filter information displayed on the button
   export function createFilteredButton(
     filterName: string,
     filterType: FILTER_TYPES
