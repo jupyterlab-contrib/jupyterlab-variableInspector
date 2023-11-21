@@ -373,6 +373,7 @@ namespace Private {
     container.className = 'filter-container';
     const filterType = document.createElement('select');
     filterType.className = FILTER_TYPE_CLASS;
+    filterType.selectedIndex = 0;
     const varTypeOption = document.createElement('option');
     varTypeOption.value = 'type';
     varTypeOption.innerHTML = 'Type';
