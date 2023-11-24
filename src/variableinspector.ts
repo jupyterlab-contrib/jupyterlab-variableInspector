@@ -8,10 +8,12 @@ import { DockLayout, Widget } from '@lumino/widgets';
 
 import { IVariableInspector } from './tokens';
 
+import { DataGrid as WebDataGrid } from '@jupyter/web-components';
+
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
-const TABLE_BODY_CLASS = 'jp-VarInspector-content';
+// const TABLE_BODY_CLASS = 'jp-VarInspector-content';
 
 /**
  * A panel that renders the variables
@@ -21,7 +23,7 @@ export class VariableInspectorPanel
   implements IVariableInspector
 {
   private _source: IVariableInspector.IInspectable | null = null;
-  private _table: HTMLTableElement;
+  private _table: HTMLDivElement;
   private _title: HTMLElement;
 
   constructor() {
@@ -88,60 +90,87 @@ export class VariableInspectorPanel
     }
 
     //Render new variable state
-    let row: HTMLTableRowElement;
-    this._table.deleteTFoot();
-    this._table.createTFoot();
-    this._table.tFoot!.className = TABLE_BODY_CLASS;
+    const table = this._table.querySelector('#variable-table') as WebDataGrid;
+    table.rowsData = [
+      {
+        delete: '',
+        view: '',
+        name: 'Name',
+        varType: 'Type',
+        size: 'Size',
+        shape: 'Shape',
+        content: 'Content'
+      }
+    ];
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
 
-      const name = item.varName;
-      const varType = item.varType;
-
-      row = this._table.tFoot!.insertRow();
+      const variableObj: {
+        delete: string;
+        view: string;
+        name: string;
+        varType: string;
+        size: string;
+        shape: string;
+        content: string;
+      } = {
+        delete: '',
+        view: '',
+        name: item.varName,
+        varType: item.varType,
+        size: item.varSize,
+        shape: item.varShape,
+        content: ''
+      };
+      // const variableObj: {
+      //   delete: HTMLDivElement;
+      //   view: HTMLDivElement;
+      //   name: string;
+      //   varType: string;
+      //   size: string;
+      //   shape: string;
+      //   content: HTMLDivElement;
+      // } = {
+      //   delete: document.createElement('div'),
+      //   view: document.createElement('div'),
+      //   name: item.varName,
+      //   varType: item.varType,
+      //   size: item.varSize,
+      //   shape: item.varShape,
+      //   content: document.createElement('div')
+      // };
 
       // Add delete icon and onclick event
-      let cell = row.insertCell(0);
+      let cell = document.createElement('div');
       cell.title = 'Delete Variable';
       cell.className = 'jp-VarInspector-deleteButton';
       const ico = closeIcon.element();
       ico.onclick = (ev: MouseEvent): any => {
-        this.source?.performDelete(name);
+        this.source?.performDelete(item.varName);
       };
       cell.append(ico);
+      // variableObj.delete = cell;
 
       // Add onclick event for inspection
-      cell = row.insertCell(1);
+      cell = document.createElement('div');
       if (item.isMatrix) {
         cell.title = 'View Contents';
         cell.className = 'jp-VarInspector-inspectButton';
         const ico = searchIcon.element();
         ico.onclick = (ev: MouseEvent): any => {
-          console.log('Click on ' + name);
+          console.log('Click on ' + item.varName);
           this._source
-            ?.performMatrixInspection(name)
+            ?.performMatrixInspection(item.varName)
             .then((model: DataModel) => {
-              this._showMatrix(model, name, varType);
+              this._showMatrix(model, item.varName, item.varType);
             });
         };
         cell.append(ico);
       } else {
         cell.innerHTML = '';
       }
-
-      cell = row.insertCell(2);
-      cell.className = 'jp-VarInspector-varName';
-      cell.innerHTML = name;
-
-      // Add remaining cells
-      cell = row.insertCell(3);
-      cell.innerHTML = varType;
-      cell = row.insertCell(4);
-      cell.innerHTML = item.varSize;
-      cell = row.insertCell(5);
-      cell.innerHTML = item.varShape;
-      cell = row.insertCell(6);
-
+      // variableObj.view = cell;
+      cell = document.createElement('div');
       const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
         const model = new OutputAreaModel({ trusted: true });
@@ -154,6 +183,8 @@ export class VariableInspectorPanel
           '</br>'
         );
       }
+      // variableObj.content = cell;
+      table.rowsData.push(variableObj);
     }
   }
 
@@ -206,26 +237,41 @@ namespace Private {
     );
   }
 
-  export function createTable(): HTMLTableElement {
-    const table = document.createElement('table');
-    table.createTHead();
-    const hrow = table.tHead!.insertRow(0) as HTMLTableRowElement;
+  export function createTable(): HTMLDivElement {
+    const node = document.createElement('div');
+    node.innerHTML =
+      '<jp-data-grid generate-header="default" id="variable-table"></jp-data-grid>';
+    // customElements.define('jp-data-grid', WebDataGrid);
+    // const table = document.createElement('jp-data-grid') as WebDataGrid;
+    // table.generateHeader = 'default';
+    // const hrow = table.tHead!.insertRow(0) as HTMLTableRowElement;
 
-    const cell1 = hrow.insertCell(0);
-    cell1.innerHTML = '';
-    const cell2 = hrow.insertCell(1);
-    cell2.innerHTML = '';
-    const cell3 = hrow.insertCell(2);
-    cell3.innerHTML = 'Name';
-    const cell4 = hrow.insertCell(3);
-    cell4.innerHTML = 'Type';
-    const cell5 = hrow.insertCell(4);
-    cell5.innerHTML = 'Size';
-    const cell6 = hrow.insertCell(5);
-    cell6.innerHTML = 'Shape';
-    const cell7 = hrow.insertCell(6);
-    cell7.innerHTML = 'Content';
-    return table;
+    // const cell1 = hrow.insertCell(0);
+    // cell1.innerHTML = '';
+    // const cell2 = hrow.insertCell(1);
+    // cell2.innerHTML = '';
+    // const cell3 = hrow.insertCell(2);
+    // cell3.innerHTML = 'Name';
+    // const cell4 = hrow.insertCell(3);
+    // cell4.innerHTML = 'Type';
+    // const cell5 = hrow.insertCell(4);
+    // cell5.innerHTML = 'Size';
+    // const cell6 = hrow.insertCell(5);
+    // cell6.innerHTML = 'Shape';
+    // const cell7 = hrow.insertCell(6);
+    // cell7.innerHTML = 'Content';
+    // table.rowsData = [
+    //   {
+    //     delete: '',
+    //     view: '',
+    //     name: 'Name',
+    //     varType: 'Type',
+    //     size: 'Size',
+    //     shape: 'Shape',
+    //     content: 'Content'
+    //   }
+    // ];
+    return node;
   }
 
   export function createTitle(header = ''): HTMLParagraphElement {
