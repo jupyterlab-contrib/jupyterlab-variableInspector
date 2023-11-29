@@ -8,7 +8,14 @@ import { DockLayout, Widget } from '@lumino/widgets';
 
 import { IVariableInspector } from './tokens';
 
-import { DataGrid as WebDataGrid } from '@jupyter/web-components';
+import {
+  DataGrid as WebDataGrid,
+  allComponents,
+  provideJupyterDesignSystem
+} from '@jupyter/web-components';
+provideJupyterDesignSystem().register(allComponents);
+
+import { ViewTemplate } from '@microsoft/fast-element';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
@@ -23,7 +30,7 @@ export class VariableInspectorPanel
   implements IVariableInspector
 {
   private _source: IVariableInspector.IInspectable | null = null;
-  private _table: HTMLDivElement;
+  private _table: WebDataGrid;
   private _title: HTMLElement;
 
   constructor() {
@@ -90,55 +97,27 @@ export class VariableInspectorPanel
     }
 
     //Render new variable state
-    const table = this._table.querySelector('#variable-table') as WebDataGrid;
-    table.rowsData = [
-      {
-        delete: '',
-        view: '',
-        name: 'Name',
-        varType: 'Type',
-        size: 'Size',
-        shape: 'Shape',
-        content: 'Content'
-      }
-    ];
+    const table = [];
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
 
       const variableObj: {
         delete: string;
-        view: string;
+        view: HTMLDivElement;
         name: string;
         varType: string;
         size: string;
         shape: string;
-        content: string;
+        content: HTMLDivElement;
       } = {
-        delete: '',
-        view: '',
+        delete: 'yep',
+        view: document.createElement('div'),
         name: item.varName,
         varType: item.varType,
         size: item.varSize,
         shape: item.varShape,
-        content: ''
+        content: document.createElement('div')
       };
-      // const variableObj: {
-      //   delete: HTMLDivElement;
-      //   view: HTMLDivElement;
-      //   name: string;
-      //   varType: string;
-      //   size: string;
-      //   shape: string;
-      //   content: HTMLDivElement;
-      // } = {
-      //   delete: document.createElement('div'),
-      //   view: document.createElement('div'),
-      //   name: item.varName,
-      //   varType: item.varType,
-      //   size: item.varSize,
-      //   shape: item.varShape,
-      //   content: document.createElement('div')
-      // };
 
       // Add delete icon and onclick event
       let cell = document.createElement('div');
@@ -169,7 +148,8 @@ export class VariableInspectorPanel
       } else {
         cell.innerHTML = '';
       }
-      // variableObj.view = cell;
+      variableObj.view = cell;
+
       cell = document.createElement('div');
       const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
@@ -183,9 +163,10 @@ export class VariableInspectorPanel
           '</br>'
         );
       }
-      // variableObj.content = cell;
-      table.rowsData.push(variableObj);
+      variableObj.content = cell;
+      table.push(variableObj);
     }
+    this._table.rowsData = table;
   }
 
   /**
@@ -237,41 +218,35 @@ namespace Private {
     );
   }
 
-  export function createTable(): HTMLDivElement {
-    const node = document.createElement('div');
-    node.innerHTML =
-      '<jp-data-grid generate-header="default" id="variable-table"></jp-data-grid>';
-    // customElements.define('jp-data-grid', WebDataGrid);
-    // const table = document.createElement('jp-data-grid') as WebDataGrid;
-    // table.generateHeader = 'default';
-    // const hrow = table.tHead!.insertRow(0) as HTMLTableRowElement;
+  export function createTable(): WebDataGrid {
+    const table = document.createElement('jp-data-grid') as WebDataGrid;
+    table.generateHeader = 'sticky';
+    table.columnDefinitions = [
+      {
+        columnDataKey: 'delete',
+        title: '',
+        cellTemplate: new ViewTemplate(
+          '<div><button onclick="()=>{this.source?.performDelete(item.varName);}">Delete</button><div>',
+          []
+        )
+      },
+      { columnDataKey: 'view', title: '' },
+      { columnDataKey: 'name', title: 'Name' },
+      { columnDataKey: 'varType', title: 'VarType' },
+      { columnDataKey: 'size', title: 'Size' },
+      { columnDataKey: 'shape', title: 'Shape' },
+      { columnDataKey: 'content', title: 'Content' }
+    ];
+    return table;
+  }
 
-    // const cell1 = hrow.insertCell(0);
-    // cell1.innerHTML = '';
-    // const cell2 = hrow.insertCell(1);
-    // cell2.innerHTML = '';
-    // const cell3 = hrow.insertCell(2);
-    // cell3.innerHTML = 'Name';
-    // const cell4 = hrow.insertCell(3);
-    // cell4.innerHTML = 'Type';
-    // const cell5 = hrow.insertCell(4);
-    // cell5.innerHTML = 'Size';
-    // const cell6 = hrow.insertCell(5);
-    // cell6.innerHTML = 'Shape';
-    // const cell7 = hrow.insertCell(6);
-    // cell7.innerHTML = 'Content';
-    // table.rowsData = [
-    //   {
-    //     delete: '',
-    //     view: '',
-    //     name: 'Name',
-    //     varType: 'Type',
-    //     size: 'Size',
-    //     shape: 'Shape',
-    //     content: 'Content'
-    //   }
-    // ];
-    return node;
+  export function createCellTemplate(table: WebDataGrid): HTMLTemplateElement {
+    const template = document.createElement('template');
+    const container = document.createElement('div');
+    container.innerText = 'testing';
+    template.appendChild(container);
+    table.appendChild(template);
+    return template;
   }
 
   export function createTitle(header = ''): HTMLParagraphElement {
