@@ -45,6 +45,69 @@
   padding-left: 10px;
 }
 
+.filter-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-search-container {
+  display: flex;
+  padding: 0 1rem;
+}
+
+.filter-type {
+  background-color: var(--jp-ui-font-color2);
+  color: var(--jp-ui-font-color1);
+  box-shadow: inset 0 0 0 var(--jp-border-width) var(--jp-input-border-color);
+  border: none;
+  padding: 0 0.5rem;
+  text-align: center;
+}
+
+.filter-input {
+  width: 20rem !important;
+  margin-left: 1rem;
+}
+
+.filter-button {
+  background-color: var(--jp-ui-font-color2);
+  color: var(--jp-ui-font-color1);
+  box-shadow: inset 0 0 0 var(--jp-border-width) var(--jp-input-border-color);
+  border: none;
+  padding: 0 0.5rem;
+}
+
+.filtered-variable-button {
+  background-color: transparent;
+  box-shadow: inset 0 0 0 var(--jp-border-width) var(--jp-input-border-color);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filtered-variable-button-text {
+  color: var(--jp-ui-font-color1);
+  background-color: transparent;
+}
+
+.type-button {
+  color: var(--jp-ui-font-color0);
+}
+
+.name-button {
+  color: var(--jp-ui-font-color1);
+}
+
+.filter-list {
+  display: flex;
+}
+
+.jp-VarInspector-table-row-hidden {
+  display: none;
+}
+
 .jp-VarInspector-deleteButton {
   text-align: center;
   width: 1em;

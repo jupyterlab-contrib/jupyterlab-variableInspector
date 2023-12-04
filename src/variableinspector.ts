@@ -16,11 +16,23 @@ import {
 provideJupyterDesignSystem().register(allComponents);
 
 import { ViewTemplate } from '@microsoft/fast-element';
+import wildcardMatch from 'wildcard-match';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
-// const TABLE_BODY_CLASS = 'jp-VarInspector-content';
+const TABLE_BODY_CLASS = 'jp-VarInspector-content';
+const TABLE_ROW_CLASS = 'jp-VarInspector-table-row';
+const TABLE_ROW_HIDDEN_CLASS = 'jp-VarInspector-table-row-hidden';
+const TABLE_TYPE_CLASS = 'jp-VarInspector-type';
+const TABLE_NAME_CLASS = 'jp-VarInspector-varName';
+const FILTER_TYPE_CLASS = 'filter-type';
+const FILTER_INPUT_CLASS = 'filter-input';
+const FILTER_BUTTON_CLASS = 'filter-button';
+const FILTER_LIST_CLASS = 'filter-list';
+const FILTERED_BUTTON_CLASS = 'filtered-variable-button';
+
+type FILTER_TYPES = 'type' | 'name';
 
 /**
  * A panel that renders the variables
@@ -31,7 +43,9 @@ export class VariableInspectorPanel
 {
   private _source: IVariableInspector.IInspectable | null = null;
   private _table: WebDataGrid;
+  private _filteredTable: HTMLDivElement;
   private _title: HTMLElement;
+  private _filtered: { type: Array<string>; name: Array<string> };
 
   constructor() {
     super();
@@ -40,8 +54,136 @@ export class VariableInspectorPanel
     this._title.className = TITLE_CLASS;
     this._table = Private.createTable();
     this._table.className = TABLE_CLASS;
+    this._filteredTable = Private.createFilterTable();
     this.node.appendChild(this._title as HTMLElement);
+    this.node.appendChild(this._filteredTable as HTMLElement);
     this.node.appendChild(this._table as HTMLElement);
+    this._filtered = { type: [], name: [] };
+    this.intializeFilteredTable();
+  }
+
+  //Sets up the filter table so when the filter button is pressed, a new filter is created
+  protected intializeFilteredTable() {
+    const filterType = this._filteredTable.querySelector(
+      '.' + FILTER_TYPE_CLASS
+    ) as HTMLSelectElement;
+    const filterInput = this._filteredTable.querySelector(
+      '.' + FILTER_INPUT_CLASS
+    ) as HTMLInputElement;
+    const filterButton = this._filteredTable.querySelector(
+      '.' + FILTER_BUTTON_CLASS
+    ) as HTMLButtonElement;
+    filterButton.addEventListener('click', () => {
+      this.onFilterChange(
+        filterType.value as FILTER_TYPES,
+        filterInput.value,
+        true
+      );
+    });
+  }
+
+  // Checks if string is in the filtered array
+  protected stringInFilter(string: string, filterType: FILTER_TYPES) {
+    // console.log(this._filtered[filterType]);
+    for (let i = 0; i < this._filtered[filterType].length; i++) {
+      const isMatch = wildcardMatch(this._filtered[filterType][i]);
+      if (isMatch(string)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /*
+    Either adds a new filter or removes a previously existing filter based
+    Params:
+    filterType: By what type the varName is filtering on
+    varName: The name of the variable we are trying to filter out
+    isAdding: If we are adding a new filter or removing a previous filter
+  */
+
+  protected onFilterChange(
+    filterType: FILTER_TYPES,
+    varName: string,
+    isAdding: boolean
+  ) {
+    if (varName === '') {
+      return;
+    }
+    if (isAdding) {
+      if (this._filtered[filterType].includes(varName)) {
+        return;
+      }
+      this._filtered[filterType].push(varName);
+      const filterList = this._filteredTable.querySelector(
+        '.' + FILTER_LIST_CLASS
+      ) as HTMLUListElement;
+      const newFilteredButton = Private.createFilteredButton(
+        varName,
+        filterType
+      );
+      newFilteredButton.addEventListener('click', () => {
+        const filterText = newFilteredButton.querySelector(
+          '.filtered-variable-button-text'
+        ) as HTMLDivElement;
+        this.onFilterChange(filterType, filterText.innerHTML, false);
+        this.addFilteredOutRows();
+        newFilteredButton.remove();
+      });
+      filterList.appendChild(newFilteredButton);
+      this.filterOutTable();
+    } else {
+      this._filtered[filterType] = this._filtered[filterType].filter(
+        filter => filter !== varName
+      );
+    }
+  }
+
+  /*
+  Goes through each filtered out row and checks if they should still be filtered
+  If not, the row becomes visible again
+  */
+  protected addFilteredOutRows() {
+    const rows = this._table.querySelectorAll(
+      '.' + TABLE_ROW_HIDDEN_CLASS
+    ) as NodeListOf<HTMLTableRowElement>;
+    for (let i = 0; i < rows.length; i++) {
+      const rowName = rows[i].querySelector(
+        '.' + TABLE_NAME_CLASS
+      ) as HTMLTableCellElement;
+      const rowType = rows[i].querySelector(
+        '.' + TABLE_TYPE_CLASS
+      ) as HTMLTableCellElement;
+      if (
+        !this.stringInFilter(rowName.innerHTML, 'name') &&
+        !this._filtered['type'].includes(rowType.innerHTML)
+      ) {
+        rows[i].className = TABLE_ROW_CLASS;
+      }
+    }
+  }
+
+  /*
+  Goes through each row and checks if the row should be filtered out
+  A row is filtered out if it matches any of the values in the _filtered object
+  */
+  protected filterOutTable() {
+    const rows = this._table.querySelectorAll(
+      '.' + TABLE_ROW_CLASS
+    ) as NodeListOf<HTMLTableRowElement>;
+    for (let i = 0; i < rows.length; i++) {
+      const rowName = rows[i].querySelector(
+        '.' + TABLE_NAME_CLASS
+      ) as HTMLTableCellElement;
+      const rowType = rows[i].querySelector(
+        '.' + TABLE_TYPE_CLASS
+      ) as HTMLTableCellElement;
+      if (
+        this.stringInFilter(rowName.innerHTML, 'name') ||
+        this._filtered['type'].includes(rowType.innerHTML)
+      ) {
+        rows[i].className = TABLE_ROW_HIDDEN_CLASS;
+      }
+    }
   }
 
   get source(): IVariableInspector.IInspectable | null {
@@ -101,23 +243,16 @@ export class VariableInspectorPanel
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
 
-      const variableObj: {
-        delete: string;
-        view: HTMLDivElement;
-        name: string;
-        varType: string;
-        size: string;
-        shape: string;
-        content: HTMLDivElement;
-      } = {
-        delete: 'yep',
-        view: document.createElement('div'),
-        name: item.varName,
-        varType: item.varType,
-        size: item.varSize,
-        shape: item.varShape,
-        content: document.createElement('div')
-      };
+      const name = item.varName;
+      const varType = item.varType;
+
+      row = this._table.tFoot!.insertRow();
+      row.className = TABLE_ROW_CLASS;
+      if (this._filtered['type'].includes(varType)) {
+        row.className = TABLE_ROW_HIDDEN_CLASS;
+      } else if (this.stringInFilter(name, 'name')) {
+        row.className = TABLE_ROW_HIDDEN_CLASS;
+      }
 
       // Add delete icon and onclick event
       let cell = document.createElement('div');
@@ -150,7 +285,20 @@ export class VariableInspectorPanel
       }
       variableObj.view = cell;
 
-      cell = document.createElement('div');
+      cell = row.insertCell(2);
+      cell.className = TABLE_NAME_CLASS;
+      cell.innerHTML = name;
+
+      // Add remaining cells
+      cell = row.insertCell(3);
+      cell.innerHTML = varType;
+      cell.className = TABLE_TYPE_CLASS;
+      cell = row.insertCell(4);
+      cell.innerHTML = item.varSize;
+      cell = row.insertCell(5);
+      cell.innerHTML = item.varShape;
+      cell = row.insertCell(6);
+
       const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
         const model = new OutputAreaModel({ trusted: true });
@@ -253,5 +401,60 @@ namespace Private {
     const title = document.createElement('p');
     title.innerHTML = header;
     return title;
+  }
+
+  export function createFilterTable(): HTMLDivElement {
+    const container = document.createElement('div');
+    container.className = 'filter-container';
+    const filterType = document.createElement('select');
+    filterType.className = FILTER_TYPE_CLASS;
+    filterType.selectedIndex = 0;
+    const varTypeOption = document.createElement('option');
+    varTypeOption.value = 'type';
+    varTypeOption.innerHTML = 'Type';
+    const nameOption = document.createElement('option');
+    nameOption.value = 'name';
+    nameOption.innerHTML = 'Name';
+    filterType.appendChild(varTypeOption);
+    filterType.appendChild(nameOption);
+    const searchContainer = document.createElement('div');
+    searchContainer.className = 'jp-InputGroup filter-search-container';
+    const input = document.createElement('input');
+    input.setAttribute('type', 'text');
+    input.setAttribute('placeholder', 'Filter out variable');
+    input.className = FILTER_INPUT_CLASS;
+    const filterButton = document.createElement('button');
+    const buttonText = document.createTextNode('Filter');
+    filterButton.appendChild(buttonText);
+    filterButton.className = FILTER_BUTTON_CLASS;
+    const list = document.createElement('ul');
+    list.className = FILTER_LIST_CLASS;
+
+    searchContainer.appendChild(filterType);
+    searchContainer.appendChild(input);
+    searchContainer.appendChild(filterButton);
+    container.appendChild(searchContainer);
+    container.appendChild(list);
+    return container;
+  }
+
+  //Creates a button with given filter information displayed on the button
+  export function createFilteredButton(
+    filterName: string,
+    filterType: FILTER_TYPES
+  ): HTMLButtonElement {
+    const filteredButton = document.createElement('button');
+    filteredButton.value = filterType;
+    filteredButton.title = filterType;
+    const buttonText = document.createElement('div');
+    buttonText.className = 'filtered-variable-button-text';
+    buttonText.innerHTML = filterName;
+    const icon = closeIcon.element({
+      container: filteredButton
+    });
+    filteredButton.appendChild(buttonText);
+    filteredButton.appendChild(icon);
+    filteredButton.className = FILTERED_BUTTON_CLASS;
+    return filteredButton;
   }
 }
