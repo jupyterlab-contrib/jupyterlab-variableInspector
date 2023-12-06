@@ -22,7 +22,7 @@ import {
   jpDataGridCell,
   jpTextField,
   jpOption,
-  jpSearch,
+  jpSelect,
   jpButton
 } from '@jupyter/web-components';
 provideJupyterDesignSystem().register(
@@ -31,7 +31,7 @@ provideJupyterDesignSystem().register(
   jpDataGridCell(),
   jpTextField(),
   jpOption(),
-  jpSearch(),
+  jpSelect(),
   jpButton()
 );
 
@@ -87,7 +87,7 @@ export class VariableInspectorPanel
     ) as Select;
     const filterInput = this._filteredTable.querySelector(
       '.' + FILTER_INPUT_CLASS
-    ) as Search;
+    ) as TextField;
     const filterButton = this._filteredTable.querySelector(
       '.' + FILTER_BUTTON_CLASS
     ) as Button;
