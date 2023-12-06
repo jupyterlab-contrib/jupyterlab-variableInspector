@@ -12,21 +12,34 @@ import {
   DataGrid as WebDataGrid,
   DataGridRow,
   DataGridCell,
-  allComponents,
   provideJupyterDesignSystem,
   Select,
   Option,
-  Search,
-  Button
+  TextField,
+  Button,
+  jpDataGrid,
+  jpDataGridRow,
+  jpDataGridCell,
+  jpTextField,
+  jpOption,
+  jpSearch,
+  jpButton
 } from '@jupyter/web-components';
-provideJupyterDesignSystem().register(allComponents);
+provideJupyterDesignSystem().register(
+  jpDataGrid(),
+  jpDataGridRow(),
+  jpDataGridCell(),
+  jpTextField(),
+  jpOption(),
+  jpSearch(),
+  jpButton()
+);
 
 import wildcardMatch from 'wildcard-match';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
-// const TABLE_BODY_CLASS = 'jp-VarInspector-content';
 const TABLE_ROW_CLASS = 'jp-VarInspector-table-row';
 const TABLE_ROW_HIDDEN_CLASS = 'jp-VarInspector-table-row-hidden';
 const TABLE_TYPE_CLASS = 'jp-VarInspector-type';
@@ -295,12 +308,15 @@ export class VariableInspectorPanel
       cell.title = 'Delete Variable';
       cell.className = 'jp-VarInspector-deleteButton';
       cell.gridColumn = '1';
+      const closeButton = document.createElement('jp-button') as Button;
+      closeButton.appearance = 'stealth';
       const ico = closeIcon.element();
       ico.className = 'icon-button';
       ico.onclick = (ev: MouseEvent): any => {
         this.removeRow(name);
       };
-      cell.append(ico);
+      closeButton.append(ico);
+      cell.append(closeButton);
       row.appendChild(cell);
 
       // Add onclick event for inspection
@@ -308,17 +324,19 @@ export class VariableInspectorPanel
       if (item.isMatrix) {
         cell.title = 'View Contents';
         cell.className = 'jp-VarInspector-inspectButton';
+        const searchButton = document.createElement('jp-button') as Button;
+        searchButton.appearance = 'stealth';
         const ico = searchIcon.element();
         ico.className = 'icon-button';
         ico.onclick = (ev: MouseEvent): any => {
-          console.log('Click on ' + item.varName);
           this._source
             ?.performMatrixInspection(item.varName)
             .then((model: DataModel) => {
               this._showMatrix(model, item.varName, item.varType);
             });
         };
-        cell.append(ico);
+        searchButton.append(ico);
+        cell.append(searchButton);
       } else {
         cell.innerHTML = '';
       }
@@ -421,15 +439,6 @@ namespace Private {
     return table;
   }
 
-  export function createCellTemplate(table: WebDataGrid): HTMLTemplateElement {
-    const template = document.createElement('template');
-    const container = document.createElement('div');
-    container.innerText = 'testing';
-    template.appendChild(container);
-    table.appendChild(template);
-    return template;
-  }
-
   export function createTitle(header = ''): HTMLParagraphElement {
     const title = document.createElement('p');
     title.innerHTML = header;
@@ -452,7 +461,7 @@ namespace Private {
     filterType.appendChild(nameOption);
     const searchContainer = document.createElement('div');
     searchContainer.className = 'jp-InputGroup filter-search-container';
-    const input = document.createElement('jp-search') as Search;
+    const input = document.createElement('jp-text-field') as TextField;
     input.setAttribute('type', 'text');
     input.setAttribute('placeholder', 'Filter out variable');
     input.className = FILTER_INPUT_CLASS;
