@@ -17,7 +17,8 @@
     "files": [
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
         "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
-        "style/index.js"
+        "style/index.js",
+        "schema/*.json"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -60,6 +61,7 @@
         "@jupyterlab/outputarea": "^4.0.0",
         "@jupyterlab/rendermime": "^4.0.0",
         "@jupyterlab/services": "^7.0.0",
+        "@jupyterlab/settingregistry": "^4.0.9",
         "@jupyterlab/ui-components": "^4.0.0",
         "@lumino/coreutils": "^2.0.0",
         "@lumino/datagrid": "^2.0.0",
@@ -95,7 +97,8 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "lckr_jupyterlab_variableinspector/labextension"
+        "outputDir": "lckr_jupyterlab_variableinspector/labextension",
+        "schemaDir": "schema"
     },
     "styleModule": "style/index.js",
     "eslintIgnore": [

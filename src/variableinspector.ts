@@ -10,6 +10,8 @@ import { IVariableInspector } from './tokens';
 
 import wildcardMatch from 'wildcard-match';
 
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
@@ -34,13 +36,15 @@ export class VariableInspectorPanel
   implements IVariableInspector
 {
   private _source: IVariableInspector.IInspectable | null = null;
+  private _settings: ISettingRegistry.ISettings;
   private _filteredTable: HTMLDivElement;
   private _table: HTMLTableElement;
   private _title: HTMLElement;
   private _filtered: { type: Array<string>; name: Array<string> };
 
-  constructor() {
+  constructor(settings: ISettingRegistry.ISettings) {
     super();
+    this._settings = settings;
     this.addClass(PANEL_CLASS);
     this._title = Private.createTitle();
     this._title.className = TITLE_CLASS;
@@ -52,6 +56,7 @@ export class VariableInspectorPanel
     this.node.appendChild(this._table as HTMLElement);
     this._filtered = { type: [], name: [] };
     this.intializeFilteredTable();
+    this.initalizeFilterButtons();
   }
 
   //Sets up the filter table so when the filter button is pressed, a new filter is created
@@ -72,6 +77,50 @@ export class VariableInspectorPanel
         true
       );
     });
+  }
+
+  // Loads filters from ISettings
+  protected loadFilters() {
+    this._filtered.type = this._settings.composite['filteredTypes'] as string[];
+    this._filtered.name = this._settings.composite['filteredNames'] as string[];
+  }
+
+  // Takes filters and saves them in ISettings
+  protected setFilters(filterType: FILTER_TYPES | null = null) {
+    if (filterType === 'type' || !filterType) {
+      this._settings.set('filteredTypes', this._filtered.type);
+    }
+    if (filterType === 'name' || !filterType) {
+      this._settings.set('filteredNames', this._filtered.name);
+    }
+  }
+
+  // Loads the filter and creates a new button for each
+  protected initalizeFilterButtons() {
+    this.loadFilters();
+    for (let i = 0; i < this._filtered.type.length; i++) {
+      this.addFilteredButton(this._filtered.type[i], 'type');
+    }
+    for (let i = 0; i < this._filtered.name.length; i++) {
+      this.addFilteredButton(this._filtered.name[i], 'name');
+    }
+  }
+
+  // Creates new filtered button and adds it to the filtered variable list
+  protected addFilteredButton(varName: string, filterType: FILTER_TYPES) {
+    const filterList = this._filteredTable.querySelector(
+      '.' + FILTER_LIST_CLASS
+    ) as HTMLUListElement;
+    const newFilteredButton = Private.createFilteredButton(varName, filterType);
+    newFilteredButton.addEventListener('click', () => {
+      const filterText = newFilteredButton.querySelector(
+        '.filtered-variable-button-text'
+      ) as HTMLDivElement;
+      this.onFilterChange(filterType, filterText.innerHTML, false);
+      this.addFilteredOutRows();
+      newFilteredButton.remove();
+    });
+    filterList.appendChild(newFilteredButton);
   }
 
   // Checks if string is in the filtered array
@@ -106,27 +155,14 @@ export class VariableInspectorPanel
         return;
       }
       this._filtered[filterType].push(varName);
-      const filterList = this._filteredTable.querySelector(
-        '.' + FILTER_LIST_CLASS
-      ) as HTMLUListElement;
-      const newFilteredButton = Private.createFilteredButton(
-        varName,
-        filterType
-      );
-      newFilteredButton.addEventListener('click', () => {
-        const filterText = newFilteredButton.querySelector(
-          '.filtered-variable-button-text'
-        ) as HTMLDivElement;
-        this.onFilterChange(filterType, filterText.innerHTML, false);
-        this.addFilteredOutRows();
-        newFilteredButton.remove();
-      });
-      filterList.appendChild(newFilteredButton);
+      this.setFilters(filterType);
+      this.addFilteredButton(varName, filterType);
       this.filterOutTable();
     } else {
       this._filtered[filterType] = this._filtered[filterType].filter(
         filter => filter !== varName
       );
+      this.setFilters(filterType);
     }
   }
 

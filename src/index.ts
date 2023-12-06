@@ -24,6 +24,7 @@ import { VariableInspectorManager } from './manager';
 import { VariableInspectorPanel } from './variableinspector';
 
 import { IVariableInspector, IVariableInspectorManager } from './tokens';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 namespace CommandIDs {
   export const open = 'variableinspector:open';
@@ -33,28 +34,36 @@ namespace CommandIDs {
  * A service providing variable introspection.
  */
 const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
-  id: '@lckr/jupyterlab_variableinspector',
-  requires: [ICommandPalette, ILayoutRestorer, ILabShell],
+  id: '@lckr/jupyterlab_variableinspector:plugin',
+  requires: [ICommandPalette, ILayoutRestorer, ILabShell, ISettingRegistry],
   provides: IVariableInspectorManager,
   autoStart: true,
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     restorer: ILayoutRestorer,
-    labShell: ILabShell
-  ): IVariableInspectorManager => {
+    labShell: ILabShell,
+    settingRegistry: ISettingRegistry
+  ): Promise<IVariableInspectorManager> => {
     const manager = new VariableInspectorManager();
     const category = 'Variable Inspector';
     const command = CommandIDs.open;
     const label = 'Open Variable Inspector';
     const namespace = 'variableinspector';
     const tracker = new WidgetTracker<VariableInspectorPanel>({ namespace });
+    let settings: ISettingRegistry.ISettings;
+
+    try {
+      settings = await settingRegistry.load(variableinspector.id);
+    } catch (error) {
+      console.error('Failed to load settings for the Git Extension', error);
+    }
 
     /**
      * Create and track a new inspector.
      */
     function newPanel(): VariableInspectorPanel {
-      const panel = new VariableInspectorPanel();
+      const panel = new VariableInspectorPanel(settings);
 
       panel.id = 'jp-variableinspector';
       panel.title.label = 'Variable Inspector';
