@@ -1,0 +1,19 @@
+{
+  "title": "Variable Inspector",
+  "description": "jupyterlab-variableinspector settings.",
+  "type": "object",
+  "properties": {
+    "filteredTypes": {
+      "type": "array",
+      "title": "Filter variables by type",
+      "description": "Filters out all variables with types matching the given filter",
+      "default": []
+    },
+    "filteredNames": {
+      "type": "array",
+      "title": "Filter variables by name",
+      "description": "Filters out all variables with names matching the given filter",
+      "default": []
+    }
+  }
+}

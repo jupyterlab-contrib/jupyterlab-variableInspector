@@ -24,7 +24,10 @@ import { VariableInspectorManager } from './manager';
 import { VariableInspectorPanel } from './variableinspector';
 
 import { IVariableInspector, IVariableInspectorManager } from './tokens';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
 import { addJupyterLabThemeChangeListener } from '@jupyter/web-components';
+import { PromiseDelegate } from '@lumino/coreutils';
 addJupyterLabThemeChangeListener();
 namespace CommandIDs {
   export const open = 'variableinspector:open';
@@ -34,28 +37,40 @@ namespace CommandIDs {
  * A service providing variable introspection.
  */
 const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
-  id: '@lckr/jupyterlab_variableinspector',
-  requires: [ICommandPalette, ILayoutRestorer, ILabShell],
+  id: '@lckr/jupyterlab_variableinspector:plugin',
+  requires: [ICommandPalette, ILayoutRestorer, ILabShell, ISettingRegistry],
   provides: IVariableInspectorManager,
   autoStart: true,
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     restorer: ILayoutRestorer,
-    labShell: ILabShell
-  ): IVariableInspectorManager => {
+    labShell: ILabShell,
+    settingRegistry: ISettingRegistry
+  ): Promise<IVariableInspectorManager> => {
     const manager = new VariableInspectorManager();
     const category = 'Variable Inspector';
     const command = CommandIDs.open;
     const label = 'Open Variable Inspector';
     const namespace = 'variableinspector';
     const tracker = new WidgetTracker<VariableInspectorPanel>({ namespace });
+    const settings = new PromiseDelegate<ISettingRegistry.ISettings>();
+
+    Promise.all([settingRegistry.load(variableinspector.id), app.restored])
+      .then(returnArray => {
+        return settings.resolve(returnArray[0]);
+      })
+      .catch(error => {
+        console.error('Failed to load settings for the Git Extension', error);
+        settings.reject(error);
+      });
 
     /**
      * Create and track a new inspector.
      */
     function newPanel(): VariableInspectorPanel {
       const panel = new VariableInspectorPanel();
+      panel.settingsPromise = settings;
 
       panel.id = 'jp-variableinspector';
       panel.title.label = 'Variable Inspector';

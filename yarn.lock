@@ -880,6 +880,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jupyterlab/nbformat@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@jupyterlab/nbformat@npm:4.0.9"
+  dependencies:
+    "@lumino/coreutils": ^2.1.2
+  checksum: 9fb2f2e03c749c46dc2ff4a815ba7a7525dae5d0c44b3d9887a6405b869329d9b3db72f69eada145543a8b37172f5466abf3a621f458793b0565d244218d32e2
+  languageName: node
+  linkType: hard
+
 "@jupyterlab/notebook@npm:^4.0.0":
   version: 4.0.9
   resolution: "@jupyterlab/notebook@npm:4.0.9"
@@ -1125,6 +1134,7 @@ __metadata:
     "@jupyterlab/outputarea": ^4.0.0
     "@jupyterlab/rendermime": ^4.0.0
     "@jupyterlab/services": ^7.0.0
+    "@jupyterlab/settingregistry": ^4.0.9
     "@jupyterlab/ui-components": ^4.0.0
     "@lumino/coreutils": ^2.0.0
     "@lumino/datagrid": ^2.0.0
