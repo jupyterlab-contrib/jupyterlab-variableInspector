@@ -8,6 +8,33 @@ import { DockLayout, Widget } from '@lumino/widgets';
 
 import { IVariableInspector } from './tokens';
 
+import {
+  DataGrid as WebDataGrid,
+  DataGridRow,
+  DataGridCell,
+  provideJupyterDesignSystem,
+  Select,
+  Option,
+  TextField,
+  Button,
+  jpDataGrid,
+  jpDataGridRow,
+  jpDataGridCell,
+  jpTextField,
+  jpOption,
+  jpSelect,
+  jpButton
+} from '@jupyter/web-components';
+provideJupyterDesignSystem().register(
+  jpDataGrid(),
+  jpDataGridRow(),
+  jpDataGridCell(),
+  jpTextField(),
+  jpOption(),
+  jpSelect(),
+  jpButton()
+);
+
 import wildcardMatch from 'wildcard-match';
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
@@ -15,7 +42,6 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
 const TABLE_CLASS = 'jp-VarInspector-table';
-const TABLE_BODY_CLASS = 'jp-VarInspector-content';
 const TABLE_ROW_CLASS = 'jp-VarInspector-table-row';
 const TABLE_ROW_HIDDEN_CLASS = 'jp-VarInspector-table-row-hidden';
 const TABLE_TYPE_CLASS = 'jp-VarInspector-type';
@@ -37,8 +63,8 @@ export class VariableInspectorPanel
 {
   private _source: IVariableInspector.IInspectable | null = null;
   private _settings: ISettingRegistry.ISettings;
+  private _table: WebDataGrid;
   private _filteredTable: HTMLDivElement;
-  private _table: HTMLTableElement;
   private _title: HTMLElement;
   private _filtered: { type: Array<string>; name: Array<string> };
 
@@ -63,13 +89,13 @@ export class VariableInspectorPanel
   protected intializeFilteredTable() {
     const filterType = this._filteredTable.querySelector(
       '.' + FILTER_TYPE_CLASS
-    ) as HTMLSelectElement;
+    ) as Select;
     const filterInput = this._filteredTable.querySelector(
       '.' + FILTER_INPUT_CLASS
-    ) as HTMLInputElement;
+    ) as TextField;
     const filterButton = this._filteredTable.querySelector(
       '.' + FILTER_BUTTON_CLASS
-    ) as HTMLButtonElement;
+    ) as Button;
     filterButton.addEventListener('click', () => {
       this.onFilterChange(
         filterType.value as FILTER_TYPES,
@@ -173,14 +199,14 @@ export class VariableInspectorPanel
   protected addFilteredOutRows() {
     const rows = this._table.querySelectorAll(
       '.' + TABLE_ROW_HIDDEN_CLASS
-    ) as NodeListOf<HTMLTableRowElement>;
+    ) as NodeListOf<DataGridRow>;
     for (let i = 0; i < rows.length; i++) {
       const rowName = rows[i].querySelector(
         '.' + TABLE_NAME_CLASS
-      ) as HTMLTableCellElement;
+      ) as DataGridCell;
       const rowType = rows[i].querySelector(
         '.' + TABLE_TYPE_CLASS
-      ) as HTMLTableCellElement;
+      ) as DataGridCell;
       if (
         !this.stringInFilter(rowName.innerHTML, 'name') &&
         !this._filtered['type'].includes(rowType.innerHTML)
@@ -197,19 +223,37 @@ export class VariableInspectorPanel
   protected filterOutTable() {
     const rows = this._table.querySelectorAll(
       '.' + TABLE_ROW_CLASS
-    ) as NodeListOf<HTMLTableRowElement>;
+    ) as NodeListOf<DataGridRow>;
     for (let i = 0; i < rows.length; i++) {
       const rowName = rows[i].querySelector(
         '.' + TABLE_NAME_CLASS
-      ) as HTMLTableCellElement;
+      ) as DataGridCell;
       const rowType = rows[i].querySelector(
         '.' + TABLE_TYPE_CLASS
-      ) as HTMLTableCellElement;
+      ) as DataGridCell;
       if (
         this.stringInFilter(rowName.innerHTML, 'name') ||
         this._filtered['type'].includes(rowType.innerHTML)
       ) {
         rows[i].className = TABLE_ROW_HIDDEN_CLASS;
+      }
+    }
+  }
+
+  /*
+  Goes through each row and if it finds a variable with name 'name', then it deletes it
+  */
+  protected removeRow(name: string) {
+    const rows = this._table.querySelectorAll(
+      '.' + TABLE_ROW_CLASS
+    ) as NodeListOf<DataGridRow>;
+    for (let i = 0; i < rows.length; i++) {
+      const cell = rows[i].querySelector(
+        '.' + TABLE_NAME_CLASS
+      ) as DataGridCell;
+      if (cell.innerHTML === name) {
+        rows[i].remove();
+        return;
       }
     }
   }
@@ -266,18 +310,28 @@ export class VariableInspectorPanel
         "    Inspecting '" + title.kernelName + "' " + title.contextName;
     }
 
+    this._table.innerHTML = '';
+    const headerRow = document.createElement('jp-data-grid-row') as DataGridRow;
+    headerRow.className = 'sticky-header';
+    const columns = [' ', ' ', 'NAME', 'TYPE', 'SIZE', 'SHAPE', 'CONTENT'];
+    for (let i = 0; i < columns.length; i++) {
+      const headerCell = document.createElement(
+        'jp-data-grid-cell'
+      ) as DataGridCell;
+      headerCell.className = 'column-header';
+      headerCell.textContent = columns[i];
+      headerCell.gridColumn = (i + 1).toString();
+      headerRow.appendChild(headerCell);
+    }
+    this._table.appendChild(headerRow);
+
     //Render new variable state
-    let row: HTMLTableRowElement;
-    this._table.deleteTFoot();
-    this._table.createTFoot();
-    this._table.tFoot!.className = TABLE_BODY_CLASS;
     for (let index = 0; index < args.length; index++) {
       const item = args[index];
-
       const name = item.varName;
       const varType = item.varType;
 
-      row = this._table.tFoot!.insertRow();
+      const row = document.createElement('jp-data-grid-row') as DataGridRow;
       row.className = TABLE_ROW_CLASS;
       if (this._filtered['type'].includes(varType)) {
         row.className = TABLE_ROW_HIDDEN_CLASS;
@@ -286,48 +340,67 @@ export class VariableInspectorPanel
       }
 
       // Add delete icon and onclick event
-      let cell = row.insertCell(0);
+      let cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       cell.title = 'Delete Variable';
       cell.className = 'jp-VarInspector-deleteButton';
+      cell.gridColumn = '1';
+      const closeButton = document.createElement('jp-button') as Button;
+      closeButton.appearance = 'stealth';
       const ico = closeIcon.element();
+      ico.className = 'icon-button';
       ico.onclick = (ev: MouseEvent): any => {
-        this.source?.performDelete(name);
+        this.removeRow(name);
       };
-      cell.append(ico);
+      closeButton.append(ico);
+      cell.append(closeButton);
+      row.appendChild(cell);
 
       // Add onclick event for inspection
-      cell = row.insertCell(1);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       if (item.isMatrix) {
         cell.title = 'View Contents';
         cell.className = 'jp-VarInspector-inspectButton';
+        const searchButton = document.createElement('jp-button') as Button;
+        searchButton.appearance = 'stealth';
         const ico = searchIcon.element();
+        ico.className = 'icon-button';
         ico.onclick = (ev: MouseEvent): any => {
-          console.log('Click on ' + name);
           this._source
-            ?.performMatrixInspection(name)
+            ?.performMatrixInspection(item.varName)
             .then((model: DataModel) => {
-              this._showMatrix(model, name, varType);
+              this._showMatrix(model, item.varName, item.varType);
             });
         };
-        cell.append(ico);
+        searchButton.append(ico);
+        cell.append(searchButton);
       } else {
         cell.innerHTML = '';
       }
+      cell.gridColumn = '2';
+      row.appendChild(cell);
 
-      cell = row.insertCell(2);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       cell.className = TABLE_NAME_CLASS;
       cell.innerHTML = name;
+      cell.gridColumn = '3';
+      row.appendChild(cell);
 
       // Add remaining cells
-      cell = row.insertCell(3);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       cell.innerHTML = varType;
       cell.className = TABLE_TYPE_CLASS;
-      cell = row.insertCell(4);
+      cell.gridColumn = '4';
+      row.appendChild(cell);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       cell.innerHTML = item.varSize;
-      cell = row.insertCell(5);
+      cell.gridColumn = '5';
+      row.appendChild(cell);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       cell.innerHTML = item.varShape;
-      cell = row.insertCell(6);
+      cell.gridColumn = '6';
+      row.appendChild(cell);
 
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
       const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
         const model = new OutputAreaModel({ trusted: true });
@@ -340,6 +413,9 @@ export class VariableInspectorPanel
           '</br>'
         );
       }
+      cell.gridColumn = '7';
+      row.appendChild(cell);
+      this._table.appendChild(row);
     }
   }
 
@@ -392,25 +468,10 @@ namespace Private {
     );
   }
 
-  export function createTable(): HTMLTableElement {
-    const table = document.createElement('table');
-    table.createTHead();
-    const hrow = table.tHead!.insertRow(0) as HTMLTableRowElement;
-
-    const cell1 = hrow.insertCell(0);
-    cell1.innerHTML = '';
-    const cell2 = hrow.insertCell(1);
-    cell2.innerHTML = '';
-    const cell3 = hrow.insertCell(2);
-    cell3.innerHTML = 'Name';
-    const cell4 = hrow.insertCell(3);
-    cell4.innerHTML = 'Type';
-    const cell5 = hrow.insertCell(4);
-    cell5.innerHTML = 'Size';
-    const cell6 = hrow.insertCell(5);
-    cell6.innerHTML = 'Shape';
-    const cell7 = hrow.insertCell(6);
-    cell7.innerHTML = 'Content';
+  export function createTable(): WebDataGrid {
+    const table = document.createElement('jp-data-grid') as WebDataGrid;
+    table.generateHeader = 'sticky';
+    table.gridTemplateColumns = '1fr 1fr 6fr 4fr 4fr 5fr 16fr';
     return table;
   }
 
@@ -423,27 +484,27 @@ namespace Private {
   export function createFilterTable(): HTMLDivElement {
     const container = document.createElement('div');
     container.className = 'filter-container';
-    const filterType = document.createElement('select');
+    const filterType = document.createElement('jp-select') as Select;
     filterType.className = FILTER_TYPE_CLASS;
     filterType.selectedIndex = 0;
-    const varTypeOption = document.createElement('option');
+    const varTypeOption = document.createElement('jp-option') as Option;
     varTypeOption.value = 'type';
     varTypeOption.innerHTML = 'Type';
-    const nameOption = document.createElement('option');
+    const nameOption = document.createElement('jp-option') as Option;
     nameOption.value = 'name';
     nameOption.innerHTML = 'Name';
     filterType.appendChild(varTypeOption);
     filterType.appendChild(nameOption);
     const searchContainer = document.createElement('div');
     searchContainer.className = 'jp-InputGroup filter-search-container';
-    const input = document.createElement('input');
+    const input = document.createElement('jp-text-field') as TextField;
     input.setAttribute('type', 'text');
     input.setAttribute('placeholder', 'Filter out variable');
     input.className = FILTER_INPUT_CLASS;
-    const filterButton = document.createElement('button');
-    const buttonText = document.createTextNode('Filter');
-    filterButton.appendChild(buttonText);
+    const filterButton = document.createElement('jp-button') as Button;
+    filterButton.textContent = 'Filter';
     filterButton.className = FILTER_BUTTON_CLASS;
+    filterButton.appearance = 'accent';
     const list = document.createElement('ul');
     list.className = FILTER_LIST_CLASS;
 
@@ -459,18 +520,22 @@ namespace Private {
   export function createFilteredButton(
     filterName: string,
     filterType: FILTER_TYPES
-  ): HTMLButtonElement {
-    const filteredButton = document.createElement('button');
+  ): Button {
+    const filteredButton = document.createElement('jp-button') as Button;
     filteredButton.value = filterType;
     filteredButton.title = filterType;
+    filteredButton.className = FILTERED_BUTTON_CLASS;
+    const filterButtonContent = document.createElement('div');
+    filterButtonContent.className = 'filter-button-content';
     const buttonText = document.createElement('div');
     buttonText.className = 'filtered-variable-button-text';
     buttonText.innerHTML = filterName;
     const icon = closeIcon.element({
-      container: filteredButton
+      container: filterButtonContent
     });
-    filteredButton.appendChild(buttonText);
-    filteredButton.appendChild(icon);
+    filterButtonContent.appendChild(buttonText);
+    filterButtonContent.appendChild(icon);
+    filteredButton.appendChild(filterButtonContent);
     filteredButton.className = FILTERED_BUTTON_CLASS;
     return filteredButton;
   }
