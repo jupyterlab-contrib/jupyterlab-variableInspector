@@ -1,3 +1,5 @@
+import { addJupyterLabThemeChangeListener } from '@jupyter/web-components';
+
 import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
 import {
@@ -24,8 +26,7 @@ import { VariableInspectorManager } from './manager';
 import { VariableInspectorPanel } from './variableinspector';
 
 import { IVariableInspector, IVariableInspectorManager } from './tokens';
-import { addJupyterLabThemeChangeListener } from '@jupyter/web-components';
-addJupyterLabThemeChangeListener();
+
 namespace CommandIDs {
   export const open = 'variableinspector:open';
 }
@@ -44,6 +45,8 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
     restorer: ILayoutRestorer,
     labShell: ILabShell
   ): IVariableInspectorManager => {
+    addJupyterLabThemeChangeListener();
+
     const manager = new VariableInspectorManager();
     const category = 'Variable Inspector';
     const command = CommandIDs.open;

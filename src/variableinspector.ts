@@ -1,13 +1,3 @@
-import { OutputAreaModel, SimplifiedOutputArea } from '@jupyterlab/outputarea';
-
-import { closeIcon, searchIcon } from '@jupyterlab/ui-components';
-
-import { DataGrid, DataModel } from '@lumino/datagrid';
-
-import { DockLayout, Widget } from '@lumino/widgets';
-
-import { IVariableInspector } from './tokens';
-
 import {
   DataGrid as WebDataGrid,
   DataGridRow,
@@ -25,6 +15,24 @@ import {
   jpSelect,
   jpButton
 } from '@jupyter/web-components';
+
+import { OutputAreaModel, SimplifiedOutputArea } from '@jupyterlab/outputarea';
+
+import { closeIcon, searchIcon } from '@jupyterlab/ui-components';
+
+import { DataGrid, DataModel } from '@lumino/datagrid';
+
+import { DockLayout, Widget } from '@lumino/widgets';
+
+import {
+  FASTElement,
+  customElement,
+  html,
+  observable
+} from '@microsoft/fast-element';
+
+import { IVariableInspector } from './tokens';
+
 provideJupyterDesignSystem().register(
   jpDataGrid(),
   jpDataGridRow(),
@@ -51,6 +59,188 @@ const FILTER_LIST_CLASS = 'filter-list';
 const FILTERED_BUTTON_CLASS = 'filtered-variable-button';
 
 type FILTER_TYPES = 'type' | 'name';
+
+const template = html<VariableInspectorElement>`
+  <p>${x => x.title}</p>
+  <fieldset>
+    <legend>Filters</legend>
+
+    <div>
+      <jp-select>
+        <jp-option title="Filter on name">Name</jp-option>
+        <jp-option title="Filter on type">Type</jp-option>
+      </jp-select>
+      <jp-text-field placeholder="Variable filter"></jp-text-field>
+      <jp-button appearance="accent">Filter</jp-button>
+    </div>
+
+    <ul>
+      ${x => ''}
+    </ul>
+  </fieldset>
+  <jp-data-grid
+    generate-header="sticky"
+    grid-template-columns="1fr 1fr 6fr 4fr 5fr 16fr"
+  >
+    <jp-data-grid-row row-type="header">
+      <jp-data-grid-cell></jp-data-grid-cell>
+      <jp-data-grid-cell></jp-data-grid-cell>
+      <jp-data-grid-cell>Name</jp-data-grid-cell>
+      <jp-data-grid-cell>Type</jp-data-grid-cell>
+      <jp-data-grid-cell>Size</jp-data-grid-cell>
+      <jp-data-grid-cell>Shape</jp-data-grid-cell>
+      <jp-data-grid-cell>Content</jp-data-grid-cell>
+    </jp-data-grid-row>
+  </jp-data-grid>
+`;
+
+@customElement({
+  name: 'jp-variable-inspector',
+  template
+})
+export class VariableInspectorElement extends FASTElement {
+  @observable filters = new Array<{ name: string; type: string }>();
+
+  @observable variables: IVariableInspector.IInspectable | null = null;
+
+  @observable title = '';
+  
+  
+
+  protected onInspectorUpdate(
+    sender: any,
+    allArgs: IVariableInspector.IVariableInspectorUpdate
+  ): void {
+    if (!this.isAttached) {
+      return;
+    }
+
+    const title = allArgs.title;
+    const args = allArgs.payload;
+
+    if (title.contextName) {
+      this._title.innerHTML = title.contextName;
+    } else {
+      this._title.innerHTML =
+        "    Inspecting '" + title.kernelName + "' " + title.contextName;
+    }
+
+    this._table.innerHTML = '';
+    const headerRow = document.createElement('jp-data-grid-row') as DataGridRow;
+    headerRow.className = 'sticky-header';
+    const columns = [' ', ' ', 'NAME', 'TYPE', 'SIZE', 'SHAPE', 'CONTENT'];
+    for (let i = 0; i < columns.length; i++) {
+      const headerCell = document.createElement(
+        'jp-data-grid-cell'
+      ) as DataGridCell;
+      headerCell.className = 'column-header';
+      headerCell.textContent = columns[i];
+      headerCell.gridColumn = (i + 1).toString();
+      headerRow.appendChild(headerCell);
+    }
+    this._table.appendChild(headerRow);
+
+    //Render new variable state
+    for (let index = 0; index < args.length; index++) {
+      const item = args[index];
+      const name = item.varName;
+      const varType = item.varType;
+
+      const row = document.createElement('jp-data-grid-row') as DataGridRow;
+      row.className = TABLE_ROW_CLASS;
+      if (this._filtered['type'].includes(varType)) {
+        row.className = TABLE_ROW_HIDDEN_CLASS;
+      } else if (this.stringInFilter(name, 'name')) {
+        row.className = TABLE_ROW_HIDDEN_CLASS;
+      }
+
+      // Add delete icon and onclick event
+      let cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.title = 'Delete Variable';
+      cell.className = 'jp-VarInspector-deleteButton';
+      cell.gridColumn = '1';
+      const closeButton = document.createElement('jp-button') as Button;
+      closeButton.appearance = 'stealth';
+      const ico = closeIcon.element();
+      ico.className = 'icon-button';
+      ico.onclick = (ev: MouseEvent): any => {
+        this.removeRow(name);
+      };
+      closeButton.append(ico);
+      cell.append(closeButton);
+      row.appendChild(cell);
+
+      // Add onclick event for inspection
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      if (item.isMatrix) {
+        cell.title = 'View Contents';
+        cell.className = 'jp-VarInspector-inspectButton';
+        const searchButton = document.createElement('jp-button') as Button;
+        searchButton.appearance = 'stealth';
+        const ico = searchIcon.element();
+        ico.className = 'icon-button';
+        ico.onclick = (ev: MouseEvent): any => {
+          this._source
+            ?.performMatrixInspection(item.varName)
+            .then((model: DataModel) => {
+              this._showMatrix(model, item.varName, item.varType);
+            });
+        };
+        searchButton.append(ico);
+        cell.append(searchButton);
+      } else {
+        cell.innerHTML = '';
+      }
+      cell.gridColumn = '2';
+      row.appendChild(cell);
+
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.className = TABLE_NAME_CLASS;
+      cell.innerHTML = name;
+      cell.gridColumn = '3';
+      row.appendChild(cell);
+
+      // Add remaining cells
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.innerHTML = varType;
+      cell.className = TABLE_TYPE_CLASS;
+      cell.gridColumn = '4';
+      row.appendChild(cell);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.innerHTML = item.varSize;
+      cell.gridColumn = '5';
+      row.appendChild(cell);
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.innerHTML = item.varShape;
+      cell.gridColumn = '6';
+      row.appendChild(cell);
+
+      cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      const rendermime = this._source?.rendermime;
+      if (item.isWidget && rendermime) {
+        const model = new OutputAreaModel({ trusted: true });
+        const output = new SimplifiedOutputArea({ model, rendermime });
+        output.future = this._source!.performWidgetInspection(item.varName);
+        Widget.attach(output, cell);
+      } else {
+        cell.innerHTML = Private.escapeHtml(item.varContent).replace(
+          /\\n/g,
+          '</br>'
+        );
+      }
+      cell.gridColumn = '7';
+      row.appendChild(cell);
+      this._table.appendChild(row);
+    }
+  }
+
+  /**
+   * Handle source disposed signals.
+   */
+  protected onSourceDisposed(sender: any, args: void): void {
+    this.source = null;
+  }
+}
 
 /**
  * A panel that renders the variables
