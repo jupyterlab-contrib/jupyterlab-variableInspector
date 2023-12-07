@@ -38,6 +38,7 @@ provideJupyterDesignSystem().register(
 import wildcardMatch from 'wildcard-match';
 
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { PromiseDelegate } from '@lumino/coreutils';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
@@ -62,15 +63,17 @@ export class VariableInspectorPanel
   implements IVariableInspector
 {
   private _source: IVariableInspector.IInspectable | null = null;
-  private _settings: ISettingRegistry.ISettings;
+  private _settingsPromise:
+    | PromiseDelegate<ISettingRegistry.ISettings>
+    | undefined;
+  private _settings: ISettingRegistry.ISettings | undefined;
   private _table: WebDataGrid;
   private _filteredTable: HTMLDivElement;
   private _title: HTMLElement;
   private _filtered: { type: Array<string>; name: Array<string> };
 
-  constructor(settings: ISettingRegistry.ISettings) {
+  constructor() {
     super();
-    this._settings = settings;
     this.addClass(PANEL_CLASS);
     this._title = Private.createTitle();
     this._title.className = TITLE_CLASS;
@@ -82,7 +85,16 @@ export class VariableInspectorPanel
     this.node.appendChild(this._table as HTMLElement);
     this._filtered = { type: [], name: [] };
     this.intializeFilteredTable();
-    this.initalizeFilterButtons();
+  }
+
+  set settingsPromise(
+    settingPromise: PromiseDelegate<ISettingRegistry.ISettings>
+  ) {
+    this._settingsPromise = settingPromise;
+    this._settingsPromise.promise.then(settings => {
+      this._settings = settings;
+      this.initalizeFilterButtons();
+    });
   }
 
   //Sets up the filter table so when the filter button is pressed, a new filter is created
@@ -107,17 +119,25 @@ export class VariableInspectorPanel
 
   // Loads filters from ISettings
   protected loadFilters() {
-    this._filtered.type = this._settings.composite['filteredTypes'] as string[];
-    this._filtered.name = this._settings.composite['filteredNames'] as string[];
+    if (this._settings) {
+      this._filtered.type = this._settings.composite[
+        'filteredTypes'
+      ] as string[];
+      this._filtered.name = this._settings.composite[
+        'filteredNames'
+      ] as string[];
+    }
   }
 
   // Takes filters and saves them in ISettings
   protected setFilters(filterType: FILTER_TYPES | null = null) {
-    if (filterType === 'type' || !filterType) {
-      this._settings.set('filteredTypes', this._filtered.type);
-    }
-    if (filterType === 'name' || !filterType) {
-      this._settings.set('filteredNames', this._filtered.name);
+    if (this._settings) {
+      if (filterType === 'type' || !filterType) {
+        this._settings.set('filteredTypes', this._filtered.type);
+      }
+      if (filterType === 'name' || !filterType) {
+        this._settings.set('filteredNames', this._filtered.name);
+      }
     }
   }
 

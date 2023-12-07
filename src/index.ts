@@ -27,6 +27,7 @@ import { IVariableInspector, IVariableInspectorManager } from './tokens';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 
 import { addJupyterLabThemeChangeListener } from '@jupyter/web-components';
+import { PromiseDelegate } from '@lumino/coreutils';
 addJupyterLabThemeChangeListener();
 namespace CommandIDs {
   export const open = 'variableinspector:open';
@@ -53,19 +54,23 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
     const label = 'Open Variable Inspector';
     const namespace = 'variableinspector';
     const tracker = new WidgetTracker<VariableInspectorPanel>({ namespace });
-    let settings: ISettingRegistry.ISettings;
+    const settings = new PromiseDelegate<ISettingRegistry.ISettings>();
 
-    try {
-      settings = await settingRegistry.load(variableinspector.id);
-    } catch (error) {
-      console.error('Failed to load settings for the Git Extension', error);
-    }
+    Promise.all([settingRegistry.load(variableinspector.id), app.restored])
+      .then(returnArray => {
+        return settings.resolve(returnArray[0]);
+      })
+      .catch(error => {
+        console.error('Failed to load settings for the Git Extension', error);
+        settings.reject(error);
+      });
 
     /**
      * Create and track a new inspector.
      */
     function newPanel(): VariableInspectorPanel {
-      const panel = new VariableInspectorPanel(settings);
+      const panel = new VariableInspectorPanel();
+      panel.settingsPromise = settings;
 
       panel.id = 'jp-variableinspector';
       panel.title.label = 'Variable Inspector';
