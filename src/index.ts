@@ -24,7 +24,8 @@ import { VariableInspectorManager } from './manager';
 import { VariableInspectorPanel } from './variableinspector';
 
 import { IVariableInspector, IVariableInspectorManager } from './tokens';
-
+import { addJupyterLabThemeChangeListener } from '@jupyter/web-components';
+addJupyterLabThemeChangeListener();
 namespace CommandIDs {
   export const open = 'variableinspector:open';
 }
