@@ -10,6 +10,7 @@
   margin: auto;
   width: 100%;
   color: var(--jp-content-font-color1);
+  padding: 0 4px;
 }
 
 .jp-VarInspector-table td,
@@ -42,7 +43,7 @@
   font-size: var(--jp-ui-font-size1);
   color: var(--jp-content-font-color1);
   text-align: left;
-  padding-left: 10px;
+  padding: 4px 10px;
 }
 
 .filter-container {

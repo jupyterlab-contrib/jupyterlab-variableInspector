@@ -460,7 +460,7 @@ namespace Private {
     filterType.appendChild(varTypeOption);
     filterType.appendChild(nameOption);
     const searchContainer = document.createElement('div');
-    searchContainer.className = 'jp-InputGroup filter-search-container';
+    searchContainer.className = 'filter-search-container';
     const input = document.createElement('jp-text-field') as TextField;
     input.setAttribute('type', 'text');
     input.setAttribute('placeholder', 'Filter out variable');
@@ -494,11 +494,10 @@ namespace Private {
     const buttonText = document.createElement('div');
     buttonText.className = 'filtered-variable-button-text';
     buttonText.innerHTML = filterName;
-    const icon = closeIcon.element({
+    closeIcon.element({
       container: filterButtonContent
     });
-    filterButtonContent.appendChild(buttonText);
-    filterButtonContent.appendChild(icon);
+    filterButtonContent.insertAdjacentElement('afterbegin', buttonText);
     filteredButton.appendChild(filterButtonContent);
     filteredButton.className = FILTERED_BUTTON_CLASS;
     return filteredButton;
