@@ -16,6 +16,7 @@ import { ISignal, Signal } from '@lumino/signaling';
  */
 export class KernelConnector {
   private _session: ISessionContext;
+  private _kernelChanged = new Signal<KernelConnector, Promise<void>>(this);
   private _kernelRestarted = new Signal<this, Promise<void>>(this);
 
   constructor(options: KernelConnector.IOptions) {
@@ -32,6 +33,13 @@ export class KernelConnector {
         }
       }
     );
+    this._session.kernelChanged.connect(() =>
+      this._kernelChanged.emit(this._session.ready)
+    );
+  }
+
+  get kernelChanged(): ISignal<KernelConnector, Promise<void>> {
+    return this._kernelChanged;
   }
 
   get kernelRestarted(): ISignal<KernelConnector, Promise<void>> {
