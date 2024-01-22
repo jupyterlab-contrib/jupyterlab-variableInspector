@@ -110,24 +110,25 @@ export class VariableInspectionHandler extends AbstractHandler {
       });
     });
 
-    this._connector.kernelRestarted.connect(
-      (sender, kernelReady: Promise<void>) => {
-        const title: IVariableInspector.IVariableTitle = {
-          contextName: '<b>Restarting kernel...</b> '
-        };
-        this._inspected.emit({
-          title: title,
-          payload: []
-        } as IVariableInspector.IVariableInspectorUpdate);
+    const onKernelReset = (sender: unknown, kernelReady: Promise<void>) => {
+      const title: IVariableInspector.IVariableTitle = {
+        contextName: '<b>Waiting for kernel...</b> '
+      };
+      this._inspected.emit({
+        title: title,
+        payload: []
+      } as IVariableInspector.IVariableInspectorUpdate);
 
-        this._ready = kernelReady.then(() => {
-          this._initOnKernel().then((msg: KernelMessage.IExecuteReplyMsg) => {
-            this._connector.iopubMessage.connect(this._queryCall);
-            this.performInspection();
-          });
+      this._ready = kernelReady.then(() => {
+        this._initOnKernel().then((msg: KernelMessage.IExecuteReplyMsg) => {
+          this._connector.iopubMessage.connect(this._queryCall);
+          this.performInspection();
         });
-      }
-    );
+      });
+    };
+
+    this._connector.kernelRestarted.connect(onKernelReset);
+    this._connector.kernelChanged.connect(onKernelReset);
   }
 
   get id(): string {
