@@ -96,7 +96,25 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "lckr_jupyterlab_variableinspector/labextension"
+        "outputDir": "lckr_jupyterlab_variableinspector/labextension",
+        "sharedPackages": {
+            "@jupyter/web-components": {
+                "bundled": true,
+                "singleton": true
+            },
+            "@microsoft/fast-components": {
+                "bundled": true,
+                "singleton": true
+            },
+            "@microsoft/fast-element": {
+                "bundled": true,
+                "singleton": true
+            },
+            "@microsoft/fast-foundation": {
+                "bundled": true,
+                "singleton": true
+            }
+        }
     },
     "styleModule": "style/index.js",
     "eslintIgnore": [
