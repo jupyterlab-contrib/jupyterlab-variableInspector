@@ -475,16 +475,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyter/web-components@npm:^0.13.3":
-  version: 0.13.3
-  resolution: "@jupyter/web-components@npm:0.13.3"
+"@jupyter/web-components@npm:^0.13.3 || ^0.15.0":
+  version: 0.15.3
+  resolution: "@jupyter/web-components@npm:0.15.3"
   dependencies:
     "@microsoft/fast-colors": ^5.3.1
-    "@microsoft/fast-components": ^2.30.6
     "@microsoft/fast-element": ^1.12.0
-    "@microsoft/fast-foundation": ^2.49.0
-    "@microsoft/fast-web-utilities": ^6.0.0
-  checksum: 23a698f4a0cecc0536f8af54c57175fd276d731a8dd978fe52ada02a72679189096f4fff337279a38a75cfdd92c590f7295d3fd12b6e1c5e3241a4691137d214
+    "@microsoft/fast-foundation": ^2.49.4
+    "@microsoft/fast-web-utilities": ^5.4.1
+  checksum: a0980af934157bfdbdb6cc169c0816c1b2e57602d524c56bdcef746a4c25dfeb8f505150d83207c8695ed89b5486cf53d35a3382584d25ef64db666e4e16e45b
   languageName: node
   linkType: hard
 
@@ -1115,7 +1114,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@lckr/jupyterlab_variableinspector@workspace:."
   dependencies:
-    "@jupyter/web-components": ^0.13.3
+    "@jupyter/web-components": ^0.13.3 || ^0.15.0
     "@jupyterlab/application": ^4.0.0
     "@jupyterlab/apputils": ^4.0.0
     "@jupyterlab/builder": ^4.0.0
@@ -1470,42 +1469,36 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/fast-colors@npm:^5.3.0, @microsoft/fast-colors@npm:^5.3.1":
+"@microsoft/fast-colors@npm:^5.3.1":
   version: 5.3.1
   resolution: "@microsoft/fast-colors@npm:5.3.1"
   checksum: ff87f402faadb4b5aeee3d27762566c11807f927cd4012b8bbc7f073ca68de0e2197f95330ff5dfd7038f4b4f0e2f51b11feb64c5d570f5c598d37850a5daf60
   languageName: node
   linkType: hard
 
-"@microsoft/fast-components@npm:^2.30.6":
-  version: 2.30.6
-  resolution: "@microsoft/fast-components@npm:2.30.6"
-  dependencies:
-    "@microsoft/fast-colors": ^5.3.0
-    "@microsoft/fast-element": ^1.10.1
-    "@microsoft/fast-foundation": ^2.46.2
-    "@microsoft/fast-web-utilities": ^5.4.1
-    tslib: ^1.13.0
-  checksum: 1fbf3b7c265bcbf6abcae4d2f72430f7f871104a3d8344f16667a4cc7b123698cdf2bab8b760cbed92ef761c4db350a67f570665c76b132d6996990ac93cbd4f
-  languageName: node
-  linkType: hard
-
-"@microsoft/fast-element@npm:^1.10.1, @microsoft/fast-element@npm:^1.12.0":
+"@microsoft/fast-element@npm:^1.12.0":
   version: 1.12.0
   resolution: "@microsoft/fast-element@npm:1.12.0"
   checksum: bbff4e9c83106d1d74f3eeedc87bf84832429e78fee59c6a4ae8164ee4f42667503f586896bea72341b4d2c76c244a3cb0d4fd0d5d3732755f00357714dd609e
   languageName: node
   linkType: hard
 
-"@microsoft/fast-foundation@npm:^2.46.2, @microsoft/fast-foundation@npm:^2.49.0":
-  version: 2.49.4
-  resolution: "@microsoft/fast-foundation@npm:2.49.4"
+"@microsoft/fast-element@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "@microsoft/fast-element@npm:1.13.0"
+  checksum: 1cb7b4cfb7531116a3542d3f59bf1dd35106194f5764205403590250aaff744de79e35a5a1f36b4941c4eda9edc088148d4d629fb80be15fdf25f6be01770f3a
+  languageName: node
+  linkType: hard
+
+"@microsoft/fast-foundation@npm:^2.49.4":
+  version: 2.49.6
+  resolution: "@microsoft/fast-foundation@npm:2.49.6"
   dependencies:
-    "@microsoft/fast-element": ^1.12.0
+    "@microsoft/fast-element": ^1.13.0
     "@microsoft/fast-web-utilities": ^5.4.1
     tabbable: ^5.2.0
     tslib: ^1.13.0
-  checksum: e979cd500aaba28090e8d9cdc6192933db01803c13288c11aded89aa54da6f0a70256ff2f249754b1c95d9abad369a18401e1df98d672e2823b83cf4cd88ad55
+  checksum: 15fdf9dd0b910a72a9cff140f765d522304df11f8a78d5a97a815e2bbae25027c2b336e94f89ca31e650d6aabe17b590b7453acc0d2cb7340c219eb76350a942
   languageName: node
   linkType: hard
 
@@ -1515,15 +1508,6 @@ __metadata:
   dependencies:
     exenv-es6: ^1.1.1
   checksum: 303e87847f962944f474e3716c3eb305668243916ca9e0719e26bb9a32346144bc958d915c103776b3e552cea0f0f6233f839fad66adfdf96a8436b947288ca7
-  languageName: node
-  linkType: hard
-
-"@microsoft/fast-web-utilities@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@microsoft/fast-web-utilities@npm:6.0.0"
-  dependencies:
-    exenv-es6: ^1.1.1
-  checksum: b4b906dbbf626212446d5952c160b1f7e7ce72dd33087c7ed634cb2745c31767bab7d17fba0e9fc32e42984fc5bc0a9929b4f05cbbcbe52869abe3666b5bfa39
   languageName: node
   linkType: hard
 
