@@ -29,9 +29,19 @@ abstract class AbstractHandler implements IVariableInspector.IInspectable {
   >(this);
   protected _connector: KernelConnector;
   protected _rendermime: IRenderMimeRegistry | null = null;
+  private _enabled: boolean;
 
   constructor(connector: KernelConnector) {
     this._connector = connector;
+    this._enabled = false;
+  }
+
+  get enabled(): boolean {
+    return this._enabled;
+  }
+
+  set enabled(value: boolean) {
+    this._enabled = value;
   }
 
   get disposed(): ISignal<this, void> {
@@ -138,10 +148,15 @@ export class VariableInspectionHandler extends AbstractHandler {
   get ready(): Promise<void> {
     return this._ready;
   }
+
   /**
    * Performs an inspection by sending an execute request with the query command to the kernel.
    */
   performInspection(): void {
+    if (!this.enabled) {
+      return;
+    }
+
     const content: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._queryCommand,
       stop_on_error: false,

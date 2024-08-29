@@ -38,6 +38,7 @@ export namespace IVariableInspector {
   export interface IInspectable extends IObservableDisposable {
     inspected: ISignal<IInspectable, IVariableInspectorUpdate>;
     rendermime: IRenderMimeRegistry | null;
+    enabled: boolean;
     performInspection(): void;
     performMatrixInspection(
       varName: string,

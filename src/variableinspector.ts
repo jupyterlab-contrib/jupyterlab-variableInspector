@@ -36,6 +36,7 @@ provideJupyterDesignSystem().register(
 );
 
 import wildcardMatch from 'wildcard-match';
+import { Message } from '@lumino/messaging';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
@@ -233,12 +234,14 @@ export class VariableInspectorPanel
     }
     //Remove old subscriptions
     if (this._source) {
+      this._source.enabled = false;
       this._source.inspected.disconnect(this.onInspectorUpdate, this);
       this._source.disposed.disconnect(this.onSourceDisposed, this);
     }
     this._source = source;
     //Subscribe to new object
     if (this._source) {
+      this._source.enabled = true;
       this._source.inspected.connect(this.onInspectorUpdate, this);
       this._source.disposed.connect(this.onSourceDisposed, this);
       this._source.performInspection();
@@ -252,8 +255,18 @@ export class VariableInspectorPanel
     if (this.isDisposed) {
       return;
     }
+    if (this.source) {
+      this.source.enabled = false;
+    }
     this.source = null;
     super.dispose();
+  }
+
+  protected onCloseRequest(msg: Message): void {
+    super.onCloseRequest(msg);
+    if (this._source) {
+      this._source.enabled = false;
+    }
   }
 
   protected onInspectorUpdate(

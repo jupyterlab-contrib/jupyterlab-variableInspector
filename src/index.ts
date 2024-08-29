@@ -2,7 +2,6 @@ import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
 import {
   ILabShell,
-  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
@@ -35,13 +34,12 @@ namespace CommandIDs {
  */
 const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
   id: '@lckr/jupyterlab_variableinspector',
-  requires: [ICommandPalette, ILayoutRestorer, ILabShell],
+  requires: [ICommandPalette, ILabShell],
   provides: IVariableInspectorManager,
   autoStart: true,
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
-    restorer: ILayoutRestorer,
     labShell: ILabShell
   ): IVariableInspectorManager => {
     const manager = new VariableInspectorManager();
@@ -72,13 +70,6 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
 
       return panel;
     }
-
-    // Enable state restoration
-    restorer.restore(tracker, {
-      command,
-      args: () => ({}),
-      name: () => 'variableinspector'
-    });
 
     // Add command to palette
     app.commands.addCommand(command, {

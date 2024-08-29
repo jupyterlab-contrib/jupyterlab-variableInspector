@@ -176,10 +176,10 @@ def _jupyterlab_variableinspector_dict_list():
     vardic = [
         {
             'varName': _v,
-            'varType': type(eval(_v)).__name__, 
-            'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(_v))), 
-            'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(_v))) if _jupyterlab_variableinspector_getshapeof(eval(_v)) else '', 
-            'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))), 
+            'varType': type(eval(_v)).__name__,
+            'varSize': str(_jupyterlab_variableinspector_getsizeof(eval(_v))),
+            'varShape': str(_jupyterlab_variableinspector_getshapeof(eval(_v))) if _jupyterlab_variableinspector_getshapeof(eval(_v)) else '',
+            'varContent': str(_jupyterlab_variableinspector_getcontentof(eval(_v))),
             'isMatrix': _jupyterlab_variableinspector_is_matrix(eval(_v)),
             'isWidget': _jupyterlab_variableinspector_is_widget(type(eval(_v)))
         }
@@ -226,7 +226,7 @@ def _jupyterlab_variableinspector_displaywidget(widget):
 
 
 def _jupyterlab_variableinspector_default(o):
-    if isinstance(o, __np.number): return int(o)  
+    if isinstance(o, __np.number): return int(o)
     raise TypeError
 
 
@@ -236,10 +236,10 @@ def _jupyterlab_variableinspector_deletevariable(x):
 
   static r_script = `library(repr)
 
-.ls.objects = function (pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE, 
-    n = 5) 
+.ls.objects = function (pos = 1, pattern, order.by, decreasing = FALSE, head = FALSE,
+    n = 5)
 {
-    napply <- function(names, fn) sapply(names, function(x) fn(get(x, 
+    napply <- function(names, fn) sapply(names, function(x) fn(get(x,
         pos = pos)))
     names <- ls(pos = pos, pattern = pattern)
     if (length(names) == 0) {
@@ -251,11 +251,11 @@ def _jupyterlab_variableinspector_deletevariable(x):
     obj.size <- napply(names, object.size)
     obj.dim <- t(napply(names, function(x) as.numeric(dim(x))[1:2]))
     obj.content <- rep("NA", length(names))
-    has_no_dim <- is.na(obj.dim)[1:length(names)]                        
+    has_no_dim <- is.na(obj.dim)[1:length(names)]
     obj.dim[has_no_dim, 1] <- napply(names, length)[has_no_dim]
     vec <- (obj.type != "function")
     obj.content[vec] <- napply(names[vec], function(x) toString(x, width = 154)[1])
-                      
+
     obj.rownames <- napply(names, rownames)
     has_rownames <- obj.rownames != "NULL"
     obj.rownames <- sapply(obj.rownames[has_rownames], function(x) paste(x,
@@ -264,24 +264,24 @@ def _jupyterlab_variableinspector_deletevariable(x):
     obj.rownames <- ifelse(nchar(obj.rownames) > 154, obj.rownames.short, obj.rownames)
     obj.rownames <- sapply(obj.rownames, function(x) paste("Row names: ",x))
     obj.content[has_rownames] <- obj.rownames
-                               
-                               
+
+
     obj.colnames <- napply(names, colnames)
     has_colnames <- obj.colnames != "NULL"
-    obj.colnames <- sapply(obj.colnames[has_colnames], function(x) paste(x, 
+    obj.colnames <- sapply(obj.colnames[has_colnames], function(x) paste(x,
         collapse = ", "))
-    obj.colnames.short <- sapply(obj.colnames, function(x) paste(substr(x, 
+    obj.colnames.short <- sapply(obj.colnames, function(x) paste(substr(x,
         1, 150), "...."))
-    obj.colnames <- ifelse(nchar(obj.colnames) > 154, obj.colnames.short, 
+    obj.colnames <- ifelse(nchar(obj.colnames) > 154, obj.colnames.short,
         obj.colnames)
     obj.colnames <- sapply(obj.colnames, function(x) paste("Column names: ",x))
-                    
+
     obj.content[has_colnames] <- obj.colnames
-                           
+
     is_function <- (obj.type == "function")
     obj.content[is_function] <- napply(names[is_function], function(x) paste(strsplit(repr_text(x),")")[[1]][1],")",sep=""))
     obj.content <- unlist(obj.content, use.names = FALSE)
-    
+
 
     out <- data.frame(obj.type, obj.size, obj.dim)
     names(out) <- c("varType", "varSize", "Rows", "Columns")
@@ -292,10 +292,10 @@ def _jupyterlab_variableinspector_deletevariable(x):
     out <- out[, !(names(out) %in% c("Rows", "Columns"))]
     rownames(out) <- NULL
     print(out)
-    if (!missing(order.by)) 
-        out <- out[order(out[[order.by]], decreasing = decreasing), 
+    if (!missing(order.by))
+        out <- out[order(out[[order.by]], decreasing = decreasing),
             ]
-    if (head) 
+    if (head)
         out <- head(out, n)
     jsonlite::toJSON(out)
 }
