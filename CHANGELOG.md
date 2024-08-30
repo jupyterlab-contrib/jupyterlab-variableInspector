@@ -2,6 +2,34 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.2.2
+
+([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.1...aecd6baa8ac0af81bb21a221c6b156ab84e161ae))
+
+### Enhancements made
+
+- Small speedup improvement on the inspection logic in Python [#311](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/311) ([@martinRenou](https://github.com/martinRenou))
+- Lazy inspection [#309](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/309) ([@martinRenou](https://github.com/martinRenou))
+
+### Maintenance and upkeep improvements
+
+- Update release workflows [#314](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/314) ([@krassowski](https://github.com/krassowski))
+- CI: Fix visual regression tests [#310](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/310) ([@martinRenou](https://github.com/martinRenou))
+- Updated integration tests workflow [#306](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/306) ([@krassowski](https://github.com/krassowski))
+- Bump ws from 8.14.2 to 8.17.1 in /ui-tests [#305](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/305) ([@dependabot](https://github.com/dependabot))
+- Set `packageManager` in package.json [#304](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/304) ([@fcollonval](https://github.com/fcollonval))
+- Bump braces from 3.0.2 to 3.0.3 [#303](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/303) ([@dependabot](https://github.com/dependabot))
+- Bump tar from 6.2.0 to 6.2.1 in /ui-tests [#301](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/301) ([@dependabot](https://github.com/dependabot))
+- Bump ip from 2.0.0 to 2.0.1 in /ui-tests [#299](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/299) ([@dependabot](https://github.com/dependabot))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-01-23&to=2024-08-30&type=c))
+
+[@dependabot](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Adependabot+updated%3A2024-01-23..2024-08-30&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Afcollonval+updated%3A2024-01-23..2024-08-30&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Agithub-actions+updated%3A2024-01-23..2024-08-30&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Akrassowski+updated%3A2024-01-23..2024-08-30&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3AmartinRenou+updated%3A2024-01-23..2024-08-30&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.2.1
 
 ([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.0...e200a2bf9bdb0cdd9a12dd7885cab532a1dacef3))
@@ -15,8 +43,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-01-23&to=2024-01-23&type=c))
 
 [@fcollonval](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Afcollonval+updated%3A2024-01-23..2024-01-23&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.2.0
 
