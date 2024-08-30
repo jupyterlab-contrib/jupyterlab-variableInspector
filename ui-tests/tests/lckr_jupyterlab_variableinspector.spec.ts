@@ -5,7 +5,7 @@ test('test', async ({ page }) => {
   await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
   await page.getByLabel('notebook content').getByRole('textbox').fill('a = 1');
   await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(2).fill('b = "hello"');
+  await page.getByRole('textbox').nth(1).fill('b = "hello"');
   await page.keyboard.press('Control+Enter');
 
   await page.getByRole('tabpanel').click({
@@ -48,7 +48,7 @@ test('variable filter', async ({ page }) => {
   await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
   await page.getByLabel('notebook content').getByRole('textbox').fill('a1 = 1');
   await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(2).fill('b1 = "hello"');
+  await page.getByRole('textbox').nth(1).fill('b1 = "hello"');
   await page.keyboard.press('Control+Enter');
 
   await page.getByRole('tabpanel').click({
