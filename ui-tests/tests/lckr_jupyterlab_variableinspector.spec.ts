@@ -5,7 +5,7 @@ test('test', async ({ page }) => {
   await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
   await page.getByLabel('notebook content').getByRole('textbox').fill('a = 1');
   await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(2).fill('b = "hello"');
+  await page.getByRole('textbox').nth(1).fill('b = "hello"');
   await page.keyboard.press('Control+Enter');
 
   await page.getByRole('tabpanel').click({
@@ -23,7 +23,7 @@ test('test', async ({ page }) => {
     .soft(firstRow.locator('.jp-VarInspector-type'))
     .toHaveText(/int/);
   await expect
-    .soft(firstRow.locator('jp-data-grid-cell').nth(4))
+    .soft(firstRow.locator('jp-data-grid-cell').nth(3))
     .toHaveText(/\d\d/);
   await expect
     .soft(firstRow.locator('jp-data-grid-cell').last())
@@ -36,7 +36,7 @@ test('test', async ({ page }) => {
     .soft(secondRow.locator('.jp-VarInspector-type'))
     .toHaveText(/str/);
   await expect
-    .soft(secondRow.locator('jp-data-grid-cell').nth(4))
+    .soft(secondRow.locator('jp-data-grid-cell').nth(3))
     .toHaveText(/\d\d/);
   await expect
     .soft(secondRow.locator('jp-data-grid-cell').last())
@@ -48,7 +48,7 @@ test('variable filter', async ({ page }) => {
   await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
   await page.getByLabel('notebook content').getByRole('textbox').fill('a1 = 1');
   await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(2).fill('b1 = "hello"');
+  await page.getByRole('textbox').nth(1).fill('b1 = "hello"');
   await page.keyboard.press('Control+Enter');
 
   await page.getByRole('tabpanel').click({
@@ -68,7 +68,7 @@ test('variable filter', async ({ page }) => {
   await expect.soft(bRow.locator('.jp-VarInspector-varName')).toHaveText(/b1/);
   await expect.soft(bRow.locator('.jp-VarInspector-type')).toHaveText(/str/);
   await expect
-    .soft(bRow.locator('jp-data-grid-cell').nth(4))
+    .soft(bRow.locator('jp-data-grid-cell').nth(3))
     .toHaveText(/\d\d/);
   await expect
     .soft(bRow.locator('jp-data-grid-cell').last())
@@ -105,7 +105,7 @@ test('variable filter', async ({ page }) => {
   await expect.soft(aRow.locator('.jp-VarInspector-varName')).toHaveText(/a1/);
   await expect.soft(aRow.locator('.jp-VarInspector-type')).toHaveText(/int/);
   await expect
-    .soft(aRow.locator('jp-data-grid-cell').nth(4))
+    .soft(aRow.locator('jp-data-grid-cell').nth(3))
     .toHaveText(/\d\d/);
   await expect.soft(aRow.locator('jp-data-grid-cell').last()).toHaveText(/1/);
 });
