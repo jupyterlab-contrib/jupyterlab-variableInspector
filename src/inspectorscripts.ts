@@ -152,7 +152,7 @@ def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
         try:
             obj = eval(v)
-            if isinstance(obj, str):
+            if isinstance(obj, (bool, str, list, int, float, type(None))):
                 return True
             if __tf and isinstance(obj, __tf.Variable):
                 return True
