@@ -269,6 +269,14 @@ export class VariableInspectorPanel
     }
   }
 
+  protected onAfterShow(msg: Message): void {
+    super.onAfterShow(msg);
+    if (this._source) {
+      this._source.enabled = true;
+      this._source.performInspection();
+    }
+  }
+
   protected onInspectorUpdate(
     sender: any,
     allArgs: IVariableInspector.IVariableInspectorUpdate
