@@ -101,7 +101,14 @@ def _jupyterlab_variableinspector_getshapeof(x):
 def _jupyterlab_variableinspector_getcontentof(x):
     # returns content in a friendly way for python variables
     # pandas and numpy
-    if __pd and isinstance(x, __pd.DataFrame):
+    if isinstance(x, (bool, str, int, float, type(None))):
+        content = str(x)
+    elif isinstance(x, (list, tuple)):
+        if len(x) < 10:
+            content = str(x)
+        else:
+            content = f"[{x[0]}, {x[1]}, {x[2]}, ..., {x[-1]}]"
+    elif __pd and isinstance(x, __pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
         content = "Columns: %s" % colnames
     elif __pd and isinstance(x, __pd.Series):
@@ -152,7 +159,7 @@ def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
         try:
             obj = eval(v)
-            if isinstance(obj, (bool, str, list, int, float, type(None))):
+            if isinstance(obj, (bool, str, list, tuple, int, float, type(None))):
                 return True
             if __tf and isinstance(obj, __tf.Variable):
                 return True
