@@ -23,7 +23,7 @@ test('test', async ({ page }) => {
     .soft(firstRow.locator('.jp-VarInspector-type'))
     .toHaveText(/int/);
   await expect
-    .soft(firstRow.locator('jp-data-grid-cell').nth(3))
+    .soft(firstRow.locator('jp-data-grid-cell').nth(4))
     .toHaveText(/\d\d/);
   await expect
     .soft(firstRow.locator('jp-data-grid-cell').last())
@@ -36,7 +36,7 @@ test('test', async ({ page }) => {
     .soft(secondRow.locator('.jp-VarInspector-type'))
     .toHaveText(/str/);
   await expect
-    .soft(secondRow.locator('jp-data-grid-cell').nth(3))
+    .soft(secondRow.locator('jp-data-grid-cell').nth(4))
     .toHaveText(/\d\d/);
   await expect
     .soft(secondRow.locator('jp-data-grid-cell').last())
@@ -68,7 +68,7 @@ test('variable filter', async ({ page }) => {
   await expect.soft(bRow.locator('.jp-VarInspector-varName')).toHaveText(/b1/);
   await expect.soft(bRow.locator('.jp-VarInspector-type')).toHaveText(/str/);
   await expect
-    .soft(bRow.locator('jp-data-grid-cell').nth(3))
+    .soft(bRow.locator('jp-data-grid-cell').nth(4))
     .toHaveText(/\d\d/);
   await expect
     .soft(bRow.locator('jp-data-grid-cell').last())
@@ -105,7 +105,7 @@ test('variable filter', async ({ page }) => {
   await expect.soft(aRow.locator('.jp-VarInspector-varName')).toHaveText(/a1/);
   await expect.soft(aRow.locator('.jp-VarInspector-type')).toHaveText(/int/);
   await expect
-    .soft(aRow.locator('jp-data-grid-cell').nth(3))
+    .soft(aRow.locator('jp-data-grid-cell').nth(4))
     .toHaveText(/\d\d/);
   await expect.soft(aRow.locator('jp-data-grid-cell').last()).toHaveText(/1/);
 });
