@@ -16,6 +16,8 @@ export abstract class Languages {
   static py_script = `import json
 import sys
 from importlib import __import__
+from itertools import islice
+import collections
 from IPython import get_ipython
 from IPython.core.magics.namespace import NamespaceMagics
 
@@ -108,6 +110,17 @@ def _jupyterlab_variableinspector_getcontentof(x):
             content = str(x)
         else:
             content = f"[{x[0]}, {x[1]}, {x[2]}, ..., {x[-1]}]"
+    elif isinstance(x, collections.abc.Mapping):
+        if len(x.keys()) < 10:
+            content = str(x)
+        else:
+            first_ten_keys = list(islice(x.keys(), 10))
+            content = "{"
+            for idx, key in enumerate(first_ten_keys):
+                if idx > 0:
+                    content += ", "
+                content += f'"{key}": {x[key]}'
+            content += ", ...}"
     elif __pd and isinstance(x, __pd.DataFrame):
         colnames = ', '.join(x.columns.map(str))
         content = "Columns: %s" % colnames
@@ -159,7 +172,7 @@ def _jupyterlab_variableinspector_dict_list():
     def keep_cond(v):
         try:
             obj = eval(v)
-            if isinstance(obj, (bool, str, list, tuple, int, float, type(None))):
+            if isinstance(obj, (bool, str, list, tuple, collections.abc.Mapping, int, float, type(None))):
                 return True
             if __tf and isinstance(obj, __tf.Variable):
                 return True
