@@ -53,6 +53,10 @@ export namespace IVariableInspector {
     performDelete(varName: string): void;
   }
 
+  export interface ISettings {
+    maxItems: number;
+  }
+
   export interface IVariableInspectorUpdate {
     title: IVariableTitle;
     payload: Array<IVariable>;
@@ -67,6 +71,7 @@ export namespace IVariableInspector {
     isMatrix: boolean;
     isWidget: boolean;
   }
+
   export interface IVariableTitle {
     kernelName?: string;
     contextName?: string; //Context currently reserved for special information.

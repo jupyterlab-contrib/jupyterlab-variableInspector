@@ -96,6 +96,7 @@
         "yjs": "^13.5.40"
     },
     "jupyterlab": {
+        "schemaDir": "schema",
         "extension": true,
         "outputDir": "lckr_jupyterlab_variableinspector/labextension",
         "sharedPackages": {

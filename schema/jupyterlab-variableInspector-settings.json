@@ -1,0 +1,15 @@
+{
+  "jupyter.lab.setting-icon": "ui-components:list",
+  "title": "Variable Inspector",
+  "description": "Settings for the jupyterlab-variableInspector extension.",
+  "type": "object",
+  "properties": {
+    "maxItems": {
+      "type": "number",
+      "minimum": 0,
+      "title": "Maximum number of items",
+      "description": "The maximum number of items to show in lists/dicts etc",
+      "default": 10
+    }
+  }
+}
