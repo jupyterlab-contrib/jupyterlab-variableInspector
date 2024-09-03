@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.2.3
+
+([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.2...3f3853d9ba99eb2f3c2e9d6e045a708ebddc9353))
+
+### Enhancements made
+
+- Some more performance improvements [#313](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/313) ([@martinRenou](https://github.com/martinRenou))
+
+### Maintenance and upkeep improvements
+
+- Bump webpack from 5.89.0 to 5.94.0 [#316](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/316) ([@dependabot](https://github.com/dependabot))
+- Bump micromatch from 4.0.5 to 4.0.8 [#315](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/315) ([@dependabot](https://github.com/dependabot))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-08-30&to=2024-09-03&type=c))
+
+[@dependabot](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Adependabot+updated%3A2024-08-30..2024-09-03&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Agithub-actions+updated%3A2024-08-30..2024-09-03&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3AmartinRenou+updated%3A2024-08-30..2024-09-03&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.2.2
 
 ([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.1...aecd6baa8ac0af81bb21a221c6b156ab84e161ae))
@@ -27,8 +48,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-01-23&to=2024-08-30&type=c))
 
 [@dependabot](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Adependabot+updated%3A2024-01-23..2024-08-30&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Afcollonval+updated%3A2024-01-23..2024-08-30&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Agithub-actions+updated%3A2024-01-23..2024-08-30&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Akrassowski+updated%3A2024-01-23..2024-08-30&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3AmartinRenou+updated%3A2024-01-23..2024-08-30&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.2.1
 
