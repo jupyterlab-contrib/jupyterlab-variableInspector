@@ -1,3 +1,5 @@
+import { IVariableInspector } from './tokens';
+
 export namespace Languages {
   export type LanguageModel = {
     initScript: string;
@@ -5,6 +7,7 @@ export namespace Languages {
     matrixQueryCommand: string;
     widgetQueryCommand: string;
     deleteCommand: string;
+    changeSettingsCommand?: (settings: IVariableInspector.ISettings) => string;
   };
 }
 
@@ -25,6 +28,8 @@ from IPython.core.magics.namespace import NamespaceMagics
 _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
 _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
+
+_jupyterlab_variableinspector_maxitems = 10
 
 __np = None
 __pd = None
@@ -54,6 +59,12 @@ def _check_imported():
     __torch = _attempt_import('torch')
     __ipywidgets = _attempt_import('ipywidgets')
     __xr = _attempt_import('xarray')
+
+
+def _jupyterlab_variableinspector_changesettings(maxitems, **kwargs):
+    global _jupyterlab_variableinspector_maxitems
+
+    _jupyterlab_variableinspector_maxitems = maxitems
 
 
 def _jupyterlab_variableinspector_getsizeof(x):
@@ -106,15 +117,18 @@ def _jupyterlab_variableinspector_getcontentof(x):
     if isinstance(x, (bool, str, int, float, type(None))):
         content = str(x)
     elif isinstance(x, (list, tuple)):
-        if len(x) < 10:
+        if len(x) <= _jupyterlab_variableinspector_maxitems:
             content = str(x)
         else:
-            content = f"[{x[0]}, {x[1]}, {x[2]}, ..., {x[-1]}]"
+            content = "["
+            for i in range(_jupyterlab_variableinspector_maxitems):
+                content += f"{x[i]}, "
+            content += "...]"
     elif isinstance(x, collections.abc.Mapping):
-        if len(x.keys()) < 10:
+        if len(x.keys()) <= _jupyterlab_variableinspector_maxitems:
             content = str(x)
         else:
-            first_ten_keys = list(islice(x.keys(), 10))
+            first_ten_keys = list(islice(x.keys(), _jupyterlab_variableinspector_maxitems))
             content = "{"
             for idx, key in enumerate(first_ten_keys):
                 if idx > 0:
@@ -331,21 +345,27 @@ def _jupyterlab_variableinspector_deletevariable(x):
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
+      changeSettingsCommand: (settings: IVariableInspector.ISettings) =>
+        `_jupyterlab_variableinspector_changesettings(maxitems=${settings.maxItems})`
     },
     python2: {
       initScript: Languages.py_script,
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
+      changeSettingsCommand: (settings: IVariableInspector.ISettings) =>
+        `_jupyterlab_variableinspector_changesettings(maxitems=${settings.maxItems})`
     },
     python: {
       initScript: Languages.py_script,
       queryCommand: '_jupyterlab_variableinspector_dict_list()',
       matrixQueryCommand: '_jupyterlab_variableinspector_getmatrixcontent',
       widgetQueryCommand: '_jupyterlab_variableinspector_displaywidget',
-      deleteCommand: '_jupyterlab_variableinspector_deletevariable'
+      deleteCommand: '_jupyterlab_variableinspector_deletevariable',
+      changeSettingsCommand: (settings: IVariableInspector.ISettings) =>
+        `_jupyterlab_variableinspector_changesettings(maxitems=${settings.maxItems})`
     },
     R: {
       initScript: Languages.r_script,

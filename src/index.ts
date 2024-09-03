@@ -11,6 +11,8 @@ import { IConsoleTracker } from '@jupyterlab/console';
 
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
 import { listIcon } from '@jupyterlab/ui-components';
 
 import { DummyHandler, VariableInspectionHandler } from './handler';
@@ -29,6 +31,9 @@ addJupyterLabThemeChangeListener();
 namespace CommandIDs {
   export const open = 'variableinspector:open';
 }
+
+const SETTINGS_ID =
+  '@lckr/jupyterlab_variableinspector:jupyterlab-variableInspector-settings';
 
 /**
  * A service providing variable introspection.
@@ -110,17 +115,24 @@ const variableinspector: JupyterFrontEndPlugin<IVariableInspectorManager> = {
  */
 const consoles: JupyterFrontEndPlugin<void> = {
   id: '@lckr/jupyterlab-variableinspector:consoles',
-  requires: [IVariableInspectorManager, IConsoleTracker, ILabShell],
+  requires: [
+    IVariableInspectorManager,
+    IConsoleTracker,
+    ILabShell,
+    ISettingRegistry
+  ],
   autoStart: true,
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     manager: IVariableInspectorManager,
     consoles: IConsoleTracker,
-    labShell: ILabShell
-  ): void => {
+    labShell: ILabShell,
+    settings: ISettingRegistry
+  ): Promise<void> => {
     const handlers: {
       [id: string]: Promise<IVariableInspector.IInspectable>;
     } = {};
+    const setting = await settings.load(SETTINGS_ID);
 
     /**
      * Subscribes to the creation of new consoles. If a new notebook is created, build a new handler for the consoles.
@@ -150,15 +162,18 @@ const consoles: JupyterFrontEndPlugin<void> = {
             const matrixQueryCommand = result.matrixQueryCommand;
             const widgetQueryCommand = result.widgetQueryCommand;
             const deleteCommand = result.deleteCommand;
+            const changeSettingsCommand = result.changeSettingsCommand;
 
             const options: VariableInspectionHandler.IOptions = {
-              queryCommand: queryCommand,
-              matrixQueryCommand: matrixQueryCommand,
+              queryCommand,
+              matrixQueryCommand,
               widgetQueryCommand,
-              deleteCommand: deleteCommand,
-              connector: connector,
-              initScript: initScript,
-              id: session.path //Using the sessions path as an identifier for now.
+              deleteCommand,
+              connector,
+              initScript,
+              changeSettingsCommand,
+              id: session.path, //Using the sessions path as an identifier for now.
+              setting
             };
             const handler = new VariableInspectionHandler(options);
             manager.addHandler(handler);
@@ -222,15 +237,22 @@ const consoles: JupyterFrontEndPlugin<void> = {
  */
 const notebooks: JupyterFrontEndPlugin<void> = {
   id: '@lckr/jupyterlab-variableinspector:notebooks',
-  requires: [IVariableInspectorManager, INotebookTracker, ILabShell],
+  requires: [
+    IVariableInspectorManager,
+    INotebookTracker,
+    ILabShell,
+    ISettingRegistry
+  ],
   autoStart: true,
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     manager: IVariableInspectorManager,
     notebooks: INotebookTracker,
-    labShell: ILabShell
-  ): void => {
+    labShell: ILabShell,
+    settings: ISettingRegistry
+  ): Promise<void> => {
     const handlers: { [id: string]: Promise<VariableInspectionHandler> } = {};
+    const setting = await settings.load(SETTINGS_ID);
 
     /**
      * Subscribes to the creation of new notebooks. If a new notebook is created, build a new handler for the notebook.
@@ -256,16 +278,19 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           const matrixQueryCommand = result.matrixQueryCommand;
           const widgetQueryCommand = result.widgetQueryCommand;
           const deleteCommand = result.deleteCommand;
+          const changeSettingsCommand = result.changeSettingsCommand;
 
           const options: VariableInspectionHandler.IOptions = {
-            queryCommand: queryCommand,
-            matrixQueryCommand: matrixQueryCommand,
+            queryCommand,
+            matrixQueryCommand,
             widgetQueryCommand,
-            deleteCommand: deleteCommand,
-            connector: connector,
+            deleteCommand,
+            connector,
             rendermime,
-            initScript: initScript,
-            id: session.path //Using the sessions path as an identifier for now.
+            initScript,
+            changeSettingsCommand,
+            id: session.path, //Using the sessions path as an identifier for now.
+            setting
           };
           const handler = new VariableInspectionHandler(options);
           manager.addHandler(handler);

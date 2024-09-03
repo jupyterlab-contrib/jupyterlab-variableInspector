@@ -1,5 +1,7 @@
 import { ISessionContext } from '@jupyterlab/apputils';
 
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+
 import { IExecuteResult } from '@jupyterlab/nbformat';
 
 import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
@@ -100,8 +102,12 @@ export class VariableInspectionHandler extends AbstractHandler {
   private _matrixQueryCommand: string;
   private _widgetQueryCommand: string;
   private _deleteCommand: string;
+  private _changeSettingsCommand:
+    | ((settings: IVariableInspector.ISettings) => string)
+    | undefined;
   private _ready: Promise<void>;
   private _id: string;
+  private _setting: ISettingRegistry.ISettings;
 
   constructor(options: VariableInspectionHandler.IOptions) {
     super(options.connector);
@@ -110,11 +116,14 @@ export class VariableInspectionHandler extends AbstractHandler {
     this._queryCommand = options.queryCommand;
     this._matrixQueryCommand = options.matrixQueryCommand;
     this._widgetQueryCommand = options.widgetQueryCommand;
+    this._changeSettingsCommand = options.changeSettingsCommand;
     this._deleteCommand = options.deleteCommand;
     this._initScript = options.initScript;
+    this._setting = options.setting;
 
     this._ready = this._connector.ready.then(() => {
       this._initOnKernel().then((msg: KernelMessage.IExecuteReplyMsg) => {
+        this.performSettingsChange();
         this._connector.iopubMessage.connect(this._queryCall);
         return;
       });
@@ -131,11 +140,19 @@ export class VariableInspectionHandler extends AbstractHandler {
 
       this._ready = kernelReady.then(() => {
         this._initOnKernel().then((msg: KernelMessage.IExecuteReplyMsg) => {
+          this.performSettingsChange();
           this._connector.iopubMessage.connect(this._queryCall);
           this.performInspection();
         });
       });
     };
+
+    this._setting.changed.connect(async () => {
+      await this._ready;
+
+      this.performSettingsChange();
+      this.performInspection();
+    });
 
     this._connector.kernelRestarted.connect(onKernelReset);
     this._connector.kernelChanged.connect(onKernelReset);
@@ -225,6 +242,27 @@ export class VariableInspectionHandler extends AbstractHandler {
   performDelete(varName: string): void {
     const content: KernelMessage.IExecuteRequestMsg['content'] = {
       code: this._deleteCommand + "('" + varName + "')",
+      stop_on_error: false,
+      store_history: false
+    };
+
+    this._connector.fetch(content, this._handleQueryResponse);
+  }
+
+  /**
+   * Send a kernel request to change settings
+   */
+  performSettingsChange(): void {
+    if (!this._changeSettingsCommand) {
+      return;
+    }
+
+    const settings: IVariableInspector.ISettings = {
+      maxItems: this._setting.get('maxItems').composite as number
+    };
+
+    const content: KernelMessage.IExecuteRequestMsg['content'] = {
+      code: this._changeSettingsCommand(settings),
       stop_on_error: false,
       store_history: false
     };
@@ -344,9 +382,11 @@ export namespace VariableInspectionHandler {
     queryCommand: string;
     matrixQueryCommand: string;
     widgetQueryCommand: string;
+    changeSettingsCommand?(settings: IVariableInspector.ISettings): string;
     deleteCommand: string;
     initScript: string;
     id: string;
+    setting: ISettingRegistry.ISettings;
   }
 }
 
