@@ -2,6 +2,23 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.2.4
+
+([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.3...dd7e6954cc20cc2273a635d9acf803efb2e34595))
+
+### Enhancements made
+
+- Lazily import modules like numpy/pandas/keras [#320](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/320) ([@martinRenou](https://github.com/martinRenou))
+- Improve pandas dataframe inspection [#319](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/pull/319) ([@martinRenou](https://github.com/martinRenou))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-09-03&to=2024-09-05&type=c))
+
+[@github-actions](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Agithub-actions+updated%3A2024-09-03..2024-09-05&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3AmartinRenou+updated%3A2024-09-03..2024-09-05&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.2.3
 
 ([Full Changelog](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/compare/v3.2.2...3f3853d9ba99eb2f3c2e9d6e045a708ebddc9353))
@@ -20,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyterlab-contrib/jupyterlab-variableInspector/graphs/contributors?from=2024-08-30&to=2024-09-03&type=c))
 
 [@dependabot](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Adependabot+updated%3A2024-08-30..2024-09-03&type=Issues) | [@github-actions](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3Agithub-actions+updated%3A2024-08-30..2024-09-03&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyterlab-contrib%2Fjupyterlab-variableInspector+involves%3AmartinRenou+updated%3A2024-08-30..2024-09-03&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.2.2
 
