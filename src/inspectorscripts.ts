@@ -43,7 +43,9 @@ __xr = None
 
 def _attempt_import(module):
     try:
-        return __import__(module)
+        # Only "import" if it was already imported
+        if module in sys.modules:
+            return __import__(module)
     except ImportError:
         return None
 
