@@ -77,7 +77,12 @@ def _jupyterlab_variableinspector_getsizeof(x):
     elif __torch and isinstance(x, __torch.Tensor):
         return x.element_size() * x.nelement()
     elif __pd and type(x).__name__ == 'DataFrame':
-        return x.memory_usage().sum()
+        # DO NOT CALL df.memory_usage() for big dataframes as this can be very costly
+        # to the point of making the kernel unresponsive or crashing it
+        if len(x.columns) < 10_000:
+            return x.memory_usage().sum()
+        else:
+            return "?"
     else:
         return sys.getsizeof(x)
 
@@ -136,8 +141,17 @@ def _jupyterlab_variableinspector_getcontentof(x):
                 content += f'"{key}": {x[key]}'
             content += ", ...}"
     elif __pd and isinstance(x, __pd.DataFrame):
-        colnames = ', '.join(x.columns.map(str))
-        content = "Columns: %s" % colnames
+        if len(x.columns) <= _jupyterlab_variableinspector_maxitems:
+            colnames = ', '.join(x.columns.map(str))
+            content = "Columns: %s" % colnames
+        else:
+            content = "Columns: "
+            for idx in range(_jupyterlab_variableinspector_maxitems):
+                if idx > 0:
+                    content += ", "
+                content += str(x.columns[idx])
+            content += ", ..."
+            return content
     elif __pd and isinstance(x, __pd.Series):
         content = str(x.values).replace(" ", ", ")[1:-1]
         content = content.replace("\\n", "")
