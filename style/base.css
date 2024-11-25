@@ -80,13 +80,13 @@
 
 .jp-VarInspector-deleteButton {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 1em;
 }
 
 .jp-VarInspector-inspectButton {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 1em;
 }
 

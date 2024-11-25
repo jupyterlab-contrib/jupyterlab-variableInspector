@@ -62,6 +62,9 @@ def _check_imported():
     __ipywidgets = _attempt_import('ipywidgets')
     __xr = _attempt_import('xarray')
 
+def _verify_import(module,name):
+    if module is None:
+        raise ImportError(f"{name} is required to inspect the variable. Please import it and try again.")
 
 def _jupyterlab_variableinspector_changesettings(maxitems, **kwargs):
     global _jupyterlab_variableinspector_maxitems
@@ -254,7 +257,8 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         if threshold is not None:
             x = x.head(threshold)
         return x.to_json(orient="table", default_handler=_jupyterlab_variableinspector_default, force_ascii=False)
-    elif __np and __pd and type(x).__name__ == "ndarray":
+    elif __np and type(x).__name__ == "ndarray":
+        _verify_import(__pd, "pandas")
         df = __pd.DataFrame(x)
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif __tf and (isinstance(x, __tf.Variable) or isinstance(x, __tf.Tensor)):
@@ -267,6 +271,7 @@ def _jupyterlab_variableinspector_getmatrixcontent(x, max_rows=10000):
         df = x.to_numpy()
         return _jupyterlab_variableinspector_getmatrixcontent(df)
     elif isinstance(x, list):
+        _verify_import(__pd, "pandas")
         s = __pd.Series(x)
         return _jupyterlab_variableinspector_getmatrixcontent(s)
 

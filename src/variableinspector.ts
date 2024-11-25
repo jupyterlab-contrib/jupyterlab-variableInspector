@@ -1,6 +1,10 @@
 import { OutputAreaModel, SimplifiedOutputArea } from '@jupyterlab/outputarea';
 
-import { closeIcon, searchIcon } from '@jupyterlab/ui-components';
+import {
+  closeIcon,
+  deleteIcon,
+  inspectorIcon
+} from '@jupyterlab/ui-components';
 
 import { DataGrid, DataModel } from '@lumino/datagrid';
 
@@ -37,6 +41,7 @@ provideJupyterDesignSystem().register(
 
 import wildcardMatch from 'wildcard-match';
 import { Message } from '@lumino/messaging';
+import { KernelMessage } from '@jupyterlab/services';
 
 const TITLE_CLASS = 'jp-VarInspector-title';
 const PANEL_CLASS = 'jp-VarInspector';
@@ -329,15 +334,16 @@ export class VariableInspectorPanel
       cell.title = 'Delete Variable';
       cell.className = 'jp-VarInspector-deleteButton';
       cell.gridColumn = '1';
-      const closeButton = document.createElement('jp-button') as Button;
-      closeButton.appearance = 'stealth';
-      const ico = closeIcon.element();
+      const deleteButton = document.createElement('jp-button') as Button;
+      deleteButton.appearance = 'stealth';
+      const ico = deleteIcon.element();
       ico.className = 'icon-button';
       ico.onclick = (ev: MouseEvent): any => {
+        this.source?.performDelete(name);
         this.removeRow(name);
       };
-      closeButton.append(ico);
-      cell.append(closeButton);
+      deleteButton.append(ico);
+      cell.append(deleteButton);
       row.appendChild(cell);
 
       // Add onclick event for inspection
@@ -345,19 +351,26 @@ export class VariableInspectorPanel
       if (item.isMatrix) {
         cell.title = 'View Contents';
         cell.className = 'jp-VarInspector-inspectButton';
-        const searchButton = document.createElement('jp-button') as Button;
-        searchButton.appearance = 'stealth';
-        const ico = searchIcon.element();
+        const inspectorButton = document.createElement('jp-button') as Button;
+        inspectorButton.appearance = 'stealth';
+        const ico = inspectorIcon.element();
         ico.className = 'icon-button';
         ico.onclick = (ev: MouseEvent): any => {
           this._source
             ?.performMatrixInspection(item.varName)
             .then((model: DataModel) => {
               this._showMatrix(model, item.varName, item.varType);
+            })
+            .catch((error: KernelMessage.IErrorMsg) => {
+              if (error.content.ename === 'ImportError') {
+                alert(error.content.evalue);
+              } else {
+                console.log(error);
+              }
             });
         };
-        searchButton.append(ico);
-        cell.append(searchButton);
+        inspectorButton.append(ico);
+        cell.append(inspectorButton);
       } else {
         cell.innerHTML = '';
       }
