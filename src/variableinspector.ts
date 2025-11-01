@@ -386,6 +386,9 @@ export class VariableInspectorPanel
       row.appendChild(cell);
 
       cell = document.createElement('jp-data-grid-cell') as DataGridCell;
+      cell.gridColumn = '7';
+      row.appendChild(cell);
+      this._table.appendChild(row);
       const rendermime = this._source?.rendermime;
       if (item.isWidget && rendermime) {
         const model = new OutputAreaModel({ trusted: true });
@@ -398,9 +401,6 @@ export class VariableInspectorPanel
           '</br>'
         );
       }
-      cell.gridColumn = '7';
-      row.appendChild(cell);
-      this._table.appendChild(row);
     }
   }
 

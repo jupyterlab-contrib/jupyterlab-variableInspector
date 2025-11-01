@@ -27,7 +27,11 @@ from IPython.core.magics.namespace import NamespaceMagics
 
 _jupyterlab_variableinspector_nms = NamespaceMagics()
 _jupyterlab_variableinspector_Jupyter = get_ipython()
-_jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
+# Check kernel implementation
+if hasattr(_jupyterlab_variableinspector_Jupyter.kernel, 'shell'):
+    _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter.kernel.shell
+else:
+    _jupyterlab_variableinspector_nms.shell = _jupyterlab_variableinspector_Jupyter
 
 _jupyterlab_variableinspector_maxitems = 10
 
