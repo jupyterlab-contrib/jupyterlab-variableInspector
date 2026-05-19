@@ -38,7 +38,7 @@
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache .stylelintcache",
         "eslint": "yarn eslint:check --fix",
-        "eslint:check": "eslint --cache .",
+        "eslint:check": "eslint --cache --ext .ts,.tsx .",
         "install:extension": "yarn build",
         "lint": "yarn stylelint && yarn prettier && yarn eslint",
         "lint:check": "yarn stylelint:check && yarn prettier:check && yarn eslint:check",
