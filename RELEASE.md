@@ -24,7 +24,7 @@ hatch version <new-version>
 Make sure to clean up all the development files before building the package:
 
 ```bash
-jlpm clean:all
+yarn clean:all
 ```
 
 You could also clean up the local git repository:

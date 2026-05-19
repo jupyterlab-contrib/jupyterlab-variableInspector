@@ -8,6 +8,7 @@ export default tseslint.config(
         ignores: [
             'node_modules/**',
             'dist/**',
+            'lckr_jupyterlab_variableinspector/labextension/**',
             'coverage/**',
             '**/*.d.ts',
             'tests/**',

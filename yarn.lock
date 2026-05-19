@@ -655,18 +655,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyter/web-components@npm:^0.17.1":
-  version: 0.17.1
-  resolution: "@jupyter/web-components@npm:0.17.1"
-  dependencies:
-    "@microsoft/fast-colors": "npm:^5.3.1"
-    "@microsoft/fast-element": "npm:^1.12.0"
-    "@microsoft/fast-foundation": "npm:^2.49.4"
-    "@microsoft/fast-web-utilities": "npm:^5.4.1"
-  checksum: 10c0/db2dad165a737eac04f37155ae360e58c14124f626d34998cabab5172dcb81c4b435a6af51b43cabe9ec211e6b7514c658533a1c1602014f9e9664c3240cfe8c
-  languageName: node
-  linkType: hard
-
 "@jupyter/ydoc@npm:^3.1.0":
   version: 3.4.1
   resolution: "@jupyter/ydoc@npm:3.4.1"
@@ -1361,7 +1349,7 @@ __metadata:
   resolution: "@lckr/jupyterlab_variableinspector@workspace:."
   dependencies:
     "@eslint/js": "npm:^10.0.1"
-    "@jupyter/web-components": "npm:^0.17.1"
+    "@jupyter/web-components": "npm:^0.16.6"
     "@jupyterlab/application": "npm:^4.5.6"
     "@jupyterlab/apputils": "npm:^4.6.6"
     "@jupyterlab/builder": "npm:^4.5.6"
