@@ -53,12 +53,10 @@ ensured-targets = [
 skip-if-exists = ["lckr_jupyterlab_variableinspector/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-build_cmd = "build:prod"
-npm = ["yarn"]
+npm = ["jlpm"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_cmd = "install:extension"
-npm = ["yarn"]
+npm = ["jlpm"]
 source_dir = "src"
 build_dir = "lckr_jupyterlab_variableinspector/labextension"
 
@@ -68,10 +66,10 @@ version_cmd = "hatch version"
 [tool.jupyter-releaser.hooks]
 before-build-npm = [
     "python -m pip install 'jupyterlab>=4.5.0,<5'",
-    "yarn install",
-    "yarn build:prod"
+    "jlpm install",
+    "jlpm build:prod"
 ]
-before-build-python = ["yarn clean:all"]
+before-build-python = ["jlpm clean:all"]
 
 [tool.check-wheel-contents]
 ignore = ["W002"]

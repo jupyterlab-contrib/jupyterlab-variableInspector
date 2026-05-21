@@ -5,11 +5,11 @@
   "private": true,
   "scripts": {
     "start": "jupyter lab --config jupyter_server_test_config.py",
-    "test": "yarn playwright test",
-    "test:update": "yarn playwright test --update-snapshots"
+    "test": "jlpm playwright test",
+    "test:update": "jlpm playwright test --update-snapshots"
   },
   "devDependencies": {
-    "@jupyterlab/galata": "^5.0.5",
-    "@playwright/test": "^1.37.0"
+    "@jupyterlab/galata": "^5.5.7",
+    "@playwright/test": "^1.60.0"
   }
 }

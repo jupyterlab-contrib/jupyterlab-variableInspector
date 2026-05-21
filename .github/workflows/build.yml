@@ -23,8 +23,8 @@ jobs:
       - name: Lint the extension
         run: |
           set -eux
-          yarn install --immutable
-          yarn run lint:check
+          jlpm install --immutable
+          jlpm run lint:check
 
       - name: Build the extension
         run: |
@@ -105,9 +105,8 @@ jobs:
       - name: Install dependencies
         working-directory: ui-tests
         env:
-          YARN_ENABLE_IMMUTABLE_INSTALLS: 0
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-        run: yarn install
+        run: jlpm install
 
       - name: Set up browser cache
         uses: actions/cache@v3
@@ -117,13 +116,13 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('ui-tests/yarn.lock') }}
 
       - name: Install browser
-        run: yarn playwright install chromium
+        run: jlpm playwright install chromium
         working-directory: ui-tests
 
       - name: Execute integration tests
         working-directory: ui-tests
         run: |
-          yarn playwright test
+          jlpm playwright test
 
       - name: Upload Playwright Test report
         if: always()
