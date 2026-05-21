@@ -127,3 +127,4 @@ venv
 
 # Yarn cache
 .yarn/
+.github/skills/code-review-and-quality/SKILL.md

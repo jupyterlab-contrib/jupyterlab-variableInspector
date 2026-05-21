@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.3.2"]
+requires = ["hatchling>=1.29.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0.4.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -44,7 +44,7 @@ exclude = [".github", "binder"]
 path = "lckr_jupyterlab_variableinspector/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
-dependencies = ["hatch-jupyter-builder>=0.5"]
+dependencies = ["hatch-jupyter-builder>=0.9.1"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
     "lckr_jupyterlab_variableinspector/labextension/static/style.js",
@@ -53,11 +53,9 @@ ensured-targets = [
 skip-if-exists = ["lckr_jupyterlab_variableinspector/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-build_cmd = "build:prod"
 npm = ["jlpm"]
 
 [tool.hatch.build.hooks.jupyter-builder.editable-build-kwargs]
-build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
 build_dir = "lckr_jupyterlab_variableinspector/labextension"
@@ -67,8 +65,8 @@ version_cmd = "hatch version"
 
 [tool.jupyter-releaser.hooks]
 before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
-    "jlpm",
+    "python -m pip install 'jupyterlab>=4.5.0,<5'",
+    "jlpm install",
     "jlpm build:prod"
 ]
 before-build-python = ["jlpm clean:all"]

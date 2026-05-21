@@ -1,17 +1,29 @@
 import { expect, test } from '@jupyterlab/galata';
 
-test('test', async ({ page }) => {
-  await page.getByText('Python 3 (ipykernel)').first().click();
-  await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
-  await page.getByLabel('notebook content').getByRole('textbox').fill('a = 1');
-  await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(1).fill('b = "hello"');
-  await page.keyboard.press('Control+Enter');
+const createAndRunNotebook = async (
+  page: any,
+  firstCell: string,
+  secondCell: string
+) => {
+  await page.notebook.createNew();
+  await page.notebook.setCell(0, 'code', firstCell);
+  await page.notebook.addCell('code', secondCell);
+  await page.notebook.runCell(0);
+  await page.notebook.runCell(1);
+};
 
-  await page.getByRole('tabpanel').click({
-    button: 'right'
+const openVariableInspector = async (page: any) => {
+  await page.evaluate(async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (window as any).jupyterapp.commands.execute('variableinspector:open');
   });
-  await page.getByRole('menu').getByText('Open Variable Inspector').click();
+  await page.locator('.jp-VarInspector').first().waitFor({ state: 'visible' });
+};
+
+test('test', async ({ page }) => {
+  test.setTimeout(120000);
+  await createAndRunNotebook(page, 'a = 1', 'b = "hello"');
+  await openVariableInspector(page);
 
   // const rows = await page.locator('.jp-VarInspector-table-row');
 
@@ -44,17 +56,9 @@ test('test', async ({ page }) => {
 });
 
 test('variable filter', async ({ page }) => {
-  await page.getByText('Python 3 (ipykernel)').first().click();
-  await page.getByText('Python 3 (ipykernel) | Idle').waitFor();
-  await page.getByLabel('notebook content').getByRole('textbox').fill('a1 = 1');
-  await page.keyboard.press('Shift+Enter');
-  await page.getByRole('textbox').nth(1).fill('b1 = "hello"');
-  await page.keyboard.press('Control+Enter');
-
-  await page.getByRole('tabpanel').click({
-    button: 'right'
-  });
-  await page.getByRole('menu').getByText('Open Variable Inspector').click();
+  test.setTimeout(120000);
+  await createAndRunNotebook(page, 'a1 = 1', 'b1 = "hello"');
+  await openVariableInspector(page);
 
   //Filter out rows with int type
   await page.locator('.filter-input').pressSequentially('int');

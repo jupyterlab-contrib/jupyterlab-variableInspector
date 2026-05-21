@@ -24,7 +24,7 @@ hatch version <new-version>
 Make sure to clean up all the development files before building the package:
 
 ```bash
-jlpm clean:all
+yarn clean:all
 ```
 
 You could also clean up the local git repository:
@@ -82,7 +82,6 @@ Here is a summary of the steps to cut a new release:
 - If the repo generates PyPI release(s), create a scoped PyPI [token](https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#saving-credentials-on-github). We recommend using a scoped token for security reasons.
 
 - You can store the token as `PYPI_TOKEN` in your fork's `Secrets`.
-
   - Advanced usage: if you are releasing multiple repos, you can create a secret named `PYPI_TOKEN_MAP` instead of `PYPI_TOKEN` that is formatted as follows:
 
     ```text

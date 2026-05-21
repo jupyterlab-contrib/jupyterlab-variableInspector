@@ -27,7 +27,7 @@ jobs:
       - name: Install extension
         run: |
           set -eux
-          jlpm
+          jlpm install --immutable
           python -m pip install .
 
       - uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@v1
